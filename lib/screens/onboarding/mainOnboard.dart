@@ -76,7 +76,9 @@ class _MainOnboardState extends State<MainOnboard>{
               ///// The next function goes in here to animate  the page view
               nextSlide();
             },
-            child: Container(
+            child: AnimatedContainer(
+                      duration: Duration(milliseconds: 3000),
+                      curve: Curves.easeInOut,
               width: MediaQuery.of(context).size.width*0.85,
               height: 50,
               decoration: BoxDecoration(
@@ -106,7 +108,9 @@ class _MainOnboardState extends State<MainOnboard>{
                       builder: (context)=> SelectTier()
                     ));
             },
-            child: Container(
+            child: AnimatedContainer(
+                      duration: Duration(milliseconds: 3000),
+                      curve: Curves.easeInOut,
               width: MediaQuery.of(context).size.width*0.4,
               height: 50,
               decoration: BoxDecoration(

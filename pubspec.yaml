@@ -35,17 +35,19 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  country_calling_code_picker: ^2.0.1
   flutter_native_splash: ^2.1.6
   get: ^4.6.1
   get_storage: ^2.0.3
   carousel_slider: ^4.1.1
   smooth_page_indicator: ^1.0.0+2
   fluttertoast: ^8.0.9
+  pin_code_text_field: ^1.8.0
 
 
 flutter_native_splash:
   color: "#286FFF"
-  image: assets/daraLogo.png
+  image: "assets/daraSplashLogo.gif"
 
 dev_dependencies:
   flutter_test:
@@ -60,7 +62,7 @@ dev_dependencies:
 
   flutter_launcher_icons: ^0.9.2  #flutter pub run flutter_launcher_icons:main
 flutter_icons:
-  image_path: "assets/Onboarding.png"
+  image_path: "assets/daraLogo.png"
   android: "launcher_icon"
   ios: true
 
