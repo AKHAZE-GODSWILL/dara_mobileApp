@@ -1,4 +1,6 @@
 import 'package:dara_app/main.dart';
+import 'package:dara_app/screens/authentication/addFingerPrint.dart';
+import 'package:dara_app/screens/authentication/addressInfo.dart';
 import 'package:dara_app/screens/authentication/registration.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -350,10 +352,11 @@ class _Personal_Info extends State<Personal_Info>{
                               && lastNameController.text.isNotEmpty
                               && emailAddressController.text.isNotEmpty 
                               && passwordController.text.isNotEmpty){
-                              ///// Navigation.push to the OTP screen
-                              // Navigator.of(context).push(
-                              //   MaterialPageRoute(builder: (context) => OtpVerification())
-                              // );
+                              /// Navigation.push to the OTP screen
+                              Navigator.of(context).push(
+                                // MaterialPageRoute(builder: (context) => Authenticate())
+                                MaterialPageRoute(builder: (context) => AddFingerPrint())
+                              );
                             }
               
                             //will save this parameter to state management later

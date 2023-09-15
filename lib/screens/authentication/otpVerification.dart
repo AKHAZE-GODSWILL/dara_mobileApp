@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:dara_app/main.dart';
+import 'package:dara_app/screens/authentication/addFingerPrint.dart';
 import 'package:dara_app/screens/authentication/personal_info.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -185,7 +187,7 @@ class _OtpVerificationState extends State<OtpVerification> {
                   if(isMaxPin){
                     ///// Navigation.push to the OTP screen
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) =>Personal_Info())
+                      MaterialPageRoute(builder: (context) => Personal_Info())
                     );
                   }
 
