@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "963804041881",
+    "project_id": "dara-a9084",
+    "storage_bucket": "dara-a9084.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:963804041881:android:c56130380d275dbe969e08",
+        "android_client_info": {
+          "package_name": "com.example.dara_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClcTqw1mXO7YO9-9mFoEhEqoP5u0YGqLA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
