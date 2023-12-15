@@ -1,4 +1,5 @@
 // import 'package:fixme/Services/network_service.dart';
+import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 // import 'package:goldenpay/Firebase/Utils/utils.dart';
@@ -23,7 +24,7 @@ class FirebaseApi {
   static Future uploadmessage(
       String idUser, String idArtisan, String message, context, chatId, fullname,
       {productImage}) async {
-    var utils = Provider.of<Utils>(context, listen: false);
+    var utils = Provider.of<DataProvider>(context, listen: false);
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // String? fullname = prefs.getString('fullname');
     // String? phone = prefs.getString('phonenumber');
@@ -68,7 +69,7 @@ class FirebaseApi {
 
   static Future uploadImage(
       String idUser, idArtisan, message, context, chatId, file, fullname) async {
-    var utils = Provider.of<Utils>(context, listen: false);
+    var utils = Provider.of<DataProvider>(context, listen: false);
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // String? fullname = prefs.getString('fullname');
     // String? phone = prefs.getString('phonenumber');
@@ -119,7 +120,7 @@ class FirebaseApi {
 
   static Future uploadRecord(
       String idUser, idArtisan, message, context, chatId, fullname) async {
-    var utils = Provider.of<Utils>(context, listen: false);
+    var utils = Provider.of<DataProvider>(context, listen: false);
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // String? fullname = prefs.getString('fullname');
     // String? phone = prefs.getString('phonenumber');

@@ -1,8 +1,14 @@
 
+import 'package:dara_app/Firebase/Model/User.dart';
 import 'package:dara_app/main.dart';
-import 'package:dara_app/screens/homepage/drawerRoutes/chat/chatPage.dart';
+// import 'package:dara_app/screens/homepage/drawerRoutes/chat/chatPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
+
+import '../../../Firebase/Firebase_service.dart';
+import '../../../Provider/DataProvider.dart';
+import '../../chat/Chat.dart';
 
 class ChatHistory extends StatefulWidget {
   const ChatHistory({Key? key}) : super(key: key);
@@ -185,10 +191,50 @@ super.initState();
     return InkWell(
 
               onTap: (){
+                var provider = Provider.of<DataProvider>(context, listen: false);
+                FirebaseApi.updateUsertoRead(
+                    idUser: provider.userType == "serviceProvider"?"285":"208",
+                    idArtisan: provider.userType == "serviceProvider"?"208":"285");
+
+                // if (users[index].fcmToken.toString() !=
+                //     data.fcmToken) {
+                //   FirebaseApi.updateUserFCMToken(
+                //     idUser: users[index].idUser,
+                //     idArtisan: userId,
+                //     token: data.fcmToken,
+                //   );
+                // }
+
+                User user = User(
+                    name: 'Daniel Smith',
+                    lastMessage: '',
+                    urlAvatar: '',
+                  idUser: provider.userType == "serviceProvider"?"285":"208",
+                  id: provider.userType == "serviceProvider"?"285":"208",
+                  // idArtisan: provider.userType == "serviceProvider"?"208":"285",
+                    userMobile: "+234900000000",
+                    lastMessageTime: DateTime.now(),
+
+                );
+
+
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) {
+                    return ChatPage(
+                        support: true,
+                        newchat: true,
+
+                        // shipments: shipment,
+                        // pickup: shipment.pickup,
+                        // dropoff:shipment.dropoff,
+                        productSend: true,
+                        user: user);
+                  },
+                ));
                     // print(user.isOnline);
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => ChatPage()
-                    ));
+                    // Navigator.push(context, MaterialPageRoute(
+                    //   builder: (context) => ChatPage()
+                    // ));
               },
 
               child: ListTile(

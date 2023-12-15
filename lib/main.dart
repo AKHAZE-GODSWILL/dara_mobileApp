@@ -1,4 +1,5 @@
-
+import 'package:dara_app/Firebase/Utils/Provider.dart';
+import 'package:dara_app/Firebase/Utils/utils.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dara_app/screens/authentication/login.dart';
 import 'package:dara_app/screens/onboarding/splash.dart';
@@ -16,47 +17,42 @@ import 'package:provider/provider.dart';
 
 final getX = GetStorage();
 Constants constants = Constants();
- Mywidget mywidgets = Mywidget();
+Mywidget mywidgets = Mywidget();
 
-Future <void> main() async{
-
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await GetStorage.init();
-  runApp( MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  
   MyApp();
 
   @override
   Widget build(BuildContext context) {
-    
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            
-
-            create: (context) => DataProvider(),
-          ),
+          create: (context) => DataProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => Utils(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => DataProviders(),
+        ),
       ],
       child: MaterialApp(
-      
-      debugShowCheckedModeBanner: false,
-      title: 'Dara',
-      
-
-      theme: ThemeData(
-        
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity
-      ),
+          debugShowCheckedModeBanner: false,
+          title: 'Dara',
+          theme: ThemeData(
+              primarySwatch: Colors.blue,
+              visualDensity: VisualDensity.adaptivePlatformDensity),
 
 //getX.read(constants.GETX_IS_LOGGED_IN) == "true" ? BottomNavBar() : MyOnboarding()
-      home:  Splash()
-    ),);
+          home: Splash()),
+    );
   }
 }
-

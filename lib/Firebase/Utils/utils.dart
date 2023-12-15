@@ -15,13 +15,14 @@ class Utils with ChangeNotifier {
   String fcmToken = '';
   bool isExpanded1 = true;
   bool isLoading = false;
-  String userId = "";
+  // String userId = "";
 
   Utils() {
     firstCall() async {
       GetStorage prefs = await GetStorage();
-      String? userID = prefs.read('userId');
-      userId = userID.toString();
+      // String? userID = (provider.userType == "serviceProvider")?"285":"208";
+      // prefs.read('userId');
+      // userId = userID.toString();
       notifyListeners();
     }
 
@@ -34,7 +35,7 @@ class Utils with ChangeNotifier {
   }
 
   changeUserId(String data) {
-    userId = data;
+    // userId = data;
     notifyListeners();
   }
   // static StreamTransformer transformer<T>(

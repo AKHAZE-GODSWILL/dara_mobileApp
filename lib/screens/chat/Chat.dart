@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dara_app/utils/constants.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,6 +26,8 @@ import '../../Firebase/Utils/Provider.dart';
 import '../../Firebase/Utils/colors.dart';
 import '../../Firebase/Utils/utils.dart';
 import '../../Firebase/Widgets/messages_widget.dart';
+import '../../Provider/DataProvider.dart';
+import '../homepage/drawerRoutes/callsScreen.dart';
 
 
 class ChatPage extends StatefulWidget {
@@ -76,7 +79,7 @@ class _ChatPageState extends State<ChatPage> {
   String message = '';
 
   sendMessageTriggerFirst() async {
-    var utils = Provider.of<Utils>(context, listen: false);
+    var utils = Provider.of<DataProvider>(context, listen: false);
     message = widget.newchat == true &&
             widget.support ==
                 false // if it is a new chatfrom giftcard and not support chat
@@ -129,7 +132,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     var data = Provider.of<Utils>(context, listen: false);
     var datas = Provider.of<DataProviders>(context, listen: false);
-    var utils = Provider.of<Utils>(context, listen: false);
+    var utils = Provider.of<DataProvider>(context, listen: false);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
     void pickImage({required ImageSource source, context}) async {
@@ -265,7 +268,7 @@ class _ChatPageState extends State<ChatPage> {
                                                 height: 40,
                                                 decoration: BoxDecoration(
                                                     color:
-                                                        messagesendercontainercolor,
+                                                    Constants().appMainColor,
                                                     shape: BoxShape.circle),
                                                 child: Icon(
                                                   Icons.attachment,
@@ -285,7 +288,7 @@ class _ChatPageState extends State<ChatPage> {
                                                 height: 40,
                                                 decoration: BoxDecoration(
                                                     color:
-                                                        messagesendercontainercolor,
+                                                    Constants().appMainColor,
                                                     shape: BoxShape.circle),
                                                 child: Icon(Icons.camera_alt,
                                                     color: Colors.white)),
@@ -303,7 +306,7 @@ class _ChatPageState extends State<ChatPage> {
                                                 height: 40,
                                                 decoration: BoxDecoration(
                                                     color:
-                                                        messagesendercontainercolor,
+                                                    Constants().appMainColor,
                                                     shape: BoxShape.circle),
                                                 child: Center(
                                                   child: Icon(Icons.image,
@@ -341,7 +344,7 @@ class _ChatPageState extends State<ChatPage> {
                       width: 30,
                       height: 30,
                       decoration: BoxDecoration(
-                          color: messagesendercontainercolor,
+                          color: Constants().appMainColor,
                           shape: BoxShape.circle),
                       child: Icon(
                         Icons.clear,
@@ -474,7 +477,7 @@ class _ChatPageState extends State<ChatPage> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 0.0),
                   child: Container(
-                    color: messagesendercontainercolor,
+                    color: Constants().appMainColor,
                     height: 115,
                     width: MediaQuery.of(context).size.width,
                     child: Column(
@@ -524,7 +527,7 @@ class _ChatPageState extends State<ChatPage> {
                                 backgroundImage: widget.user.urlAvatar ==
                                     ""
                                     ? AssetImage(
-                                    "image/user.png")
+                                    "assets/profile.png")
                                     : NetworkImage(widget.user.urlAvatar)
                                 as ImageProvider,
                               ),
@@ -569,14 +572,28 @@ class _ChatPageState extends State<ChatPage> {
                                 children: [
                                   InkWell(
                                     onTap:(){
-                                      Future<void> _launchUrl(_url) async {
-                                        if (!await launchUrl(_url)) {
-                                          throw 'Could not launch $_url';
-                                        }
-                                      }
-                                      final Uri _url = Uri.parse('tel:+2340${widget.user.userMobile}');
-
-                                      _launchUrl(_url);
+                                      // Future<void> _launchUrl(_url) async {
+                                      //   if (!await launchUrl(_url)) {
+                                      //     throw 'Could not launch $_url';
+                                      //   }
+                                      // }
+                                      // final Uri _url = Uri.parse('tel:+2340${widget.user.userMobile}');
+                                      //
+                                      // _launchUrl(_url);
+                                      Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation, secondaryAnimation) {
+                                              return CallsScreen();
+                                            },
+                                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                              return FadeTransition(
+                                                opacity: animation,
+                                                child: child,
+                                              );
+                                            },
+                                          )
+                                      );
 
                                       
 
@@ -708,10 +725,7 @@ class _ChatPageState extends State<ChatPage> {
                                         }
                                         _modalBottomSheetMenu(datas);
                                       },
-                                      child: Image.asset(
-                                        "image/lik.png",
-                                        scale: 0.8,
-                                      ),
+                                      child: Icon(Icons.photo_outlined,),
                                     ),
                                   ),
                                 ],
@@ -720,7 +734,7 @@ class _ChatPageState extends State<ChatPage> {
                               Container(
                                 margin: EdgeInsets.only(left: 9),
                                 decoration: BoxDecoration(
-                                    color: messagesendercontainercolor,
+                                    color: Constants().appMainColor,
                                     borderRadius: BorderRadius.circular(10)),
                                 height: 58,
                                 width: 58,

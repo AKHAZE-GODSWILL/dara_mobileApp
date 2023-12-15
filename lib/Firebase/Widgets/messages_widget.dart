@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Firebase_service.dart';
@@ -24,7 +25,7 @@ class _MessagesWidgetState extends State<MessagesWidget> {
   var chats;
   @override
   void initState() {
-    var utils = Provider.of<Utils>(context, listen: false);
+    var utils = Provider.of<DataProvider>(context, listen: false);
     super.initState();
     chats = FirebaseApi.getMessages(
         widget.idUser,
@@ -36,7 +37,7 @@ class _MessagesWidgetState extends State<MessagesWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var utils = Provider.of<Utils>(context, listen: false);
+    var utils = Provider.of<DataProvider>(context, listen: false);
     return Container(
       child: StreamBuilder(
         stream: chats,

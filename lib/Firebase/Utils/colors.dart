@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
+import '../../utils/constants.dart';
+
 Color messagesendertextcolor = Colors.white;
-Color messagesendercontainercolor = Color(0XFF236484);
+Color messagesendercontainercolor = Constants().appMainColor;
 
 
-Color messagereceivertextcolor = Color(0xFF1F2937);
+Color messagereceivertextcolor = Constants().appMainColor;
 Color messagereceivercontainercolor = Color.fromRGBO(244, 246, 255, 1);
