@@ -466,7 +466,7 @@ class _Login extends State<Login>{
                           loginServiceProvider(phoneNumber: (dropDownLoginField == "Phone")? "${countryCallingCode}${phone}": emailController.text.trim(), password: passwordController.text.trim()).then((value) {
 
                             print("The final Value of what was resulted from the request was :$value");
-
+                            // mywidgets.displayToast(msg: "$value");
                             if(value["status"]== true && value["message"]== "login successful"){
                                   mywidgets.displayToast(msg: "Login is successful");
                                   
@@ -485,7 +485,7 @@ class _Login extends State<Login>{
                                   getX.write(constants.GETX_LOGGED_IN,true);
                                   Navigator.pushAndRemoveUntil(
                                     context,
-                                    MaterialPageRoute(builder: (BuildContext context) => Bottombar()),
+                                    MaterialPageRoute(builder: (BuildContext context) => Bottombar(userType: provider.userType,user_id: (provider.userType == "serviceProvider")? provider.sp_user_id:provider.client_user_id)),
                                     (route) => false,
                                   );
                                 }
@@ -550,7 +550,7 @@ class _Login extends State<Login>{
                                 getX.write(constants.GETX_LOGGED_IN,true);
                                 Navigator.pushAndRemoveUntil(
                                   context,
-                                  MaterialPageRoute(builder: (BuildContext context) => Bottombar()),
+                                  MaterialPageRoute(builder: (BuildContext context) => Bottombar(userType: provider.userType,user_id: (provider.userType == "serviceProvider")? provider.sp_user_id:provider.client_user_id)),
                                   (route) => false,
                                 );
                               }
@@ -714,7 +714,8 @@ class _Login extends State<Login>{
                                   getX.write(constants.GETX_LOGGED_IN,true);
                                   Navigator.pushAndRemoveUntil(
                                     context,
-                                    MaterialPageRoute(builder: (BuildContext context) => Bottombar()),
+                                    MaterialPageRoute(builder: (BuildContext context) => Bottombar(userType: provider.userType,user_id: (provider.userType == "serviceProvider")? provider.sp_user_id:provider.client_user_id)
+                                    ),
                                     (route) => false,
                                   );
                                 }
@@ -779,7 +780,7 @@ class _Login extends State<Login>{
                                 getX.write(constants.GETX_LOGGED_IN,true);
                                 Navigator.pushAndRemoveUntil(
                                   context,
-                                  MaterialPageRoute(builder: (BuildContext context) => Bottombar()),
+                                  MaterialPageRoute(builder: (BuildContext context) => Bottombar(userType: provider.userType,user_id: (provider.userType == "serviceProvider")? provider.sp_user_id:provider.client_user_id)),
                                   (route) => false,
                                 );
                               }

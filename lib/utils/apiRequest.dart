@@ -636,3 +636,30 @@ Future<dynamic> reloadUserObject() async {
 }
 
 
+Future<dynamic> getAgoraChannelToken({required channelName, required role}) async {
+
+      print(">>>>>>>>>>>>>>>>In the getAgoraChannelToken Place...... Before making the http request to get token");
+
+      http.Client client = http.Client();
+      http.Response response = await client.post(
+        
+      Uri.https("gradeeasebackend.onrender.com", "/agora/generateAccessToken"),
+      body: json.encode({
+      "channel": channelName,
+      "role": role,//subscriber, publisher
+      }),
+
+      
+      headers: {
+      "Content-Type": "application/json"
+      },
+      );
+
+      print(">>>>>>>>>>>>>>>>Successfully made the Http request");
+      dynamic decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+
+      print(decodedResponse);
+      return decodedResponse;
+    }
+
+

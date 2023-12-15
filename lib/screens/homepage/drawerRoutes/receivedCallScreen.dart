@@ -16,23 +16,29 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../main.dart';
 
-class CallsScreen extends StatefulWidget {
-  const CallsScreen({Key? key}) : super(key: key);
-
+class ReceivedCallsScreen extends StatefulWidget {
+  const ReceivedCallsScreen({Key? key, 
+    required this.call_token, 
+    required this.channel_name, 
+    required this.caller_img, 
+    required this.caller_name}) : super(key: key);
+    
+    final call_token;
+    final channel_name;
+    final caller_img;
+    final caller_name;
   @override
-  State<CallsScreen> createState() => _CallsScreenState();
+  State<ReceivedCallsScreen> createState() => _ReceivedCallsScreenState();
 }
 
-class _CallsScreenState extends State<CallsScreen> {
+class _ReceivedCallsScreenState extends State<ReceivedCallsScreen> {
   
   
   late RtcEngine _engine;
   String appId = "d988f4a94f5a428284809ba1361df8ed";
-  String token = "";
   String device_token = "";
   String call_in_progress = "";
   String is_calling = "";
-  String channel = "";
   bool callTimerInit = false;
   int? _remoteUid;
   bool _localUserJoined = false;
@@ -105,11 +111,10 @@ class _CallsScreenState extends State<CallsScreen> {
     });
   }
 
-  Future<void> initAgora() async {
-    
+  Future<void> acceptCall() async {
     var provider = Provider.of<DataProvider>(context, listen: false); 
     var documentReference  = FirebaseFirestore.instance.collection((provider.userType == "serviceProvider")? "clients":"serviceProviders")
-      .doc((provider.userType == "serviceProvider")?"208":"211");
+      .doc((provider.userType == "serviceProvider")?"${provider.sp_user_id}":"${provider.client_user_id}");
     // retrieve permissions
     await Permission.microphone.request();
 
@@ -161,8 +166,8 @@ class _CallsScreenState extends State<CallsScreen> {
     );
 
     await _engine.joinChannel(
-      token,
-       channel,
+      widget.call_token,
+       widget.channel_name,
       '',
       0,
     );
@@ -181,24 +186,6 @@ class _CallsScreenState extends State<CallsScreen> {
     "caller_img": ""
   };
 
-  void getDriverTokenAndCallStatus()async{
-    var provider = Provider.of<DataProvider>(context, listen: false); 
-    var documentReference  = FirebaseFirestore.instance.collection((provider.userType == "serviceProvider")? "clients":"serviceProviders")
-      .doc((provider.userType == "serviceProvider")?"208":"211");
-    
-    var documentSnapshot = await documentReference.get();
-
-    if(documentSnapshot.exists){
-
-        call_in_progress = documentSnapshot["call_in_progress"];
-        is_calling = documentSnapshot["is_calling"];
-    }
-    else{
-      print("No document like this available");
-    }
-    
-  }
-
 
   void startAnimation() {
     timer = Timer.periodic(Duration(milliseconds: 1000), (Timer t) {
@@ -211,35 +198,8 @@ class _CallsScreenState extends State<CallsScreen> {
 
   @override
   void initState() {
-    channel = Uuid().v4();
     startAnimation();
-    getDriverTokenAndCallStatus();
-
-    getAgoraChannelToken (channelName: channel, role:"publisher").then((value) { 
-      if (value['status'].toString().toLowerCase() == '200') {
-
-        print(">>>>>>>>>>>>>>>>>> I got the token successfully");
-        print(value['token']);
-         token = value['token'];
-        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>> the call token is ${token}');
-          var provider = Provider.of<DataProvider>(context, listen: false); 
-
-        FirebaseFirestore.instance.collection((provider.userType == "serviceProvider")? "clients":"serviceProviders")
-      .doc((provider.userType == "serviceProvider")?"285":"208").update({
-              "is_calling": true,
-              "channel_name": channel,
-              "call_token": token,
-              "caller_name": provider.userType == "serviceProvider"? "${provider.sp_first_name} ${provider.sp_last_name}":provider.client_first_name,
-              "caller_img": provider.userType == "serviceProvider"? provider.sp_profile_image:provider.client_profile_image,
-            }).then((value) {
-              print('before agora function');
-              initAgora();
-            });
-          }
-        }).catchError((E){
-          print("error occured");
-        });
-
+    acceptCall();
         ////////////////////// weeeeeeeeeeeeeee
     
     super.initState();

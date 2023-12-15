@@ -4,6 +4,7 @@ import 'package:dara_app/screens/authentication/login.dart';
 import 'package:dara_app/screens/onboarding/splash.dart';
 import 'package:dara_app/utils/constants.dart';
 import 'package:dara_app/utils/myWidget.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
@@ -20,6 +21,7 @@ Constants constants = Constants();
 Future <void> main() async{
 
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   await GetStorage.init();
   runApp( MyApp());
 }

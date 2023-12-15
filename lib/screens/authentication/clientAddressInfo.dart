@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dara_app/main.dart';
 import 'package:dara_app/screens/homepage/home.dart';
@@ -581,11 +582,24 @@ class _ClientAddressInfo extends State<ClientAddressInfo>{
                             print("The final Value of what was resulted from the request was :$value");
 
                             if(value["status"]== true){
+                              mywidgets.displayToast(msg: "Before updating firestore, id is ${provider.client_user_id}, first name is ${provider.client_first_name} last name is ${provider.client_last_name}");
+                              FirebaseFirestore.instance.collection("clients").doc("${provider.client_user_id}").set({
+                                "id":provider.client_user_id,
+                                "first_name":provider.client_first_name,
+                                "last_name":provider.client_last_name,
+                                "call_in_progress":false,
+                                "is_calling": false,
+                                "caller_name": "",
+                                "caller_img":"",
+                                "channel_name":"",
+                                "call_token":""
+                              });
+                              mywidgets.displayToast(msg: "after the Firestore update");
                               getX.write(constants.GETX_LOGGED_IN,true);
                               /// Navigation.push to the OTP screen
                               Navigator.pushAndRemoveUntil(
                                 context,
-                                MaterialPageRoute(builder: (BuildContext context) => Bottombar()),
+                                MaterialPageRoute(builder: (BuildContext context) => Bottombar(userType: provider.userType,user_id: (provider.userType == "serviceProvider")? provider.sp_user_id:provider.client_user_id)),
                                 (route) => false,
                               );
                             }
