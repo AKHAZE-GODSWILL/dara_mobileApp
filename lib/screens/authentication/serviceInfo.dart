@@ -574,10 +574,11 @@ class _Service_Info extends State<Service_Info>{
                             mywidgets.displayToast(msg: "End point worked and this is the error");
                             if(value["status"]== true){
                               mywidgets.displayToast(msg: "Got to the place before fire store");
-                              FirebaseFirestore.instance.collection("serviceProviders").doc("${provider.sp_user_id}").set({
+                              FirebaseFirestore.instance.collection("users").doc("${provider.sp_user_id}").set({
                                 "id":provider.sp_user_id,
                                 "first_name":provider.sp_first_name,
                                 "last_name":provider.sp_last_name,
+                                "user_type":"serviceProvider",
                                 "call_in_progress":false,
                                 "is_calling": false,
                                 "caller_name": "",

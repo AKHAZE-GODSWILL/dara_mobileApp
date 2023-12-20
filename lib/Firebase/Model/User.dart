@@ -19,6 +19,7 @@ class User {
   final DateTime? lastMessageTime;
   final String lastMessage;
   final String? userMobile;
+  final String? fcmToken;
 
   const User({
     this.idUser,
@@ -28,6 +29,7 @@ class User {
     this.docid,
     this.id,
     this.status,
+    this.fcmToken,
     required this.name,
     required this.lastMessage,
     required this.urlAvatar,
@@ -43,6 +45,7 @@ class User {
         status = json['[status'],
         userMobile = json['userMobile'],
         docid = id ?? '',
+        fcmToken =json["fcmToken"] ,
         lastMessage = json['lastMessage'],
         urlAvatar = json['urlAvatar'],
         lastMessageTime = Utils.toDateTime(json['lastMessageTime']);
@@ -56,6 +59,7 @@ class User {
     String? userMobile,
     String? id,
     String? name,
+    String? fcmToken,
     bool? block,
     bool? read,
     bool? status,
@@ -75,6 +79,7 @@ class User {
         lastMessage: lastMessage ?? this.lastMessage,
         urlAvatar: urlAvatar ?? this.urlAvatar,
         lastMessageTime: lastMessageTime ?? this.lastMessageTime,
+        fcmToken: fcmToken?? this.fcmToken
       );
 
   static User fromJson([Map<String, dynamic>? json, id]) => User(
@@ -88,6 +93,7 @@ class User {
         docid: id ?? '',
         lastMessage: json['lastMessage'],
         urlAvatar: json['urlAvatar'],
+        fcmToken: json["fcmToken"],
         lastMessageTime: Utils.toDateTime(json['lastMessageTime']),
       );
 
@@ -103,5 +109,6 @@ class User {
         'lastMessage': lastMessage,
         'urlAvatar': urlAvatar,
         'lastMessageTime': Utils.fromDateTimeToJson(lastMessageTime!),
+        'fcmToken':fcmToken
       };
 }

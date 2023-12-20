@@ -17,8 +17,9 @@ import 'package:uuid/uuid.dart';
 import '../../../../main.dart';
 
 class CallsScreen extends StatefulWidget {
-  const CallsScreen({Key? key}) : super(key: key);
+  const CallsScreen({Key? key, required this.target_id}) : super(key: key);
 
+  final target_id;
   @override
   State<CallsScreen> createState() => _CallsScreenState();
 }
@@ -108,8 +109,8 @@ class _CallsScreenState extends State<CallsScreen> {
   Future<void> initAgora() async {
     
     var provider = Provider.of<DataProvider>(context, listen: false); 
-    var documentReference  = FirebaseFirestore.instance.collection((provider.userType == "serviceProvider")? "clients":"serviceProviders")
-      .doc((provider.userType == "serviceProvider")?"208":"211");
+    var documentReference  = FirebaseFirestore.instance.collection("users")
+      .doc("${widget.target_id}");
     // retrieve permissions
     await Permission.microphone.request();
 
@@ -183,8 +184,8 @@ class _CallsScreenState extends State<CallsScreen> {
 
   void getDriverTokenAndCallStatus()async{
     var provider = Provider.of<DataProvider>(context, listen: false); 
-    var documentReference  = FirebaseFirestore.instance.collection((provider.userType == "serviceProvider")? "clients":"serviceProviders")
-      .doc((provider.userType == "serviceProvider")?"208":"211");
+    var documentReference  = FirebaseFirestore.instance.collection("users")
+      .doc("${widget.target_id}");
     
     var documentSnapshot = await documentReference.get();
 
@@ -224,8 +225,8 @@ class _CallsScreenState extends State<CallsScreen> {
         print('>>>>>>>>>>>>>>>>>>>>>>>>>>>> the call token is ${token}');
           var provider = Provider.of<DataProvider>(context, listen: false); 
 
-        FirebaseFirestore.instance.collection((provider.userType == "serviceProvider")? "clients":"serviceProviders")
-      .doc((provider.userType == "serviceProvider")?"285":"208").update({
+        FirebaseFirestore.instance.collection("users")
+      .doc(widget.target_id).update({
               "is_calling": true,
               "channel_name": channel,
               "call_token": token,

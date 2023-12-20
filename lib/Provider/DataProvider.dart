@@ -56,7 +56,6 @@ class DataProvider with ChangeNotifier {
 
   setUserType({required userTier}){
     userType = userTier;
-    userId = (userType == "serviceProvider")?"208":"285";
     notifyListeners();
   }
 

@@ -53,6 +53,7 @@ class _HomePageState extends State<HomePage> {
                               setState(() {
                                 getX.write((widget.userType == "serviceProvider")? constants.GETX_SP_FEEDS:constants.GETX_CLIENT_FEEDS, value["user_object"]["posts"]);
                                 posts = value["user_object"]["posts"];
+                                print(posts);
                               });
                               
                             }
@@ -350,7 +351,7 @@ class _HomePageState extends State<HomePage> {
                                           placeholder: (context, url) => CircularProgressIndicator(),
                                           errorWidget: (context, url, error) => Icon(Icons.person,
                                          size: 50, color:Colors.grey),
-                                          ) 
+                        ) 
                     ),
                   ),
                   Column(
@@ -949,7 +950,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                         },
-                          ),
+                      ),
 
 
                       ]
@@ -1043,13 +1044,30 @@ class _HomePageState extends State<HomePage> {
                               padding: const EdgeInsets.only(right: 8.0),
                               child: InkWell(
                                 onTap:(){
-                                  Navigator.push(context,MaterialPageRoute(builder: (context)=> ServiceProviderAccount())
+                                  Map<dynamic, dynamic> user = {
+                                    "first_name": posts[postIndex]["author_name"],
+                                    "last_name": "",
+                                    "user_id": posts[postIndex]["user_id"]
+                                  };
+                                  Navigator.push(context,MaterialPageRoute(
+                                    builder: (context)=> ServiceProviderAccount(user: user ))
                                 );
                                 },
-                                child: CircleAvatar(
-                                  radius: 25,
-                                  backgroundImage: AssetImage("assets/profile1.png"),
-                                ),
+                                child: CachedNetworkImage(
+                                          imageUrl: posts[postIndex]["author_image"],
+                                          imageBuilder: (context, imageProvider) => Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                image: imageProvider, fit: BoxFit.cover),
+                                            ),
+                                          ),
+                                          placeholder: (context, url) => CircularProgressIndicator(),
+                                          errorWidget: (context, url, error) => Icon(Icons.person,
+                                         size: 50, color:Colors.grey),
+                        )
                               ),
                             ),
                             Column(
@@ -1057,7 +1075,7 @@ class _HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Daniel Smith",
+                                  posts[postIndex]["author_name"],
                                   style:
                                   GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.bold),
                                 ),

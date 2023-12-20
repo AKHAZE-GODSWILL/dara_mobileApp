@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:dara_app/main.dart';
+import 'package:dara_app/screens/homepage/drawerRoutes/chat/recordingVisualizer.dart';
 import 'package:dara_app/utils/constants.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -13,10 +15,12 @@ import 'dart:async';
 import 'dart:io' as io;
 import 'package:file/local.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:get_time_ago/get_time_ago.dart';
 // import 'package:optimized_cached_image/optimized_cached_image.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -68,6 +72,19 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   //FocusNode textFieldFocus = FocusNode();
   bool recordStatus = false;
+  FlutterSoundRecorder? _soundRecorder;
+
+  bool show = false;
+  bool isRecorderInit = false;
+  bool isRecording = false;
+  FocusNode focusNode = FocusNode();
+
+  List<int> durations = [900,700,800,500,300,700,900,400,800,600];
+  File? readyUpload;
+  String _filePath = "";
+  int fileCounter = 0;
+  String recordingPath = "";
+  
 
   // FlutterAudioRecorder2? _recorder;
   // Recording? _current;
@@ -92,69 +109,156 @@ class _ChatPageState extends State<ChatPage> {
 
     String productImage;
 
-    await FirebaseApi.uploadmessage(widget.user.idUser, utils.userId, message,
-        context, '${utils.userId}-${widget.user.id}', widget.user.name
+    await FirebaseApi.uploadmessage(widget.user.idUser, widget.user.id, message,
+        context, '${widget.user.id}-${widget.user.id}', widget.user.name
         // productImage: productImage,
         );
     // sendAndRetrieveMessage(message, widget.user.fcmToken);
   }
   // List<DeliveryLocationModel>? delivery;
 
+  /////////////////////// My own methods starts from here /////////////////////////
+  
+  void openAudio() async{
+    final status = await Permission.microphone.request();
+    if(status != PermissionStatus.granted ){
+      throw RecordingPermissionException("Mic permission not allowed");
+    }
+
+    await _soundRecorder!.openRecorder();
+    isRecorderInit = true;
+  }
+
+  initRecordingPath() async{
+    Directory appDirectory = await getApplicationDocumentsDirectory();
+     recordingPath = appDirectory.path+'/'+DateTime.now().millisecondsSinceEpoch.toString() +
+    '.aac';
+  }
+
+
+
+  
+
   @override
   void initState() {
     // TODO: implement initState
+
+    _soundRecorder = FlutterSoundRecorder();
+    openAudio();
+    initRecordingPath();
     super.initState();
-    // print(widget.shipments.toJson());
-    // ShipmentProvider shipmentProvider =
-    // Provider.of<ShipmentProvider>(context, listen: false);
-    // print(widget.shipments.deliveryID);
-    // print(widget.shipments.id);
-    // print(widget.shipments.ids);
+  }
 
-
-    // shipmentProvider.getDeliveryLocation(
-    //     widget.shipments.id==null&&widget.shipments.ids==null?
-    //     widget.shipments.deliveryID:
-    //     widget.shipments.id==null&&widget.shipments.deliveryID==null?
-    //     widget.shipments.ids:
-    //     widget.shipments.ids==null&&widget.shipments.deliveryID==null?
-    //     widget.shipments.id:widget.shipments.id
-    // )
-    //     .then((e){
-    //   setState((){
-    //     delivery = e;
-    //     // print(delivery);
-    //   });
-    // });
+  @override 
+  void dispose(){
+    _soundRecorder!.closeRecorder();
+    isRecorderInit = false;
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     var data = Provider.of<Utils>(context, listen: false);
     var datas = Provider.of<DataProviders>(context, listen: false);
-    var utils = Provider.of<DataProvider>(context, listen: false);
+    // var utils = Provider.of<DataProvider>(context, listen: false);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
     void pickImage({required ImageSource source, context}) async {
+      // String? mediaType;
       final picker = ImagePicker();
-      var selectedImage = await picker.pickImage(source: source);
-      FocusScope.of(context).unfocus();
+      var selectedImage = (source == ImageSource.gallery)? 
+       await ImagePicker().pickMedia().then((media){
+
+          if (media!.path.endsWith('.jpg') 
+            || media.path.endsWith('.jpeg') 
+            || media.path.endsWith('.png')
+            || media.path.endsWith('.gif')
+            || media.path.endsWith('.bmp')
+            || media.path.endsWith('.tif')
+            || media.path.endsWith('.tiff')
+            || media.path.endsWith('.webp')
+            || media.path.endsWith('.svg')
+            || media.path.endsWith('.heic')
+            || media.path.endsWith('.heif')){
+
+              // mediaType  == "image";
+
+              FirebaseApi.uploadCheckChat(widget.user.idUser);
+                _controller.clear();
+                datas.setWritingTo(false);
+                FirebaseApi.uploadImage(
+                        widget.user.idUser,
+                        widget.user.id,
+                        media,
+                        context,
+                        '${widget.user.id}-${widget.user.id}',
+                        false,
+                        'image',
+                        widget.user.name)
+                    .then((value) {
+                  // sendAndRetrieveMessage(message, widget.user.fcmToken);
+                });
+            }
+
+            else if(
+              media.path.endsWith('.mp4') 
+           || media.path.endsWith('.avi') 
+           || media.path.endsWith('.mov')
+           || media.path.endsWith('.mkv')
+           || media.path.endsWith('.wmv')
+           || media.path.endsWith('.flv')
+           || media.path.endsWith('.webm')
+           || media.path.endsWith('.3gp')
+           || media.path.endsWith('.mpeg')
+           || media.path.endsWith('.mpg')
+           || media.path.endsWith('.ogg')){
+
+              // mediaType = "video";
+
+              FirebaseApi.uploadCheckChat(widget.user.idUser);
+                _controller.clear();
+                datas.setWritingTo(false);
+                FirebaseApi.uploadImage(
+                        widget.user.idUser,
+                        widget.user.id,
+                        media,
+                        context,
+                        '${widget.user.id}-${widget.user.id}',
+                        false,
+                        'video',
+                        widget.user.name)
+                    .then((value) {
+                  // sendAndRetrieveMessage(message, widget.user.fcmToken);
+                });        
+            }
+
+            else{
+              mywidgets.displayToast(msg: "File Format not supported");
+              return;
+            }
+       })
+      :await picker.pickImage(source: source).then((media) {
+
+        FirebaseApi.uploadCheckChat(widget.user.idUser);
+          _controller.clear();
+          datas.setWritingTo(false);
+          FirebaseApi.uploadImage(
+                  widget.user.idUser,
+                  widget.user.id,
+                  media,
+                  context,
+                  '${widget.user.id}-${widget.user.id}',
+                  false,
+                  'image',
+                  widget.user.name)
+              .then((value) {
+            // sendAndRetrieveMessage(message, widget.user.fcmToken);
+          });
+          });
+          FocusScope.of(context).unfocus();
       // _controller2.clear();
-      FirebaseApi.uploadCheckChat(widget.user.idUser);
-      _controller.clear();
-      datas.setWritingTo(false);
-      await FirebaseApi.uploadImage(
-              widget.user.idUser,
-              utils.userId,
-              selectedImage,
-              context,
-              '${utils.userId}-${widget.user.id}',
-              false,
-              widget.user.name)
-          .then((value) {
-        // sendAndRetrieveMessage(message, widget.user.fcmToken);
-      });
     }
+    
 
     pickDoc() async {
       final selectedImage = await FilePicker.platform
@@ -165,13 +269,24 @@ class _ChatPageState extends State<ChatPage> {
         'csv',
         'xls',
         'xlsx',
-        'ods',
         'txt',
+        'htm',
         'html',
-        'png',
-        'jpeg',
-        'jpg',
-        'gif'
+        'xml',
+        'ppt',
+        'pptx'
+        'rtf',
+        'json',
+        'md',
+        'markdown',
+        'tex',
+        'odt',
+        'ods',
+        'odp'
+        // 'png',
+        // 'jpeg',
+        // 'jpg',
+        // 'gif'
       ]);
 
       FocusScope.of(context).unfocus();
@@ -182,11 +297,12 @@ class _ChatPageState extends State<ChatPage> {
       datas.setWritingTo(false);
       await FirebaseApi.uploadImage(
           widget.user.idUser,
-          utils.userId,
+          widget.user.id,
           selectedImage,
           context,
-          '${utils.userId}-${widget.user.id}',
+          '${widget.user.id}-${widget.user.id}',
           true,
+          'document',
           widget.user.name);
       // sendAndRetrieveMessage(message, widget.user.fcmToken);
     }
@@ -196,8 +312,8 @@ class _ChatPageState extends State<ChatPage> {
       FirebaseApi.uploadCheckChat(widget.user.idUser);
       _controller.clear();
       datas.setWritingTo(false);
-      await FirebaseApi.uploadRecord(widget.user.idUser, utils.userId, record,
-          context, '${utils.userId}-${widget.user.id}', widget.user.name);
+      await FirebaseApi.uploadRecord(widget.user.idUser, widget.user.id, record,
+          context, '${widget.user.id}-${widget.user.id}', 'voice_recording',widget.user.name);
       // sendAndRetrieveMessage(message, widget.user.fcmToken);
     }
 
@@ -211,10 +327,10 @@ class _ChatPageState extends State<ChatPage> {
       datas.setWritingTo(false);
       await FirebaseApi.uploadmessage(
           widget.user.idUser,
-          utils.userId,
+          widget.user.id,
           message,
           context,
-          '${utils.userId}-${widget.user.id}',
+          '${widget.user.id}-${widget.user.id}',
           widget.user.name);
       // sendAndRetrieveMessage(message, widget.user.fcmToken);
     }
@@ -398,7 +514,7 @@ class _ChatPageState extends State<ChatPage> {
       //   actions: <Widget>[
       //     widget.user.idUser == null ||
       //             widget.user.idUser.toString().isEmpty ||
-      //             utils.userId == null
+      //             widget.user.id == null
       //         ? Text('')
       //         : SizedBox(),
 
@@ -417,7 +533,7 @@ class _ChatPageState extends State<ChatPage> {
       //   ),
       //   onPressed: widget.user.idUser == null ||
       //           widget.user.idUser.toString().isEmpty ||
-      //           utils.userId == null
+      //           widget.user.id == null
       //       ? () {
       //           data.makePhoneCall(widget.user.userMobile);
       //         }
@@ -477,7 +593,7 @@ class _ChatPageState extends State<ChatPage> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 0.0),
                   child: Container(
-                    color: Constants().appMainColor,
+                    // color: Constants().appMainColor,
                     height: 115,
                     width: MediaQuery.of(context).size.width,
                     child: Column(
@@ -498,7 +614,7 @@ class _ChatPageState extends State<ChatPage> {
                                     Padding(
                                       padding: const EdgeInsets.only(left:8.0),
                                       child: Icon(PhosphorIcons.caret_left_light,
-                                          size: 25, color: Colors.white),
+                                          size: 25, color: Colors.black),
                                     ),
                                     // SizedBox(width: 4),
                                     // Text(
@@ -547,7 +663,7 @@ class _ChatPageState extends State<ChatPage> {
                                           "${widget.user.name}".capitalize(),
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.white),
+                                              color: Colors.black),
                                         ),
                                         Builder(
                                           builder: (context) {
@@ -557,7 +673,7 @@ class _ChatPageState extends State<ChatPage> {
                                               padding: const EdgeInsets.only(top:6.0),
                                               child: Text(
                                                 "Active ${GetTimeAgo.parse(widget.user.lastMessageTime)}",
-                                                style: TextStyle(color: Colors.white),
+                                                style: TextStyle(color: Colors.black),
                                               ),
                                             );
                                           }
@@ -584,7 +700,7 @@ class _ChatPageState extends State<ChatPage> {
                                           context,
                                           PageRouteBuilder(
                                             pageBuilder: (context, animation, secondaryAnimation) {
-                                              return CallsScreen();
+                                              return CallsScreen(target_id: widget.user.idUser);
                                             },
                                             transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                               return FadeTransition(
@@ -601,7 +717,7 @@ class _ChatPageState extends State<ChatPage> {
                                     child: Padding(
                                       padding: const EdgeInsets.only(right:8.0, top:5, bottom:5),
                                       child: Icon(PhosphorIcons.phone,
-                                          size: 30, color: Colors.white),
+                                          size: 30, color: Colors.black),
                                     ),
                                   ),
 
@@ -648,14 +764,31 @@ class _ChatPageState extends State<ChatPage> {
                                 width: 13,
                               ),
 
-                              Stack(
+                              (isRecording)? 
+
+                              Container(
+                                width: MediaQuery.of(context).size.width*0.8,
+                                // color: Colors.red,
+                                child: Center(
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width*0.4,
+                                    // color: Colors.blue,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children:  List<Widget>.generate(10, (index) => RecordingVisualizer(animDuration: durations[index])),
+                                                        ),
+                                  ),
+                                ),
+                              )
+                              
+                              :Stack(
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
                                     child: AnimatedContainer(
                                       duration: Duration(milliseconds: 300),
                                       color: Color(0xFFF4F6FF),
-                                      height: 60,
+                                      height: 48,
                                       width: recordStatus
                                           ? MediaQuery.of(context).size.width /
                                               1.26
@@ -668,19 +801,19 @@ class _ChatPageState extends State<ChatPage> {
                                             String? token =
                                                 await FirebaseMessaging.instance
                                                     .getToken();
-                                            FirebaseApi.updateUsertoRead(
-                                                idUser: widget.user.idUser,
-                                                idArtisan: utils.userId);
+                                            // FirebaseApi.updateUsertoRead(
+                                            //     idUser: widget.user.idUser,
+                                            //     idArtisan: widget.user.id);
 
-                                            if (widget.user.fcmToken
-                                                    .toString() !=
-                                                token) {
-                                              FirebaseApi.updateUserFCMToken(
-                                                idUser: widget.user.idUser,
-                                                idArtisan: utils.userId,
-                                                token: token,
-                                              );
-                                            }
+                                            // if (widget.user.fcmToken
+                                            //         .toString() !=
+                                            //     token) {
+                                            //   FirebaseApi.updateUserFCMToken(
+                                            //     idUser: widget.user.idUser,
+                                            //     idArtisan: widget.user.id,
+                                            //     token: token,
+                                            //   );
+                                            // }
                                           },
                                           controller: _controller,
                                           onChanged: (val) {
@@ -734,15 +867,53 @@ class _ChatPageState extends State<ChatPage> {
                               Container(
                                 margin: EdgeInsets.only(left: 9),
                                 decoration: BoxDecoration(
-                                    color: Constants().appMainColor,
-                                    borderRadius: BorderRadius.circular(10)),
-                                height: 58,
-                                width: 58,
+                                    shape:BoxShape.circle,
+                                    color: Color(0XFFF3F4F6),),
+                                height: 48,
+                                width: 48,
                                 child: Center(
                                   child: IconButton(
-                                    onPressed:
-                                        datas.isWriting ? sendMessage : () {},
-                                    icon: Icon(Icons.send, color: Colors.white),
+                                    onPressed:() async{
+                                          print("The send/ recording button pushed");
+                                          if(datas.isWriting){
+                                            sendMessage();
+                                          }
+                                          else{
+                                            print("In the else block of the send button");
+                                            // var tempDir = await getTemporaryDirectory();
+                                            // var path = "${tempDir.path}/flutter_sound.aac";
+
+                                            if(isRecorderInit == false){
+                                              print("is Recorder init is false");
+                                              return;
+                                            }
+                                            
+                                            if(isRecording){
+                                              await _soundRecorder!.stopRecorder();
+                                              print("The current Path id is $recordingPath");
+                                              // sendMediaMessage(type: "source",mediaType: "sound recording" ,mediaPath: recordingPath);
+                                              record(record: recordingPath, context: context);
+                                              initRecordingPath();
+                                              // Navigator.push(context, MaterialPageRoute(builder: (context)=>  CustomAudioPlayer(audioPath: path)));
+                                            }
+                                            else{
+                                              await _soundRecorder!.startRecorder(
+                                                toFile: recordingPath
+                                              );
+                                            }
+
+                                            setState(() {
+                                              isRecording = !isRecording;
+                                            });
+                                          }
+                                          
+                                        
+                                        },
+                                    icon:(datas.isWriting)? Icon(Icons.send, color: Colors.white)
+                                     :(isRecording)?Icon(Icons.close): Icon(
+                                      Icons.mic_none_outlined,
+                                      color: Colors.black,
+                                    )
                                   ),
                                 ),
                               )

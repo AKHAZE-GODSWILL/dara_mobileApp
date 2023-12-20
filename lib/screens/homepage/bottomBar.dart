@@ -42,8 +42,8 @@ class _BottombarState extends State<Bottombar> {
 
     // DataProvider provider = Provider.of<DataProvider>(key.currentContext!, listen: true);
     var documentReference = FirebaseFirestore.instance
-      .collection((widget.userType == "serviceProvider")? "serviceProviders":"clients")
-      .doc((widget.userType == "serviceProvider")? widget.user_id:widget.user_id);
+      .collection("users")
+      .doc(widget.user_id);
       
     // _pageManager.pause();
   CallKitParams params = CallKitParams(
@@ -133,8 +133,8 @@ Map<String, dynamic> reset = {
 
     // DataProvider provider = Provider.of<DataProvider>(key.currentContext!, listen: true);
     var documentReference = FirebaseFirestore.instance
-      .collection((widget.userType == "serviceProvider")? "serviceProviders":"clients")
-      .doc((widget.userType == "serviceProvider")? widget.user_id:widget.user_id);
+      .collection("users")
+      .doc(widget.user_id);
 
     subscription = documentReference.snapshots().listen((event) {
 

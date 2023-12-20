@@ -113,7 +113,7 @@ class _ReceivedCallsScreenState extends State<ReceivedCallsScreen> {
 
   Future<void> acceptCall() async {
     var provider = Provider.of<DataProvider>(context, listen: false); 
-    var documentReference  = FirebaseFirestore.instance.collection((provider.userType == "serviceProvider")? "clients":"serviceProviders")
+    var documentReference  = FirebaseFirestore.instance.collection("users")
       .doc((provider.userType == "serviceProvider")?"${provider.sp_user_id}":"${provider.client_user_id}");
     // retrieve permissions
     await Permission.microphone.request();

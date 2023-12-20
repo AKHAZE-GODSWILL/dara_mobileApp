@@ -583,10 +583,11 @@ class _ClientAddressInfo extends State<ClientAddressInfo>{
 
                             if(value["status"]== true){
                               mywidgets.displayToast(msg: "Before updating firestore, id is ${provider.client_user_id}, first name is ${provider.client_first_name} last name is ${provider.client_last_name}");
-                              FirebaseFirestore.instance.collection("clients").doc("${provider.client_user_id}").set({
+                              FirebaseFirestore.instance.collection("users").doc("${provider.client_user_id}").set({
                                 "id":provider.client_user_id,
                                 "first_name":provider.client_first_name,
                                 "last_name":provider.client_last_name,
+                                "user_type":"client",
                                 "call_in_progress":false,
                                 "is_calling": false,
                                 "caller_name": "",

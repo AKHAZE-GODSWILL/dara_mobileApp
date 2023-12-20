@@ -636,6 +636,44 @@ Future<dynamic> reloadUserObject() async {
 }
 
 
+Future<dynamic> searchServiceProviders({required query}) async {
+  
+  print("Register service provider started running");
+  try{
+    String token = getX.read(constants.GETX_TOKEN);
+  print("In the try method");
+  final Map<String, String> headers = {
+    'Content-Type': 'application/json',
+    'Authorization':'Bearer $token'
+  };
+
+  print("Before postin the request");
+  
+  http.Client client = http.Client();
+  print("After defining the client object");
+  final response = await client.get(
+    Uri.https(url,"/api/v1/search"),
+    headers: headers
+  );
+
+  print("Before decoding the request");
+    final utf8Response = utf8.decode(response.bodyBytes);
+    final jsonData = json.decode(utf8Response) as Map;
+
+    print("Before returning the response");
+    return jsonData;
+  }
+  on SocketException catch(e){
+    print("Socket Error Occured : $e");
+    return {"status":"Network Error"};
+  }
+  on Error catch (e){
+    print("Error Occured : $e");
+    return "Some error occured";
+  }
+}
+
+
 Future<dynamic> getAgoraChannelToken({required channelName, required role}) async {
 
       print(">>>>>>>>>>>>>>>>In the getAgoraChannelToken Place...... Before making the http request to get token");

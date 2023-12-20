@@ -21,7 +21,8 @@ import 'package:provider/provider.dart';
 
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key}): super(key: key);
+  const ChatPage({Key? key,  required this.target_id}): super(key: key);
+  final target_id;
   State<ChatPage> createState() => _ChatPage();
 }
 
@@ -128,7 +129,7 @@ class _ChatPage extends State<ChatPage> with TickerProviderStateMixin{
 
                         (provider.userType == "serviceProvider")? Navigator.push(context,MaterialPageRoute(builder: (context)=> ViewClientAccount())
                                       )
-                        :Navigator.push(context,MaterialPageRoute(builder: (context)=> ServiceProviderAccount())
+                        :Navigator.push(context,MaterialPageRoute(builder: (context)=> ServiceProviderAccount(user: widget.target_id,))
                                       );
                       },
                       child: CircleAvatar(
@@ -171,7 +172,7 @@ class _ChatPage extends State<ChatPage> with TickerProviderStateMixin{
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation, secondaryAnimation) {
-                            return CallsScreen();
+                            return CallsScreen(target_id: widget.target_id,);
                           },
                           transitionsBuilder: (context, animation, secondaryAnimation, child) {
                             return FadeTransition(
@@ -611,7 +612,27 @@ void openMedia({required String filePath, required String type}) {
 Future<void> _pickFile() async {
     await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ["pdf", "doc", "docX", "xls", "xlsx", "ppt", "pptx", "txt", "rtf", "csv", "htm", "html", "xml", "json", "md", "markdown", "tex", "odt", "ods", "odp"]
+      allowedExtensions: [
+        "pdf",
+        "doc", 
+        "docX", 
+        "xls", 
+        "xlsx", 
+        "ppt", 
+        "pptx", 
+        "txt", 
+        "rtf", 
+        "csv", 
+        "htm", 
+        "html", 
+        "xml", 
+        "json", 
+        "md", 
+        "markdown", 
+        "tex", 
+        "odt", 
+        "ods", 
+        "odp"]
     ).then((result)  {
       if(result != null){
       _filePath = result.files.single.path!;

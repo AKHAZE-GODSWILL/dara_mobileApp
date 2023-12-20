@@ -68,7 +68,7 @@ class FirebaseApi {
   }
 
   static Future uploadImage(
-      String idUser, idArtisan, message, context, chatId, file, fullname) async {
+      String idUser, idArtisan, message, context, chatId, file,media_type, fullname) async {
     var utils = Provider.of<DataProvider>(context, listen: false);
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // String? fullname = prefs.getString('fullname');
@@ -93,6 +93,7 @@ class FirebaseApi {
               'https://uploads.fixme.ng/thumbnails/${'network.profilePicFileName'}',
           'username': fullname,
           'message': imageurl,
+          'media_type': media_type,
           'createdAt': FieldValue.serverTimestamp(),
         };
 
@@ -119,7 +120,7 @@ class FirebaseApi {
   }
 
   static Future uploadRecord(
-      String idUser, idArtisan, message, context, chatId, fullname) async {
+      String idUser, idArtisan, message, context, chatId, media_type,fullname) async {
     var utils = Provider.of<DataProvider>(context, listen: false);
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // String? fullname = prefs.getString('fullname');
@@ -132,9 +133,9 @@ class FirebaseApi {
 
     Reference storageReferenceImage = FirebaseStorage.instance
         .ref()
-        .child('image/${Path.basename(message.path)}');
+        .child('image/${Path.basename(message)}');
 
-    UploadTask uploadTask = storageReferenceImage.putFile(File(message.path));
+    UploadTask uploadTask = storageReferenceImage.putFile(File(message));
     uploadTask.then((res) {
       storageReferenceImage.getDownloadURL().then((imageurl) async {
         final newMessage = {
@@ -144,6 +145,7 @@ class FirebaseApi {
               'https://uploads.fixme.ng/thumbnails/${'network.profilePicFileName'}',
           'username': fullname,
           'message': imageurl,
+          'media_type':media_type,
           'createdAt': FieldValue.serverTimestamp(),
         };
 

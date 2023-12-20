@@ -1,14 +1,19 @@
+import 'package:dara_app/Firebase/Model/User.dart';
+import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dara_app/main.dart';
+import 'package:dara_app/screens/chat/Chat.dart';
 import 'package:dara_app/screens/homepage/serviceProviderProfile/serviceProviderOverview.dart';
 import 'package:dara_app/screens/homepage/serviceProviderProfile/serviceProviderPosts.dart';
 import 'package:dara_app/screens/homepage/serviceProviderProfile/serviceProviderReviews.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 enum TypeSelected { OVERVIEW, POST, REVIEW }
 
 class ServiceProviderAccount extends StatefulWidget {
-  const ServiceProviderAccount({Key? key}) : super(key: key);
+  const ServiceProviderAccount({Key? key, required this.user}) : super(key: key);
+  final user;
   @override
   State<ServiceProviderAccount> createState() => _ServiceProviderAccountState();
 }
@@ -18,6 +23,7 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
 
   @override
   Widget build(BuildContext context) {
+    DataProvider provider = Provider.of<DataProvider>(context, listen: true);
     return Scaffold(
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -99,6 +105,49 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.white,
                         ),
+
+                        InkWell(
+                      onTap: (){
+
+                        User user = User(
+                            name: '${widget.user["first_name"]} ${widget.user["last_name"]}',
+                            lastMessage: '',
+                            urlAvatar: '',
+                          idUser: provider.client_user_id,
+                          id: widget.user["user_id"],
+                          // idArtisan: provider.userType == "serviceProvider"?"208":"285",
+                            userMobile: "+234900000000",
+                            lastMessageTime: DateTime.now(),
+
+                        );
+
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) {
+                            return ChatPage(
+                                support: true,
+                                newchat: true,
+
+                                // shipments: shipment,
+                                // pickup: shipment.pickup,
+                                // dropoff:shipment.dropoff,
+                                productSend: true,
+                                user: user);
+                          },
+                        ));
+                      },
+                      child: Container(
+                        height: 40,
+                        width: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color: constants.appMainColor, width: 2),
+                                      borderRadius: BorderRadius.circular(6)
+                                  ),
+                        child: SvgPicture.asset("assets/svg/message.svg")
+                      ),
+                    ),
                           
                       ],
                     ),
@@ -118,7 +167,7 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                   Row(
                     children: [
                       Text(
-                        "Daniel Smith",
+                        "${widget.user["first_name"]} ${widget.user["last_name"]}",
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                       ),
 
