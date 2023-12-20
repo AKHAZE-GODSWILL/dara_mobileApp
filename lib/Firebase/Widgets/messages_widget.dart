@@ -29,8 +29,8 @@ class _MessagesWidgetState extends State<MessagesWidget> {
     super.initState();
     chats = FirebaseApi.getMessages(
         widget.idUser,
-        '${utils.userId}-${widget.user.id}',
-        '${widget.user.id}-${utils.userId}');
+        '${utils.client_user_id!.isEmpty?utils.sp_user_id:utils.client_user_id}-${widget.user.id}',
+        '${widget.user.id}-${utils.client_user_id!.isEmpty?utils.sp_user_id:utils.client_user_id}');
     // FirebaseApi.changeIndividualReadChats();
     // utils.changeIndividualReadChats();
   }
@@ -77,7 +77,7 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                         return MessageWidget(
                           message: messages[index],
                           snapshot: snapshot.data!.docs[index],
-                          isMe: messages[index].idUser == utils.userId,
+                          isMe: messages[index].idUser == (utils.client_user_id!.isEmpty?utils.sp_user_id:utils.client_user_id),
                         );
                       },
                       // optional

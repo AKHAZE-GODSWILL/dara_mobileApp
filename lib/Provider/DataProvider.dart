@@ -52,7 +52,7 @@ class DataProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  String userId = "";
+  // String userId = "";
 
   setUserType({required userTier}){
     userType = userTier;

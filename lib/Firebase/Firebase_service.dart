@@ -33,11 +33,14 @@ class FirebaseApi {
     final refMessages2 = FirebaseFirestore.instance
         .collection('chats/$idArtisan/messages')
         .doc();
+    print(idUser);
+    print(idArtisan);
+    print(chatId);
 
     final newMessage = {
       'productImage': productImage,
       'chatId': chatId ?? '',
-      'idUser': utils.userId,
+      'idUser': utils.client_user_id!.isEmpty?utils.sp_user_id:utils.client_user_id,
       'urlAvatar':
           'https://uploads.fixme.ng/thumbnails/${'network.profilePicFileName'}',
       'username': fullname ?? '',
@@ -45,6 +48,7 @@ class FirebaseApi {
       'createdAt': FieldValue.serverTimestamp(),
       'read': false
     };
+
 
     await refMessages.set(newMessage);
 
@@ -88,7 +92,7 @@ class FirebaseApi {
       storageReferenceImage.getDownloadURL().then((imageurl) async {
         final newMessage = {
           'chatId': chatId ?? '',
-          'idUser': utils.userId,
+          'idUser': utils.client_user_id!.isEmpty?utils.sp_user_id:utils.client_user_id,
           'urlAvatar':
               'https://uploads.fixme.ng/thumbnails/${'network.profilePicFileName'}',
           'username': fullname,
@@ -140,7 +144,7 @@ class FirebaseApi {
       storageReferenceImage.getDownloadURL().then((imageurl) async {
         final newMessage = {
           'chatId': chatId ?? '',
-          'idUser': utils.userId,
+          'idUser': utils.client_user_id!.isEmpty?utils.sp_user_id:utils.client_user_id,
           'urlAvatar':
               'https://uploads.fixme.ng/thumbnails/${'network.profilePicFileName'}',
           'username': fullname,
@@ -230,10 +234,10 @@ class FirebaseApi {
     token2,
   }) async {
     final refUsers =
-        FirebaseFirestore.instance.collection('UserChat/$idArtisan/individual');
-    final refAritisan =
         FirebaseFirestore.instance.collection('UserChat/$idUser/individual');
-    await refUsers.doc(idArtisan).set({
+    final refAritisan =
+        FirebaseFirestore.instance.collection('UserChat/$idArtisan/individual');
+    await refAritisan.doc(idArtisan).set({
       // "shipment": shipment.toJson(),
       'chatid': idArtisan,
       'read': false,
@@ -248,7 +252,7 @@ class FirebaseApi {
       'lastMessageTime': DateTime.now(),
     });
 
-    await refAritisan.doc(idUser).set({
+    await  refUsers.doc(idUser).set({
       // "shipment":  shipment.toJson(),
       'chatid': idUser,
       'read': false,

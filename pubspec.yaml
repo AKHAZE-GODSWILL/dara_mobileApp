@@ -53,6 +53,7 @@ dependencies:
   material_design_icons_flutter:
   google_search_place:
   dropdown_button2: ^1.2.5
+  intl:
   encrypt: ^5.0.3
 #  flutter_native_splash: ^2.1.6
   file_picker: ^6.0.0
