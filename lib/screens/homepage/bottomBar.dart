@@ -177,7 +177,7 @@ Map<String, dynamic> reset = {
       body: pageIndex == 0
           ? HomePage(userType: provider.userType!,)
           : pageIndex == 1
-              ? Offers()
+              ? Offers(userType: (provider.userType == "serviceProvider")? "serviceProvider":"client",)
               : (pageIndex == 2)? (provider.userType == "serviceProvider")?CreatePost(backToHome: backToHome,): DiscoverPage()
                   : pageIndex == 3
                       ? Projects()

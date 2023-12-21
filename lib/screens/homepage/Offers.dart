@@ -6,6 +6,7 @@ import 'package:dara_app/screens/homepage/drawerRoutes/settings/settingsPage.dar
 import 'package:dara_app/screens/homepage/drawerRoutes/shareApp.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/wallet.dart';
 import 'package:dara_app/screens/homepage/viewOffers.dart';
+import 'package:dara_app/utils/apiRequest.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_ph/**/osphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_svg/svg.dart';
@@ -15,14 +16,59 @@ import 'package:provider/provider.dart';
 import '../../main.dart';
 
 class Offers extends StatefulWidget {
-  const Offers({Key? key}) : super(key: key);
+  const Offers({Key? key, required this.userType}) : super(key: key);
 
+  final userType;
   @override
   State<Offers> createState() => _OffersState();
 }
 
 class _OffersState extends State<Offers> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  List offers = [];
+  bool isLoading = false;
+
+  makeOfferRequest(){
+
+    mywidgets.displayToast(msg: "In the Make offer method and the user type is ${widget.userType}");
+
+    // DataProvider provider = Provider.of<DataProvider>(context, listen: true);
+    setState((){
+        isLoading =true;
+      });
+
+     (widget.userType == "serviceProvider")? getOffers().then((value) {
+      mywidgets.displayToast(msg: "making the request");
+    print("The final Value of what was resulted from the request was :$value");
+
+    if(value["status"]== true && value["message"]=="Data fetched successfully"){
+      mywidgets.displayToast(msg: "Data fetched successfully and the data is ${value["data"]}");
+      setState(() {
+        // offers = value["data"];
+      });
+    }
+    else if(value["status"] == "Network Error"){
+      mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
+    }
+    else{
+      mywidgets.displayToast(msg: value["message"]);
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  })
+  
+  :();
+  }
+
+  @override
+  initState(){
+
+    makeOfferRequest();
+    // mywidgets.displayToast(msg: "After the make offer method in the initstate");
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -252,7 +298,9 @@ class _OffersState extends State<Offers> {
     ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
-        child: Column(
+        child: (isLoading)? Center(
+          child: CircularProgressIndicator(),
+        ): Column(
           children: [
             SizedBox(height: 19),
             Padding(
@@ -321,7 +369,7 @@ class _OffersState extends State<Offers> {
             ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              itemCount: 10,
+              itemCount: offers.length,
               itemBuilder: (context, index){
 
               return (provider.userType == "serviceProvider")? serviceProviderOfferWidget(index: index): clientOfferWidget(index: index);
@@ -376,7 +424,7 @@ class _OffersState extends State<Offers> {
                                   width: MediaQuery.of(context).size.width*0.75,
                                   child: RichText(text: TextSpan(children: [
                                     TextSpan(
-                                      text:  "Daniel ",
+                                      text:  offers[index]["data"]["sender"],
                                       style: TextStyle(fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black),

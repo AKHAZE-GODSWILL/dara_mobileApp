@@ -1,4 +1,5 @@
 import 'package:dara_app/main.dart';
+import 'package:dara_app/utils/apiRequest.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -336,7 +337,9 @@ class Mywidget {
       );
   }
 
-  showHireSheet({context}){
+  showHireSheet({context, required sp_id}){
+    String message = "";
+    // bool? isLoading = false;
     return showModalBottomSheet(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
@@ -347,7 +350,9 @@ class Mywidget {
               context: context,
               isScrollControlled: true,
               builder: (BuildContext context) {
-                return SingleChildScrollView(
+                return StatefulBuilder(builder: (context, setState){
+                  bool isLoading = false;
+                  return SingleChildScrollView(
                   child: Container(
                     height: 450,
                     child: Column(
@@ -400,6 +405,7 @@ class Mywidget {
                                   child: TextFormField(
                                     // focusNode: textNode,
                                     onChanged: (value){
+                                      message = value;
                                 },  
                                     keyboardType: TextInputType.multiline,
                                     textAlignVertical: TextAlignVertical.top,
@@ -431,7 +437,35 @@ class Mywidget {
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: InkWell(
                             onTap: (){
+
+                              setState((){
+                                isLoading =true;
+                              });
+
+                              makeOfferToSP(service_provider_id: sp_id, message: message.trim()).then((value) {
+
+                            print("The final Value of what was resulted from the request was :$value");
+
+                            if(value["status"]== true && value["message"]=="Your offer has been submitted successfully."){
+                              mywidgets.displayToast(msg: "Offers sent successfully");
+                              setState(() {
+                                
+                              });
                               Navigator.pop(context);
+                            }
+                            else if(value["status"] == "Network Error"){
+                              mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
+                            }
+                            else{
+                              mywidgets.displayToast(msg: value["message"]);
+                            }
+
+                            setState(() {
+                              isLoading = false;
+                            });
+                          });
+                          
+                              
                             },
                             child: Container(
                               width: MediaQuery.of(context).size.width,
@@ -441,7 +475,7 @@ class Mywidget {
                                   borderRadius: BorderRadius.circular(200)
                               ),
                               child: Center(
-                                child: Text(
+                                child:( isLoading == true)? CircularProgressIndicator():Text(
                                   "Submit",
                                   style: GoogleFonts.inter(
                                       color:  Colors.white,
@@ -455,6 +489,7 @@ class Mywidget {
                     )
                   ),
                 );
+                });
               },
             );
 

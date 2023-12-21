@@ -107,10 +107,10 @@ class _ChatPageState extends State<ChatPage> {
 
     await FirebaseApi.uploadmessage(
         widget.user.idUser,
-        "${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}",
+        "${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}",
         message,
         context,
-        '${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
+        '${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
         widget.user.name
         // productImage: productImage,
         );
@@ -186,10 +186,10 @@ class _ChatPageState extends State<ChatPage> {
                 datas.setWritingTo(false);
                 FirebaseApi.uploadImage(
                         widget.user.idUser,
-                        "${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}",
+                        "${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}",
                         media,
                         context,
-                        '${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
+                        '${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
                         false,
                         'image',
                         widget.user.name)
@@ -214,10 +214,10 @@ class _ChatPageState extends State<ChatPage> {
                 datas.setWritingTo(false);
                 FirebaseApi.uploadImage(
                         widget.user.idUser,
-                        "${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}",
+                        "${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}",
                         media,
                         context,
-                        '${utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id}-${widget.user.id}',
+                        '${utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id}-${widget.user.id}',
                         false,
                         'video',
                         widget.user.name)
@@ -235,10 +235,10 @@ class _ChatPageState extends State<ChatPage> {
               datas.setWritingTo(false);
               FirebaseApi.uploadImage(
                       widget.user.idUser,
-                      "${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}",
+                      "${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}",
                       media,
                       context,
-                      '${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
+                      '${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
                       false,
                       'image',
                       widget.user.name)
@@ -287,10 +287,10 @@ class _ChatPageState extends State<ChatPage> {
       datas.setWritingTo(false);
       await FirebaseApi.uploadImage(
           widget.user.idUser,
-          "${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}",
+          "${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}",
           selectedImage,
           context,
-          '${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
+          '${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
           true,
           'document',
           widget.user.name);
@@ -304,10 +304,10 @@ class _ChatPageState extends State<ChatPage> {
       datas.setWritingTo(false);
       await FirebaseApi.uploadRecord(
           widget.user.idUser,
-          "${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}",
+          "${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}",
           record,
           context,
-          '${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
+          '${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
           'voice_recording',
           widget.user.name);
       // sendAndRetrieveMessage(message, widget.user.fcmToken);
@@ -323,10 +323,10 @@ class _ChatPageState extends State<ChatPage> {
       datas.setWritingTo(false);
       await FirebaseApi.uploadmessage(
           widget.user.idUser,
-          "${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}",
+          "${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}",
           message,
           context,
-          '${(utils.client_user_id!.isEmpty ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
+          '${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
           widget.user.name);
       // sendAndRetrieveMessage(message, widget.user.fcmToken);
     }

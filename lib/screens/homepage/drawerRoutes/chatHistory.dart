@@ -74,7 +74,7 @@ class _ChatHistoryState extends State<ChatHistory> {
 
   @override
   Widget build(BuildContext context) {
-    var utils = Provider.of<DataProvider>(context, listen: false);
+    var utils = Provider.of<DataProvider>(context, listen: true);
     return Scaffold(
         appBar: AppBar(
           leading: null,
@@ -196,7 +196,7 @@ class _ChatHistoryState extends State<ChatHistory> {
                 ),
                 StreamBuilder(
                   stream: FirebaseApi.userChatStream(
-                      (utils.client_user_id!.isEmpty
+                      (utils.userType == "serviceProvider"
                           ? utils.sp_user_id
                           : utils.client_user_id)),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -281,12 +281,13 @@ class _ChatHistoryState extends State<ChatHistory> {
   }
 
   CustomChatCard(UserChat user, date) {
+    // mywidgets.displayToast(msg: "${user.lastMessage}");
     return InkWell(
       onTap: () {
         var utils = Provider.of<DataProvider>(context, listen: false);
         FirebaseApi.updateUsertoRead(
             idUser: user.idUser,
-            idArtisan:  utils.client_user_id!.isEmpty?utils.sp_user_id:utils.client_user_id);
+            idArtisan:  utils.userType == "serviceProvider"? utils.sp_user_id:utils.client_user_id);
 
         // if (users[index].fcmToken.toString() !=
         //     data.fcmToken) {

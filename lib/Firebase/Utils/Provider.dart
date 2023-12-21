@@ -249,7 +249,14 @@ bool overlay = false;
       if (result.contains('jpg') ||
           result.contains('jpeg') ||
           result.contains('png') ||
-          result.contains('gif')) {
+          result.contains('gif') || 
+          result.contains('bmp') ||
+          result.contains('tif') ||
+          result.contains('tiff') ||
+          result.contains('webp') ||
+          result.contains('svg') ||
+          result.contains('heic') ||
+          result.contains('heif') ) {
         return 'image';
       } else if (result.contains('pdf') ||
           result.contains('doc') ||
@@ -259,10 +266,36 @@ bool overlay = false;
           result.contains('ods') ||
           result.contains('txt') ||
           result.contains('csv') ||
-          result.contains('html')) {
+          result.contains('html') ||
+          result.contains('ppt') ||
+          result.contains('pptx') ||
+          result.contains('rtf') ||
+          result.contains('htm') ||
+          result.contains('xml') ||
+          result.contains('json') ||
+          result.contains('md') ||
+          result.contains('markdown') ||
+          result.contains('tex') ||
+          result.contains('odt') ||
+          result.contains('odp')) {
         return 'doc';
-      } else if (result.contains('wav') || result.contains('mp3')) {
+      } else if (result.contains('wav') || result.contains('mp3') || result.contains("aac")) {
         return 'audio';
+      }
+      else if(
+        result.contains('mp4') ||
+        result.contains('avi') ||
+        result.contains('mov') ||
+        result.contains('mkv') ||
+        result.contains('wmv') ||
+        result.contains('flv') ||
+        result.contains('webm') ||
+        result.contains('3gp') ||
+        result.contains('mpeg') ||
+        result.contains('mpg') ||
+        result.contains('ogg')
+      ){
+        return 'video';
       }
     } else {
       return 'link';

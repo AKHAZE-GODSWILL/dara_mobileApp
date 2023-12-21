@@ -620,18 +620,18 @@ Future<void> _pickFile() async {
         "xlsx", 
         "ppt", 
         "pptx", 
-        "txt", 
+        "txt", //
         "rtf", 
-        "csv", 
+        "csv", //
         "htm", 
-        "html", 
+        "html", //
         "xml", 
         "json", 
         "md", 
         "markdown", 
         "tex", 
         "odt", 
-        "ods", 
+        "ods", //
         "odp"]
     ).then((result)  {
       if(result != null){

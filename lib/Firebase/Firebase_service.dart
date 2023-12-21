@@ -40,7 +40,7 @@ class FirebaseApi {
     final newMessage = {
       'productImage': productImage,
       'chatId': chatId ?? '',
-      'idUser': utils.client_user_id!.isEmpty?utils.sp_user_id:utils.client_user_id,
+      'idUser': utils.userType == "serviceProvider"?utils.sp_user_id:utils.client_user_id,
       'urlAvatar':
           'https://uploads.fixme.ng/thumbnails/${'network.profilePicFileName'}',
       'username': fullname ?? '',
@@ -92,7 +92,7 @@ class FirebaseApi {
       storageReferenceImage.getDownloadURL().then((imageurl) async {
         final newMessage = {
           'chatId': chatId ?? '',
-          'idUser': utils.client_user_id!.isEmpty?utils.sp_user_id:utils.client_user_id,
+          'idUser': utils.userType == "serviceProvider"?utils.sp_user_id:utils.client_user_id,
           'urlAvatar':
               'https://uploads.fixme.ng/thumbnails/${'network.profilePicFileName'}',
           'username': fullname,
@@ -144,7 +144,7 @@ class FirebaseApi {
       storageReferenceImage.getDownloadURL().then((imageurl) async {
         final newMessage = {
           'chatId': chatId ?? '',
-          'idUser': utils.client_user_id!.isEmpty?utils.sp_user_id:utils.client_user_id,
+          'idUser': utils.userType == "serviceProvider"?utils.sp_user_id:utils.client_user_id,
           'urlAvatar':
               'https://uploads.fixme.ng/thumbnails/${'network.profilePicFileName'}',
           'username': fullname,

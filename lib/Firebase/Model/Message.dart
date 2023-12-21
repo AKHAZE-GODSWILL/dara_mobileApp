@@ -17,6 +17,7 @@ class Message {
   final String? message;
   final String? productImage;
   final String? calltype;
+  final String? media_type;
   final chatId;
   final DateTime? createdAt;
   final bool? read;
@@ -29,6 +30,7 @@ class Message {
     @required this.idUser,
     this.chatId,
     this.callStatus,
+    this.media_type,
     @required this.urlAvatar,
     @required this.username,
     @required this.message,
@@ -48,6 +50,7 @@ class Message {
         urlAvatar = snapshot['urlAvatar'] ?? '',
         callStatus = snapshot['callStatus'] ?? '',
         username = snapshot['username'] ?? '',
+        media_type = snapshot['media_type']??'',
         createdAt = Utils.toDateTime(snapshot['createdAt']);
 
   Map<String, dynamic> toJson() => {
@@ -60,6 +63,7 @@ class Message {
         'callStatus': callStatus,
         'username': username,
         'message': message,
+        'media_type':media_type,
         'createdAt': Utils.fromDateTimeToJson(createdAt!),
       };
 }

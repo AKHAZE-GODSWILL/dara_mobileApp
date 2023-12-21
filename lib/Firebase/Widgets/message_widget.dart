@@ -1,27 +1,109 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:bubble/bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dara_app/Firebase/Widgets/photoView.dart';
 import 'package:dara_app/Firebase/Widgets/recordPlayer.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../Model/Message.dart';
 import '../Utils/Provider.dart';
 import '../Utils/colors.dart';
 import '../Utils/utils.dart';
 
-class MessageWidget extends StatelessWidget {
+class MessageWidget extends StatefulWidget{
+  MessageWidget({Key? key, required this.message, required this.isMe, required this.snapshot}):super(key:key);
+
   final Message message;
   final bool isMe;
   final QueryDocumentSnapshot snapshot;
+  State<MessageWidget> createState()=> _MessageWidget();
+}
+class _MessageWidget extends State<MessageWidget> {
+  
 
-  const MessageWidget({
-    required this.message,
-    required this.isMe,
-    required this.snapshot,
-  });
+  late AudioPlayer _audioPlayer;
+  String recordingPath = "";
+  bool isPlaying = false;
+  bool isDownloading = false;
+  double _sliderValue = 0.0;
+  double audioDuration = 0.0;
+  double currentDuration = 0.0;
+  late Timer sliderUpdateTimer;
+  
+  initializeSound(){
+    //
+        _audioPlayer = AudioPlayer();
+        _audioPlayer.setSourceUrl(widget.message.message!).then((value) {
+      _audioPlayer.getDuration().then((value) {
+      setState(() {
+        audioDuration = value!.inSeconds.toDouble();
+      });
+    });
+    });
 
+    
+
+    _audioPlayer.onDurationChanged.listen((Duration duration) {
+      setState(() {
+        
+        audioDuration = duration.inSeconds.toDouble();
+      });
+    });
+
+
+    _audioPlayer.onPlayerComplete.listen((event) {
+      // Add your action here, for example, showing a message when the audio is completed.
+      print('Audio playback completed');
+      // You can also reset the slider and isPlaying state, or perform any other desired action.
+      setState(() {
+        _sliderValue = 0.0;
+        isPlaying = false;
+      });
+    });
+
+
+
+    // Create a timer to update the slider value every 1 second
+    sliderUpdateTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _audioPlayer.getCurrentPosition().then((value) {
+        setState(() {
+          currentDuration = value?.inSeconds.toDouble() ?? 0.0;
+          _sliderValue = currentDuration;
+        });
+      });
+    });
+  }
+
+  // initRecording() async{
+  //  Directory appDirectory =  await getApplicationDocumentsDirectory();
+  //  recordingPath = appDirectory.path+'/'+DateTime.now().millisecondsSinceEpoch.toString() +
+  //       '.aac';
+  // }
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    ////////////////////
+    
+    _audioPlayer = AudioPlayer();
+    initializeSound();
+    // initRecording();
+    // downloadAudioFromFirebaseStorage(widget.message.message!, recordingPath!).then((value) {
+    //   initializeSound();
+    // });
+
+    super.initState();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -29,12 +111,12 @@ class MessageWidget extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment:
-            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+            widget.isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: <Widget>[
           SizedBox(
             width: 15,
           ),
-          !isMe
+          !widget.isMe
               ? Container(
                   width: MediaQuery.of(context).size.width * 0.7,
                   child: buildMessageReceiver(context),
@@ -56,23 +138,23 @@ class MessageWidget extends StatelessWidget {
     var datas = Provider.of<DataProviders>(context, listen: false);
 //    var date = data
 //        .formatTime(message.createdAt);
-    var date = data.compareDateChat(message.createdAt);
+    var date = data.compareDateChat(widget.message.createdAt);
     return Column(
       children: [
         Bubble(
-          color: Color(0xFFF4F6FF),
+          color: Color(0xFFF3F4F6),
           radius: Radius.circular(7),
           child: Column(
             crossAxisAlignment:
-                isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: <Widget>[
-              message.message!.contains('https://') ||
-                      message.message!.contains('http://')
-                  ? datas.categorizeUrl(message.message.toString()) == 'image'
+              widget.message.message!.contains('https://') ||
+                      widget.message.message!.contains('http://')
+                  ? datas.categorizeUrl(widget.message.message.toString()) == 'image'
                       ? Padding(
                           padding: const EdgeInsets.only(top: 4.0),
                           child: Hero(
-                            tag: message.message.toString(),
+                            tag: widget.message.message.toString(),
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -81,8 +163,8 @@ class MessageWidget extends StatelessWidget {
                                     pageBuilder: (context, animation,
                                         secondaryAnimation) {
                                       return PhotoView(
-                                        message.message,
-                                        message.message,
+                                        widget.message.message,
+                                        widget.message.message,
                                       );
                                     },
                                     transitionsBuilder: (context, animation,
@@ -102,7 +184,7 @@ class MessageWidget extends StatelessWidget {
                                   child: Padding(
                                     padding: const EdgeInsets.all(3.0),
                                     child: Image.network(
-                                      message.message.toString(),
+                                      widget.message.message.toString(),
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -111,7 +193,7 @@ class MessageWidget extends StatelessWidget {
                             ),
                           ),
                         )
-                      : datas.categorizeUrl(message.message.toString()) ==
+                      : datas.categorizeUrl(widget.message.message.toString()) ==
                               'audio'
                           ? GestureDetector(
                               onTap: () {
@@ -121,8 +203,8 @@ class MessageWidget extends StatelessWidget {
                                     pageBuilder: (context, animation,
                                         secondaryAnimation) {
                                       return AudioApp(
-                                          kUrl: message.message,
-                                          tag: message.message);
+                                          kUrl: widget.message.message,
+                                          tag: widget.message.message);
                                     },
                                     transitionsBuilder: (context, animation,
                                         secondaryAnimation, child) {
@@ -137,7 +219,7 @@ class MessageWidget extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Hero(
-                                      tag: message.message.toString(),
+                                      tag: widget.message.message.toString(),
                                       child: Icon(
                                         Icons.play_circle_filled,
                                         size: 35,
@@ -175,34 +257,34 @@ class MessageWidget extends StatelessWidget {
                                 ],
                               ),
                             )
-                          : datas.categorizeUrl(message.message.toString()) ==
+                          : datas.categorizeUrl(widget.message.message.toString()) ==
                                   'doc'
                               ? InkWell(
                                   onTap: () {
-                                    data.opeLink(message.message);
+                                    data.opeLink(widget.message.message);
                                   },
                                   child: Tab(
                                     text: 'Open this Document/Download',
                                     icon: Icon(FontAwesomeIcons.file, size: 40),
                                   ))
                               : datas.categorizeUrl(
-                                          message.message.toString()) ==
+                                          widget.message.message.toString()) ==
                                       'link'
                                   ? Container(
                                       width: MediaQuery.of(context).size.width /
                                           1.3,
                                       child: InkWell(
                                         onTap: () {
-                                          data.opeLink(message.message);
+                                          data.opeLink(widget.message.message);
                                         },
                                         child: Text(
-                                          message.message.toString(),
+                                          widget.message.message.toString(),
                                           style: TextStyle(
                                               fontSize: 16,
-                                              color: isMe
-                                                  ? Colors.blue
-                                                  : Colors.blue),
-                                          textAlign: isMe
+                                              color: widget.isMe
+                                                  ? Colors.black
+                                                  : Colors.black),
+                                          textAlign: widget.isMe
                                               ? TextAlign.end
                                               : TextAlign.start,
                                         ),
@@ -214,13 +296,13 @@ class MessageWidget extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          message.productImage == null ||
-                                  message.productImage!.isEmpty
+                          widget.message.productImage == null ||
+                                  widget.message.productImage!.isEmpty
                               ? Container()
                               : Padding(
                                   padding: const EdgeInsets.only(top: 4.0),
                                   child: Hero(
-                                    tag: message.message.toString(),
+                                    tag: widget.message.message.toString(),
                                     child: GestureDetector(
                                       onTap: () {
                                         Navigator.push(
@@ -229,8 +311,8 @@ class MessageWidget extends StatelessWidget {
                                             pageBuilder: (context, animation,
                                                 secondaryAnimation) {
                                               return PhotoView(
-                                                message.productImage,
-                                                message.productImage,
+                                                widget.message.productImage,
+                                                widget.message.productImage,
                                               );
                                             },
                                             transitionsBuilder: (context,
@@ -252,7 +334,7 @@ class MessageWidget extends StatelessWidget {
                                           child: Padding(
                                             padding: const EdgeInsets.all(3.0),
                                             child: Image.network(
-                                              message.productImage.toString(),
+                                              widget.message.productImage.toString(),
                                               fit: BoxFit.cover,
                                             ),
                                           ),
@@ -262,24 +344,24 @@ class MessageWidget extends StatelessWidget {
                                   ),
                                 ),
                           Text(
-                            message.message.toString(),
+                            widget.message.message.toString(),
                             style: TextStyle(
                                 fontSize: 16,
                                 fontFamily: 'Roboto',
-                                color: isMe
-                                    ? messagereceivertextcolor
-                                    : messagereceivertextcolor),
-                            textAlign: isMe ? TextAlign.end : TextAlign.start,
+                                color: widget.isMe
+                                    ? Colors.black
+                                    : Colors.black),
+                            textAlign: widget.isMe ? TextAlign.end : TextAlign.start, ////////////////////////////////////////////////////
                           ),
                         ],
                       ),
                     ),
-            ],
-          ),
-        ),
-        message.read == true && !snapshot.metadata.hasPendingWrites
+
+
+                    ////////////////////
+                    widget.message.read == true && !widget.snapshot.metadata.hasPendingWrites
             ? Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Icon(
                     PhosphorIcons.check_light,
@@ -299,9 +381,9 @@ class MessageWidget extends StatelessWidget {
                   )
                 ],
               )
-            : message.read == false && snapshot.metadata.hasPendingWrites
+            : widget.message.read == false && widget.snapshot.metadata.hasPendingWrites
                 ? Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Icon(
                         PhosphorIcons.clock,
@@ -315,7 +397,7 @@ class MessageWidget extends StatelessWidget {
                     ],
                   )
                 : Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Icon(
                         PhosphorIcons.check_light,
@@ -327,6 +409,10 @@ class MessageWidget extends StatelessWidget {
                       )
                     ],
                   )
+            ],
+          ),
+        ),
+        
       ],
     );
   }
@@ -336,7 +422,7 @@ class MessageWidget extends StatelessWidget {
     var datas = Provider.of<DataProviders>(context, listen: false);
 //    var date = data
 //        .formatTime(message.createdAt);
-    var date = data.compareDateChat(message.createdAt);
+    var date = data.compareDateChat(widget.message.createdAt);
     return Column(
       children: [
         Bubble(
@@ -346,16 +432,16 @@ class MessageWidget extends StatelessWidget {
             children: [
               Column(
                 crossAxisAlignment:
-                    isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                    widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: <Widget>[
-                  message.message!.contains('https://') ||
-                          message.message!.contains('http://')
-                      ? datas.categorizeUrl(message.message.toString()) ==
+                  widget.message.message!.contains('https://') ||
+                          widget.message.message!.contains('http://')
+                      ? datas.categorizeUrl(widget.message.message.toString()) ==
                               'image'
                           ? Padding(
                               padding: const EdgeInsets.only(top: 4.0),
                               child: Hero(
-                                tag: message.message.toString(),
+                                tag: widget.message.message.toString(),
                                 child: GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -364,8 +450,8 @@ class MessageWidget extends StatelessWidget {
                                         pageBuilder: (context, animation,
                                             secondaryAnimation) {
                                           return PhotoView(
-                                            message.message,
-                                            message.message,
+                                            widget.message.message,
+                                            widget.message.message,
                                           );
                                         },
                                         transitionsBuilder: (context, animation,
@@ -385,7 +471,7 @@ class MessageWidget extends StatelessWidget {
                                       child: Padding(
                                         padding: const EdgeInsets.all(3.0),
                                         child: Image.network(
-                                          message.message.toString(),
+                                          widget.message.message.toString(),
                                           fit: BoxFit.cover,
                                         ),
                                       ),
@@ -394,80 +480,139 @@ class MessageWidget extends StatelessWidget {
                                 ),
                               ),
                             )
-                          : datas.categorizeUrl(message.message.toString()) ==
+                          : datas.categorizeUrl(widget.message.message.toString()) ==
                                   'audio'
-                              ? GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder: (context, animation,
-                                            secondaryAnimation) {
-                                          return AudioApp(
-                                              kUrl: message.message,
-                                              tag: message.message);
-                                        },
-                                        transitionsBuilder: (context, animation,
-                                            secondaryAnimation, child) {
-                                          return FadeTransition(
-                                            opacity: animation,
-                                            child: child,
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  },
-                                  child: Row(
+                              ?  Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Hero(
-                                          tag: message.message.toString(),
-                                          child: Icon(
-                                            Icons.play_circle_filled,
-                                            size: 35,
-                                          )),
-                                      SliderTheme(
-                                        data: SliderTheme.of(context).copyWith(
-                                          activeTrackColor: Color(0xFF9B049B),
-                                          inactiveTrackColor: Color(0xFF9B049B),
-                                          trackShape:
-                                              RoundedRectSliderTrackShape(),
-                                          trackHeight: 5.0,
-                                          thumbShape: RoundSliderThumbShape(
-                                              enabledThumbRadius: 12.0),
-                                          thumbColor: Color(0xFFEBCDEB),
-                                          overlayColor: Color(0xFF9B049B),
-                                          overlayShape: RoundSliderOverlayShape(
-                                              overlayRadius: 15.0),
-                                          tickMarkShape:
-                                              RoundSliderTickMarkShape(),
-                                          activeTickMarkColor:
-                                              Color(0xFF9B049B),
-                                          inactiveTickMarkColor:
-                                              Color(0xFF9B049B),
-                                          valueIndicatorShape:
-                                              PaddleSliderValueIndicatorShape(),
-                                          valueIndicatorColor:
-                                              Color(0xFFEBCDEB),
-                                          valueIndicatorTextStyle: TextStyle(
-                                            color: Colors.white,
+                                      
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          InkWell(
+                                            onTap: () async {
+                                              if (isPlaying) {
+                                                await _audioPlayer.pause();
+                                              } else {
+                                                await _audioPlayer.play(UrlSource(widget.message.message!));
+                                              }
+                                              setState(() {
+                                                isPlaying = !isPlaying;
+                                              });
+                                            },
+                                            child: Icon(isPlaying ? Icons.pause_circle : Icons.play_circle, color: Colors.white),
                                           ),
-                                        ),
-                                        child: Slider(
-                                          value: 0,
-                                          onChanged: (double value) {},
-                                          min: 0.0,
-                                          max: 10.0,
+                                          
+                                          Container(
+                                            width: 200,
+                                            height: 20,
+                                            child: Slider(
+                                              value: _sliderValue,
+                                              min: 0.0,
+                                              max: audioDuration,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _sliderValue = value;
+                                                  _audioPlayer.seek(Duration(seconds: value.toInt()));
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      
+                                
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 25),
+                                        child: StreamBuilder<Duration>(
+                                          stream: _audioPlayer.onDurationChanged,
+                                          builder: (context, snapshot) {
+                                            return Text(
+                                              '${_formatDuration(currentDuration)} / ${_formatDuration(audioDuration)}',
+                                              style: TextStyle(color: Colors.white),
+                                            );
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
                                 )
+                              
+                              // GestureDetector(
+                              //     onTap: () {
+                              //       Navigator.push(
+                              //         context,
+                              //         PageRouteBuilder(
+                              //           pageBuilder: (context, animation,
+                              //               secondaryAnimation) {
+                              //             return AudioApp(
+                              //                 kUrl: message.message,
+                              //                 tag: message.message);
+                              //           },
+                              //           transitionsBuilder: (context, animation,
+                              //               secondaryAnimation, child) {
+                              //             return FadeTransition(
+                              //               opacity: animation,
+                              //               child: child,
+                              //             );
+                              //           },
+                              //         ),
+                              //       );
+                              //     },
+                              //     child: Row(
+                              //       children: [
+                              //         Hero(
+                              //             tag: message.message.toString(),
+                              //             child: Icon(
+                              //               Icons.play_circle_filled,
+                              //               size: 35,
+                              //             )),
+                              //         SliderTheme(
+                              //           data: SliderTheme.of(context).copyWith(
+                              //             activeTrackColor: Color(0xFF9B049B),
+                              //             inactiveTrackColor: Color(0xFF9B049B),
+                              //             trackShape:
+                              //                 RoundedRectSliderTrackShape(),
+                              //             trackHeight: 5.0,
+                              //             thumbShape: RoundSliderThumbShape(
+                              //                 enabledThumbRadius: 12.0),
+                              //             thumbColor: Color(0xFFEBCDEB),
+                              //             overlayColor: Color(0xFF9B049B),
+                              //             overlayShape: RoundSliderOverlayShape(
+                              //                 overlayRadius: 15.0),
+                              //             tickMarkShape:
+                              //                 RoundSliderTickMarkShape(),
+                              //             activeTickMarkColor:
+                              //                 Color(0xFF9B049B),
+                              //             inactiveTickMarkColor:
+                              //                 Color(0xFF9B049B),
+                              //             valueIndicatorShape:
+                              //                 PaddleSliderValueIndicatorShape(),
+                              //             valueIndicatorColor:
+                              //                 Color(0xFFEBCDEB),
+                              //             valueIndicatorTextStyle: TextStyle(
+                              //               color: Colors.white,
+                              //             ),
+                              //           ),
+                              //           child: Slider(
+                              //             value: 0,
+                              //             onChanged: (double value) {},
+                              //             min: 0.0,
+                              //             max: 10.0,
+                              //           ),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //   )
                               : datas.categorizeUrl(
-                                          message.message.toString()) ==
+                                          widget.message.message.toString()) ==
                                       'doc'
                                   ? InkWell(
                                       onTap: () {
-                                        data.opeLink(message.message);
+                                        data.opeLink(widget.message.message);
                                       },
                                       child: Tab(
                                         text: 'Open this Document/Download',
@@ -475,7 +620,7 @@ class MessageWidget extends StatelessWidget {
                                             size: 40),
                                       ))
                                   : datas.categorizeUrl(
-                                              message.message.toString()) ==
+                                              widget.message.message.toString()) ==
                                           'link'
                                       ? Container(
                                           width: MediaQuery.of(context)
@@ -484,16 +629,16 @@ class MessageWidget extends StatelessWidget {
                                               1.3,
                                           child: InkWell(
                                             onTap: () {
-                                              data.opeLink(message.message);
+                                              data.opeLink(widget.message.message);
                                             },
                                             child: Text(
-                                              message.message.toString(),
+                                              widget.message.message.toString(),
                                               style: TextStyle(
                                                   fontSize: 16,
-                                                  color: isMe
+                                                  color: widget.isMe
                                                       ? Colors.blue
                                                       : Colors.blue),
-                                              textAlign: isMe
+                                              textAlign: widget.isMe
                                                   ? TextAlign.end
                                                   : TextAlign.start,
                                             ),
@@ -507,14 +652,14 @@ class MessageWidget extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  message.productImage == null ||
-                                          message.productImage!.isEmpty
+                                  widget.message.productImage == null ||
+                                          widget.message.productImage!.isEmpty
                                       ? Container()
                                       : Padding(
                                           padding:
                                               const EdgeInsets.only(top: 4.0),
                                           child: Hero(
-                                            tag: message.message.toString(),
+                                            tag: widget.message.message.toString(),
                                             child: GestureDetector(
                                               onTap: () {
                                                 Navigator.push(
@@ -524,8 +669,8 @@ class MessageWidget extends StatelessWidget {
                                                         animation,
                                                         secondaryAnimation) {
                                                       return PhotoView(
-                                                        message.productImage,
-                                                        message.productImage,
+                                                        widget.message.productImage,
+                                                        widget.message.productImage,
                                                       );
                                                     },
                                                     transitionsBuilder:
@@ -550,7 +695,7 @@ class MessageWidget extends StatelessWidget {
                                                         const EdgeInsets.all(
                                                             3.0),
                                                     child: Image.network(
-                                                      message.productImage
+                                                      widget.message.productImage
                                                           .toString(),
                                                       fit: BoxFit.cover,
                                                     ),
@@ -561,15 +706,15 @@ class MessageWidget extends StatelessWidget {
                                           ),
                                         ),
                                   Text(
-                                    message.message.toString(),
+                                    widget.message.message.toString(),
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontFamily: 'Roboto',
-                                        color: isMe
+                                        color: widget.isMe
                                             ? messagesendertextcolor
                                             : messagesendertextcolor),
                                     textAlign:
-                                        isMe ? TextAlign.end : TextAlign.start,
+                                        widget.isMe ? TextAlign.end : TextAlign.start,
                                   ),
                                 ],
                               ),
@@ -599,10 +744,8 @@ class MessageWidget extends StatelessWidget {
                   // ),
                 ],
               ),
-            ],
-          ),
-        ),
-        message.read == true && !snapshot.metadata.hasPendingWrites
+
+              widget.message.read == true && !widget.snapshot.metadata.hasPendingWrites
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -624,9 +767,9 @@ class MessageWidget extends StatelessWidget {
                   )
                 ],
               )
-            : message.read == false && snapshot.metadata.hasPendingWrites
+            : widget.message.read == false && widget.snapshot.metadata.hasPendingWrites
                 ? Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Icon(
                         PhosphorIcons.clock,
@@ -635,24 +778,50 @@ class MessageWidget extends StatelessWidget {
                       ),
                       Text(
                         " $date",
-                        style: TextStyle(color: messagesendercontainercolor),
+                        style: TextStyle(color: Colors.white),
                       )
                     ],
                   )
                 : Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Icon(
                         PhosphorIcons.check_light,
-                        color: messagesendercontainercolor,
+                        color: Colors.white,
                       ),
                       Text(
                         " $date",
-                        style: TextStyle(color: messagesendercontainercolor),
+                        style: TextStyle(color: Colors.white),
                       )
                     ],
                   )
+            ],
+          ),
+        ),
+        
       ],
     );
   }
+
+
+  String _formatDuration(double seconds) {
+    final int s = seconds.toInt() % 60;
+    final int m = (seconds ~/ 60) % 60;
+    final int h = seconds ~/ 3600;
+    return '$h:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+
+
+Future<void> downloadAudioFromFirebaseStorage(String storagePath, String localFilePath) async {
+  try {
+    final ref = FirebaseStorage.instance.ref(storagePath);
+    final File localFile = File(localFilePath);
+
+    await ref.writeToFile(localFile);
+    print('Audio downloaded successfully to: $localFilePath');
+  } catch (e) {
+    print('Error downloading audio: $e');
+  }
+}
+
 }
