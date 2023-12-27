@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dara_app/utils/apiRequest.dart';
@@ -17,9 +18,11 @@ import 'package:uuid/uuid.dart';
 import '../../../../main.dart';
 
 class CallsScreen extends StatefulWidget {
-  const CallsScreen({Key? key, required this.target_id}) : super(key: key);
+  const CallsScreen({Key? key, required this.target_id, required this.target_name, required this.target_img}) : super(key: key);
 
   final target_id;
+  final target_name;
+  final target_img;
   @override
   State<CallsScreen> createState() => _CallsScreenState();
 }
@@ -376,18 +379,37 @@ timer!.cancel();
                                 ),
                               ),
 
-                              Container(
-                                width: 120,
-                                height: 120,
-                                padding: EdgeInsets.symmetric(horizontal: 20),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: AssetImage("assets/profile.png"),
-                                  fit: BoxFit.cover)
-                                  ,
-                                ),
-                              ),
+                              CachedNetworkImage(
+                                          imageUrl: widget.target_img,
+                                          imageBuilder: (context, imageProvider) => Container(
+                                            width: 120,
+                                            height: 120,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                image: imageProvider, fit: BoxFit.cover),
+                                            ),
+                                          ),
+                                          placeholder: (context, url) => Container(
+                                            width: 60,
+                                            height: 60,
+                                            child: CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) => Icon(Icons.person,
+                                         size: 50, color:Colors.grey),
+                                          ),
+
+                              // Container(
+                              //   width: 120,
+                              //   height: 120,
+                              //   padding: EdgeInsets.symmetric(horizontal: 20),
+                              //   decoration: BoxDecoration(
+                              //     shape: BoxShape.circle,
+                              //     image: DecorationImage(
+                              //       image: AssetImage("assets/profile.png"),
+                              //     fit: BoxFit.cover)
+                              //     ,
+                              //   ),
+                              // ),
                             ],
                           ),
                           
@@ -401,7 +423,7 @@ timer!.cancel();
                         ),
 
                         Text(
-                              'Daniel Smith',
+                              widget.target_name,
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Color(0XFF121212)
@@ -462,7 +484,11 @@ timer!.cancel();
                     child: IconButton(
                             // handles the action performed anytime you press the send button
                             onPressed: () {
-                              Navigator.pop(context);
+                              FirebaseFirestore.instance.collection("users")
+                              .doc(widget.target_id).update(reset).then((value) {
+                                  Navigator.pop(context);
+                              });
+                              
                             },
                         
                             icon: Icon(

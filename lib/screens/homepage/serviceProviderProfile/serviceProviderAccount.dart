@@ -131,6 +131,7 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                                   )
                                 ];
 
+                                //----------------------//
                                 FirebaseApi.addUserChat(
                                   // shipment: e.value,
                                   token2: 'data.fcmToken',

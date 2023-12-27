@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dara_app/utils/apiRequest.dart';
@@ -335,18 +336,37 @@ timer!.cancel();
                                 ),
                               ),
 
-                              Container(
-                                width: 120,
-                                height: 120,
-                                padding: EdgeInsets.symmetric(horizontal: 20),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: AssetImage("assets/profile.png"),
-                                  fit: BoxFit.cover)
-                                  ,
-                                ),
-                              ),
+                              CachedNetworkImage(
+                                          imageUrl: widget.caller_img,
+                                          imageBuilder: (context, imageProvider) => Container(
+                                            width: 120,
+                                            height: 120,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                image: imageProvider, fit: BoxFit.cover),
+                                            ),
+                                          ),
+                                          placeholder: (context, url) => Container(
+                                            width: 60,
+                                            height: 60,
+                                            child: CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) => Icon(Icons.person,
+                                         size: 50, color:Colors.grey),
+                                          ),
+
+                              // Container(
+                              //   width: 120,
+                              //   height: 120,
+                              //   padding: EdgeInsets.symmetric(horizontal: 20),
+                              //   decoration: BoxDecoration(
+                              //     shape: BoxShape.circle,
+                              //     image: DecorationImage(
+                              //       image: AssetImage("assets/profile.png"),
+                              //     fit: BoxFit.cover)
+                              //     ,
+                              //   ),
+                              // ),
                             ],
                           ),
                           
@@ -360,7 +380,7 @@ timer!.cancel();
                         ),
 
                         Text(
-                              'Daniel Smith',
+                              widget.caller_name,
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Color(0XFF121212)

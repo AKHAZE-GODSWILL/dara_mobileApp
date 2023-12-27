@@ -172,7 +172,7 @@ class _ChatPage extends State<ChatPage> with TickerProviderStateMixin{
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation, secondaryAnimation) {
-                            return CallsScreen(target_id: widget.target_id,);
+                            return CallsScreen(target_id: widget.target_id,target_name: "",target_img:"");
                           },
                           transitionsBuilder: (context, animation, secondaryAnimation, child) {
                             return FadeTransition(

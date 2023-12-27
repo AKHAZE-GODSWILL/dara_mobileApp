@@ -694,8 +694,10 @@ class _ChatPageState extends State<ChatPage> {
                                             pageBuilder: (context, animation,
                                                 secondaryAnimation) {
                                               return CallsScreen(
-                                                  target_id:
-                                                      widget.user.idUser);
+                                                  target_id:widget.user.idUser,
+                                                  target_name: widget.user.name,
+                                                  target_img:widget.user.name
+                                              );
                                             },
                                             transitionsBuilder: (context,
                                                 animation,

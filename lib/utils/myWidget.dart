@@ -339,6 +339,9 @@ class Mywidget {
 
   showHireSheet({context, required sp_id}){
     String message = "";
+    String skillRequired = "";
+    String price = "";
+
     // bool? isLoading = false;
     return showModalBottomSheet(
               shape: RoundedRectangleBorder(
@@ -352,143 +355,261 @@ class Mywidget {
               builder: (BuildContext context) {
                 return StatefulBuilder(builder: (context, setState){
                   bool isLoading = false;
-                  return SingleChildScrollView(
-                  child: Container(
-                    height: 450,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 40,),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Hire Service Provider",
-                                 style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold),),
-                                SizedBox(height: 20,),
-                                Text("Feel free to leave a note for the service provider in the provided box.Provide a brief description of the project's nature and details.",
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: Color(0XFF374151))),
-                              ],
+                  return Container(
+                    height: 400,
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 40,),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Container(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Hire Service Provider",
+                                   style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold),),
+                                  SizedBox(height: 20,),
+                                  Text("Feel free to leave a note for the service provider in the provided box.Provide a brief description of the project's nature and details.",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: Color(0XFF374151))),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                
-                        SizedBox(height: 20,),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Message (Optional)",
-                                 style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0XFF6B7280)),
-                                 ),
-                                SizedBox(height: 10,),
-                                Container(
-                                  height: 209,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      width: 1,
-                                      color: Color(0XFFE5E7EB)
-                                    )
-                                  ),
-                                  child: TextFormField(
-                                    // focusNode: textNode,
-                                    onChanged: (value){
-                                      message = value;
-                                },  
-                                    keyboardType: TextInputType.multiline,
-                                    textAlignVertical: TextAlignVertical.top,
-                                    maxLines: null,
-                                    expands: true,
-                                    minLines: null,
-                                    // controller: bioController,
-                                    decoration: InputDecoration(
-                                      focusedBorder:OutlineInputBorder(
-                                    borderSide: BorderSide.none, // Remove the border when focused
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide.none, // Remove the border when enabled
-                                  ),
-                                      hintText: "Describe what you want the service provider to know",
-                                      hintStyle: GoogleFonts.inter(
-                                        fontSize: 12,
-                                        color: Color(0XFF6B7280)),
+                    
+                          /////// The Demacation //////////
+                          SizedBox(height: 20,),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Container(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Skill Required",
+                                   style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0XFF6B7280)),
+                                   ),
+                                  SizedBox(height: 10,),
+                                  Container(
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        width: 1,
+                                        color: Color(0XFFE5E7EB)
+                                      )
+                                    ),
+                                    child: TextFormField(
+                                      // focusNode: textNode,
+                                      onChanged: (value){
+                                        skillRequired = value;
+                                  },  
+                                      keyboardType: TextInputType.text,
+                                      textAlignVertical: TextAlignVertical.top,
+                                      
+                                      // controller: bioController,
+                                      decoration: InputDecoration(
+                                        focusedBorder:OutlineInputBorder(
+                                      borderSide: BorderSide.none, // Remove the border when focused
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide.none, // Remove the border when enabled
+                                    ),
+                                        hintText: "Describe what you want the service provider to know",
+                                        hintStyle: GoogleFonts.inter(
+                                          fontSize: 12,
+                                          color: Color(0XFF6B7280)),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 20,),
-                
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: InkWell(
-                            onTap: (){
-
-                              setState((){
-                                isLoading =true;
-                              });
-
-                              makeOfferToSP(service_provider_id: sp_id, message: message.trim()).then((value) {
-
-                            print("The final Value of what was resulted from the request was :$value");
-
-                            if(value["status"]== true && value["message"]=="Your offer has been submitted successfully."){
-                              mywidgets.displayToast(msg: "Offers sent successfully");
-                              setState(() {
-                                
-                              });
-                              Navigator.pop(context);
-                            }
-                            else if(value["status"] == "Network Error"){
-                              mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
-                            }
-                            else{
-                              mywidgets.displayToast(msg: value["message"]);
-                            }
-
-                            setState(() {
-                              isLoading = false;
-                            });
-                          });
-                          
-                              
-                            },
+                    
+                          /////// The Demacation //////////
+                          SizedBox(height: 20,),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
                             child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                  color: constants.appMainColor,
-                                  borderRadius: BorderRadius.circular(200)
-                              ),
-                              child: Center(
-                                child:( isLoading == true)? CircularProgressIndicator():Text(
-                                  "Submit",
-                                  style: GoogleFonts.inter(
-                                      color:  Colors.white,
-                                      fontSize: 14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Price",
+                                   style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0XFF6B7280)),
+                                   ),
+                                  SizedBox(height: 10,),
+                                  Container(
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        width: 1,
+                                        color: Color(0XFFE5E7EB)
+                                      )
+                                    ),
+                                    child: TextFormField(
+                                      // focusNode: textNode,
+                                      onChanged: (value){
+                                        price = value;
+                                  },  
+                                      keyboardType: TextInputType.number,
+                                      textAlignVertical: TextAlignVertical.top,
+                                      
+                                      // controller: bioController,
+                                      decoration: InputDecoration(
+                                        focusedBorder:OutlineInputBorder(
+                                      borderSide: BorderSide.none, // Remove the border when focused
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide.none, // Remove the border when enabled
+                                    ),
+                                        hintText: "Describe what you want the service provider to know",
+                                        hintStyle: GoogleFonts.inter(
+                                          fontSize: 12,
+                                          color: Color(0XFF6B7280)),
                                       ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        )
-                      ],
+                    
+                    
+                          /////// The Demacation //////////
+                          SizedBox(height: 20,),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Container(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Message (Optional)",
+                                   style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0XFF6B7280)),
+                                   ),
+                                  SizedBox(height: 10,),
+                                  Container(
+                                    height: 209,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        width: 1,
+                                        color: Color(0XFFE5E7EB)
+                                      )
+                                    ),
+                                    child: TextFormField(
+                                      // focusNode: textNode,
+                                      onChanged: (value){
+                                        message = value;
+                                  },  
+                                      keyboardType: TextInputType.multiline,
+                                      textAlignVertical: TextAlignVertical.top,
+                                      maxLines: null,
+                                      expands: true,
+                                      minLines: null,
+                                      // controller: bioController,
+                                      decoration: InputDecoration(
+                                        focusedBorder:OutlineInputBorder(
+                                      borderSide: BorderSide.none, // Remove the border when focused
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide.none, // Remove the border when enabled
+                                    ),
+                                        hintText: "Describe what you want the service provider to know",
+                                        hintStyle: GoogleFonts.inter(
+                                          fontSize: 12,
+                                          color: Color(0XFF6B7280)),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20,),
+                                    
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: InkWell(
+                              onTap: (){
+                                
+                                if(message.isNotEmpty && skillRequired.isNotEmpty && price.isNotEmpty){
+
+                                      setState((){
+                                  isLoading =true;
+                                });
+                    
+                                makeOfferToSP(service_provider_id: sp_id, message: message.trim(), price: price.trim(), skill_needed: skillRequired.trim()).then((value) {
+                    
+                              print("The final Value of what was resulted from the request was :$value");
+                    
+                              if(value["status"]== true && value["message"]=="Your offer has been submitted successfully."){
+                                mywidgets.displayToast(msg: "Offers sent successfully");
+                                setState(() {
+                                  
+                                });
+                                Navigator.pop(context);
+                              }
+                              else if(value["status"] == "Network Error"){
+                                mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
+                              }
+                              else{
+                                mywidgets.displayToast(msg: value["message"]);
+                              }
+                    
+                              setState(() {
+                                isLoading = false;
+                              });
+                            });
+                                }
+                                else{}
+                                
+                            
+                                
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                    color: constants.appMainColor,
+                                    borderRadius: BorderRadius.circular(200)
+                                ),
+                                child: Center(
+                                  child:( isLoading == true)? CircularProgressIndicator():Text(
+                                    "Submit",
+                                    style: GoogleFonts.inter(
+                                        color:  Colors.white,
+                                        fontSize: 14),
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(height: 20,)
+
+                          
+                        ],
+                      ),
                     )
-                  ),
-                );
+                  );
                 });
               },
             );

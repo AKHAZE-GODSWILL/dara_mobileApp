@@ -1165,10 +1165,10 @@ class _HomePageState extends State<HomePage> {
                                                 image: imageProvider, fit: BoxFit.cover),
                                             ),
                                           ),
-                                          placeholder: (context, url) => Container(
-                                            width: 60,
-                                            height: 60,
-                                            child: CircularProgressIndicator()),
+                                          // placeholder: (context, url) => Container(
+                                          //   width: 60,
+                                          //   height: 60,
+                                          //   child: CircularProgressIndicator()),
                                           errorWidget: (context, url, error) => Icon(Icons.person,
                                          size: 50, color:Colors.grey),
                                           ),

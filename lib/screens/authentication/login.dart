@@ -468,15 +468,18 @@ class _Login extends State<Login>{
                             print("The final Value of what was resulted from the request was :$value");
                             // mywidgets.displayToast(msg: "$value");
                             if(value["status"]== true && value["message"]== "login successful"){
-                                  mywidgets.displayToast(msg: "Login is successful");
                                   
-                                  provider.set_sp_login_info(
+                                  
+
+                                  if( provider.userType == "serviceProvider" && value["user_object"]["personal_information"]["service_provider"] == "1"){
+                                    mywidgets.displayToast(msg: "Login is successful");
+                                    provider.set_sp_login_info(
                                     firstName: value["user_object"]["personal_information"]["first_name"],
                                     lastName: value["user_object"]["personal_information"]["last_name"],
                                     email: value["user_object"]["personal_information"]["email"], 
                                     id: value["user_object"]["personal_information"]["id"].toString(), 
                                     access_token: value["access_token"], 
-                                    profile_image: "");
+                                    profile_image: (value["user_object"]["address_information"] != null)? value["user_object"]["address_information"]["profile_image"]: "");
                                   provider.set_sp_phone(service_provider_phone: value["user_object"]["personal_information"]["phone"]);
                                   getX.write(constants.GETX_TOKEN,value["access_token"]);
 
@@ -502,6 +505,11 @@ class _Login extends State<Login>{
                               String encryptedPassword=  encryptPassword(passwordController.text.trim());
                               getX.write(constants.GETX_SP_PASSWORD ,encryptedPassword);
                               getX.write(constants.GETX_SP_PHONE,(dropDownLoginField == "Phone")? "${countryCallingCode}${phone}": emailController.text.trim());
+                                  }
+                                  else{
+                                    mywidgets.displayToast(msg: "This account is registered as a client. Select the Client Option as User type and Login again");
+                                  }
+                                  
                             }
                             else if(value["status"] == "Network Error"){
                               mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
@@ -529,16 +537,19 @@ class _Login extends State<Login>{
                           loginClient(email:emailController.text.trim(), password: passwordController.text.trim()).then((value) {
 
                             print("The final Value of what was resulted from the request was :$value");
+                            
+                            
 
                             if(value["status"]== true && value["message"]== "login successful"){
-                              
-                              provider.set_client_login_info(
+
+                              if(provider.userType == "client" && value["user_object"]["personal_information"]["service_provider"] == "0"){
+                                provider.set_client_login_info(
                                     firstName: value["user_object"]["personal_information"]["first_name"],
                                     lastName: value["user_object"]["personal_information"]["last_name"], 
                                     email: value["user_object"]["personal_information"]["email"], 
                                     id: value["user_object"]["personal_information"]["id"].toString(), 
                                     access_token: value["access_token"], 
-                                    profile_image: "");
+                                    profile_image: (value["user_object"]["address_information"] != null)? value["user_object"]["address_information"]["profile_image"]: "");
                                     getX.write(constants.GETX_TOKEN,value["access_token"]);
                               // provider.set_client_user_id(userId: value["user_object"]["personal_information"]["id"].toString());
                               
@@ -564,6 +575,12 @@ class _Login extends State<Login>{
                               String encryptedPassword=  encryptPassword(passwordController.text.trim());
                               getX.write(constants.GETX_CLIENT_PASSWORD ,encryptedPassword);
                               getX.write(constants.GETX_CLIENT_EMAIL, emailController.text.trim(),);
+
+                            }else{
+                              mywidgets.displayToast(msg: "This account is registered as a Service Provider. Select the Service Provider Option as User type and Login again");
+                            }
+
+                              
                             }
                             else if(value["status"] == "Network Error"){
                               mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
@@ -690,20 +707,13 @@ class _Login extends State<Login>{
 
                             if(value["status"]== true && value["message"]== "login successful"){
 
-                                  // provider.set_sp_user_id(userId: value["user_object"]["personal_information"]["id"].toString());
-                                  // provider.set_sp_personal_info(
-                                  //   firstName: value["user_object"]["personal_information"]["first_name"],
-                                  //   lastName: value["user_object"]["personal_information"]["last_name"], 
-                                  //   email: value["user_object"]["personal_information"]["email"]
-                                  //   );
-
                                   provider.set_sp_login_info(
                                     firstName: value["user_object"]["personal_information"]["first_name"],
                                     lastName: value["user_object"]["personal_information"]["last_name"], 
                                     email: value["user_object"]["personal_information"]["email"], 
                                     id: value["user_object"]["personal_information"]["id"].toString(), 
                                     access_token: value["access_token"], 
-                                    profile_image: value["user_object"]["address_information"]["profile_image"]);
+                                    profile_image: (value["user_object"]["address_information"] != null)? value["user_object"]["address_information"]["profile_image"]: "");
                                   provider.set_sp_phone(service_provider_phone: value["user_object"]["personal_information"]["phone"]);
                                   getX.write(constants.GETX_TOKEN,value["access_token"]);
 
@@ -770,7 +780,7 @@ class _Login extends State<Login>{
                                     email: value["user_object"]["personal_information"]["email"], 
                                     id: value["user_object"]["personal_information"]["id"].toString(), 
                                     access_token: value["access_token"], 
-                                    profile_image: "");
+                                    profile_image: (value["user_object"]["address_information"] != null)? value["user_object"]["address_information"]["profile_image"]: "");
                                     getX.write(constants.GETX_TOKEN,value["access_token"]);
                               // provider.set_client_user_id(userId: value["user_object"]["personal_information"]["id"].toString());
                               print("................I'm so happy because he user id is ${value["user_object"]["personal_information"]["id"]}");
@@ -789,11 +799,6 @@ class _Login extends State<Login>{
                                 Navigator.of(context).push(
                                   MaterialPageRoute(builder: (context) => ClientAddressInfo()));
                               }
-
-                              // encrypt the password and save it in the user's device offline, so I can retrieve it later
-                              // String encryptedPassword=  encryptPassword(passwordController.text.trim());
-                              // getX.write(constants.GETX_CLIENT_PASSWORD ,encryptedPassword);
-                              // getX.write(constants.GETX_CLIENT_EMAIL, _textEditingController.text.trim(),);
                             }
                             else if(value["status"] == "Network Error"){
                               mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");

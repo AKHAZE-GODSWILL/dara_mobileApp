@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dara_app/screens/homepage/viewProject.dart';
+import 'package:dara_app/utils/apiRequest.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_ph/**/osphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_svg/svg.dart';
@@ -6,14 +8,63 @@ import 'package:flutter_svg/svg.dart';
 import '../../main.dart';
 
 class Projects extends StatefulWidget {
-  const Projects({Key? key}) : super(key: key);
-
+  const Projects({Key? key, required this.userType}) : super(key: key);
+  final userType;
   @override
   State<Projects> createState() => _ProjectsState();
 }
 
 class _ProjectsState extends State<Projects> {
   bool selected = false;
+  bool isLoading = false;
+  List allProjects = [];
+  List ongoingProjects = [];
+  List completedProjects = [];
+  
+  void viewAllProjects(){
+    // DataProvider provider = Provider.of<DataProvider>(context, listen: true);
+    setState((){
+        isLoading =true;
+      });
+
+      myProjects().then((value) {
+      // mywidgets.displayToast(msg: "making the request");
+    print("The final Value of what was resulted from the request was :$value");
+
+    if(value["status"]== true && value["message"]=="success"){
+      setState(() {
+        allProjects = value["data"];
+
+        allProjects.forEach((element) {
+          if(element["status"] == "ongoing"){
+            ongoingProjects.add(element);
+          }
+          else if(element["status"] == "completed"){
+            completedProjects.add(element);
+          }
+         });
+      });
+    }
+    else if(value["status"] == "Network Error"){
+      mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
+    }
+    else{
+      mywidgets.displayToast(msg: value["message"]);
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    viewAllProjects();
+    super.initState();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,9 +169,9 @@ class _ProjectsState extends State<Projects> {
 
             ],
           ),
-         selected? Expanded(
+        (isLoading)? Center(child: CircularProgressIndicator()): selected? Expanded(
            child: ListView.builder(
-            itemCount: 4,
+            itemCount: ongoingProjects.length,
             itemBuilder: (context, index){
             return InkWell(
               onTap: (){
@@ -154,11 +205,24 @@ class _ProjectsState extends State<Projects> {
                                 padding: EdgeInsets.only(right: 8.0),
                                 child: Stack(
                                   children: [
-                                    CircleAvatar(
-                                      radius: 22,
-                                      backgroundImage:
-                                      AssetImage("assets/profile1.png"),
-                                    ),
+                                    CachedNetworkImage(
+                                          imageUrl: ongoingProjects[index]["profile_image"],
+                                          imageBuilder: (context, imageProvider) => Container(
+                                            width: 48,
+                                            height: 48,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                image: imageProvider, fit: BoxFit.cover),
+                                            ),
+                                          ),
+                                          placeholder: (context, url) => Container(
+                                            width: 50,
+                                            height: 50,
+                                            child: CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) => Icon(Icons.person,
+                                         size: 50, color:Colors.grey),
+                                          ),
                                     Padding(
                                       padding: EdgeInsets.only(left: 32),
                                       child: Container(
@@ -184,7 +248,7 @@ class _ProjectsState extends State<Projects> {
                                     width: MediaQuery.of(context).size.width*0.78,
                                     child: RichText(text: TextSpan(children: [
                                       TextSpan(
-                                        text:  "Daniel Smith ",
+                                        text:  ongoingProjects[index]["customer_first_name"],
                                         style: TextStyle(fontSize: 14,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black),
@@ -207,7 +271,7 @@ class _ProjectsState extends State<Projects> {
                                         Padding(
                                           padding: const EdgeInsets.all(2.0),
                                           child: Text(
-                                            "NGN 25,0000",
+                                            "NGN ${ongoingProjects[index]["price"]}",
                                             style: TextStyle(
                                                 fontSize: 13, color: Colors.black),
                                           ),
@@ -261,7 +325,7 @@ class _ProjectsState extends State<Projects> {
          ):
          Expanded(
            child: ListView.builder(
-            itemCount: 4,
+            itemCount: completedProjects.length,
             itemBuilder: (context, index){
             return InkWell(
               onTap: (){

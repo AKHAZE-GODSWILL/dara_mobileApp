@@ -306,20 +306,19 @@ Future<dynamic> getOffers() async {
   };
 
   print("Before postin the request");
-  mywidgets.displayToast(msg: "Before making the get request");
+  // mywidgets.displayToast(msg: "Before making the get request");
   http.Client client = http.Client();
   print("After defining the client object");
   final response = await client.get(
     Uri.https(url,"/api/v1/offers"),
     headers: headers
   );
-  mywidgets.displayToast(msg: "after making the get request");
+  // mywidgets.displayToast(msg: "after making the get request");
   print("Before decoding the request");
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response) as Map;
 
     print("Before returning the response");
-    mywidgets.displayToast(msg: jsonData);
     return jsonData;
   }
   on SocketException catch(e){
@@ -332,42 +331,117 @@ Future<dynamic> getOffers() async {
   }
 }
 
-// Future<dynamic> offersDetails() async {
+Future<dynamic> acceptOffers({required offer_id}) async {
   
-//   print("Register service provider started running");
-//   try{
-//     String token = getX.read(constants.GETX_TOKEN);
-//   print("In the try method");
-//   final Map<String, String> headers = {
-//     'Content-Type': 'application/json',
-//     'Authorization':'Bearer $token'
-//   };
+  print("Register service provider started running");
+  try{
+    String token = getX.read(constants.GETX_TOKEN);
+  print("In the try method");
+  final Map<String, String> headers = {
+    'Content-Type': 'application/json',
+    'Authorization':'Bearer $token'
+  };
 
-//   print("Before postin the request");
+  print("Before postin the request");
+  // mywidgets.displayToast(msg: "Before making the get request");
+  http.Client client = http.Client();
+  print("After defining the client object");
+  final response = await client.get(
+    Uri.https(url,"/api/v1/offers/", {"offer_id":"$offer_id/accept"}),
+    headers: headers
+  );
+  // mywidgets.displayToast(msg: "after making the get request");
+  print("Before decoding the request");
+    final utf8Response = utf8.decode(response.bodyBytes);
+    final jsonData = json.decode(utf8Response) as Map;
+
+    print("Before returning the response");
+    return jsonData;
+  }
+  on SocketException catch(e){
+    print("Socket Error Occured : $e");
+    return {"status":"Network Error"};
+  }
+  on Error catch (e){
+    print("Error Occured : $e");
+    return "Some error occured $e";
+  }
+}
+
+Future<dynamic> rejectOffers({required offer_id}) async {
   
-//   http.Client client = http.Client();
-//   print("After defining the client object");
-//   final response = await client.get(
-//     Uri.https(url,"/api/v1/reload"),
-//     headers: headers
-//   );
+  print("Register service provider started running");
+  try{
+    String token = getX.read(constants.GETX_TOKEN);
+  print("In the try method");
+  final Map<String, String> headers = {
+    'Content-Type': 'application/json',
+    'Authorization':'Bearer $token'
+  };
 
-//   print("Before decoding the request");
-//     final utf8Response = utf8.decode(response.bodyBytes);
-//     final jsonData = json.decode(utf8Response) as Map;
+  print("Before postin the request");
+  // mywidgets.displayToast(msg: "Before making the get request");
+  http.Client client = http.Client();
+  print("After defining the client object");
+  final response = await client.get(
+    Uri.https(url,"/api/v1/offers",{"offer_id":"$offer_id/reject"}),
+    headers: headers
+  );
+  // mywidgets.displayToast(msg: "after making the get request");
+  print("Before decoding the request");
+    final utf8Response = utf8.decode(response.bodyBytes);
+    final jsonData = json.decode(utf8Response) as Map;
 
-//     print("Before returning the response");
-//     return jsonData;
-//   }
-//   on SocketException catch(e){
-//     print("Socket Error Occured : $e");
-//     return {"status":"Network Error"};
-//   }
-//   on Error catch (e){
-//     print("Error Occured : $e");
-//     return "Some error occured";
-//   }
-// }
+    print("Before returning the response");
+    return jsonData;
+  }
+  on SocketException catch(e){
+    print("Socket Error Occured : $e");
+    return {"status":"Network Error"};
+  }
+  on Error catch (e){
+    print("Error Occured : $e");
+    return "Some error occured $e";
+  }
+}
+
+Future<dynamic> myProjects() async {
+  
+  print("Register service provider started running");
+  try{
+    String token = getX.read(constants.GETX_TOKEN);
+  print("In the try method");
+  final Map<String, String> headers = {
+    'Content-Type': 'application/json',
+    'Authorization':'Bearer $token'
+  };
+
+  print("Before postin the request");
+  // mywidgets.displayToast(msg: "Before making the get request");
+  http.Client client = http.Client();
+  print("After defining the client object");
+  final response = await client.get(
+    Uri.https(url,"/api/v1/projects"),
+    headers: headers
+  );
+  // mywidgets.displayToast(msg: "after making the get request");
+  print("Before decoding the request");
+    final utf8Response = utf8.decode(response.bodyBytes);
+    final jsonData = json.decode(utf8Response) as Map;
+
+    print("Before returning the response");
+    return jsonData;
+  }
+  on SocketException catch(e){
+    print("Socket Error Occured : $e");
+    return {"status":"Network Error"};
+  }
+  on Error catch (e){
+    print("Error Occured : $e");
+    return "Some error occured $e";
+  }
+}
+
 
 /////////////////////////// The Clients Apis request here >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -749,7 +823,7 @@ Future<dynamic> searchServiceProviders({required query}) async {
 }
 
 
-Future<dynamic> makeOfferToSP({required service_provider_id, required message}) async {
+Future<dynamic> makeOfferToSP({required service_provider_id, required message, required price, required skill_needed}) async {
   
   // print("Register service provider started running");
   try{
@@ -763,7 +837,9 @@ Future<dynamic> makeOfferToSP({required service_provider_id, required message}) 
 
   final Map<String, dynamic> requestBody = {
     "service_provider_id":service_provider_id,
-    "message":message
+    "message":message,
+    "price":price,
+    "skill_needed": skill_needed
   }; // Replace with your request data
 
   // print("Before postin the request");

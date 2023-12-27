@@ -180,7 +180,7 @@ Map<String, dynamic> reset = {
               ? Offers(userType: (provider.userType == "serviceProvider")? "serviceProvider":"client",)
               : (pageIndex == 2)? (provider.userType == "serviceProvider")?CreatePost(backToHome: backToHome,): DiscoverPage()
                   : pageIndex == 3
-                      ? Projects()
+                      ? Projects(userType: (provider.userType == "serviceProvider")? "serviceProvider":"client")
                       : (provider.userType == "serviceProvider")?AccountMain(backToHome: backToHome):ClientAccount(backToHome: backToHome),
       bottomNavigationBar: buildMyNavBar(context,
 

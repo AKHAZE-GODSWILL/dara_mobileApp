@@ -1,5 +1,10 @@
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dara_app/Firebase/Firebase_service.dart';
+import 'package:dara_app/Firebase/Model/User.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
+import 'package:dara_app/screens/chat/Chat.dart';
+import 'package:dara_app/screens/homepage/drawerRoutes/callsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,8 +14,8 @@ import 'package:provider/provider.dart';
 import '../../main.dart';
 
 class ViewOffers extends StatefulWidget {
-  const ViewOffers({Key? key}) : super(key: key);
-
+  const ViewOffers({Key? key, required this.offerDetail}) : super(key: key);
+  final offerDetail;
   @override
   State<ViewOffers> createState() => _ViewOffersState();
 }
@@ -95,7 +100,7 @@ super.initState();
                     children: [
                       Text("Skill Needed", style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
                       SizedBox(height: 10,),
-                      Text("Laundry Service"),
+                      Text(widget.offerDetail["skill_needed"]),
                     ],
                   ),
                 ),
@@ -110,8 +115,7 @@ super.initState();
                     children: [
                       Text("Project Description", style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
                       SizedBox(height: 10,),
-                      Text("Lorem ipsum dolor sit amet consectetur. Donec vulputate tristique sit quis tristique sit ut ultrices. "
-                                "Adipiscing pulvinar eros arcu scelerisque lectus scelerisque... See more"),
+                      Text(widget.offerDetail["message"]),
                     ],
                   ),
                 ),
@@ -143,7 +147,7 @@ super.initState();
                     children: [
                       Text("Price", style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
                       SizedBox(height: 10,),
-                      Text("N/A"),
+                      Text("N${widget.offerDetail["price"]}"),
                     ],
                   ),
                 ),
@@ -166,17 +170,31 @@ super.initState();
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: CircleAvatar(
-                        radius: 25,
-                        backgroundImage: AssetImage("assets/profile.png"),
-                      ),
+                      child: CachedNetworkImage(
+                                          imageUrl: widget.offerDetail["sender_profile_image"],
+                                          imageBuilder: (context, imageProvider) => Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                image: imageProvider, fit: BoxFit.cover),
+                                            ),
+                                          ),
+                                          placeholder: (context, url) => Container(
+                                            width: 60,
+                                            height: 60,
+                                            child: CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) => Icon(Icons.person,
+                                         size: 50, color:Colors.grey),
+                                          ),
                     ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Daniel Smith",
+                          widget.offerDetail["sender"],
                           style:
                               TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                         ),Container(
@@ -199,22 +217,57 @@ super.initState();
                     Spacer(),
                     InkWell(
                       onTap: (){
-                        // Navigator.push(
-                        //   context,
-                        //   PageRouteBuilder(
-                        //     pageBuilder: (context, animation, secondaryAnimation) {
-                        //       return Notifications();
-                        //       // MainOnboard();
-                        //       // HomePageWidget();
-                        //     },
-                        //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                        //       return FadeTransition(
-                        //         opacity: animation,
-                        //         child: child,
-                        //       );
-                        //     },
-                        //   )
-                        // );
+
+                        List<User> users = [
+                                  User(
+                                    lastMessage: '',
+                                    urlAvatar: "",
+                                    userMobile: "",
+                                    lastMessageTime: DateTime.now(),
+                                    idUser: widget.offerDetail["sender_user_id"],
+                                    name:
+                                        '${widget.offerDetail["sender"]}',
+                                    read: true,
+                                    id: widget.offerDetail["sender_user_id"],
+                                    status: true,
+                                    docid: widget.offerDetail["sender_user_id"],
+                                  )
+                                ];
+
+                        //----------------------//
+                                FirebaseApi.addUserChat(
+                                  // shipment: e.value,
+                                  token2: 'data.fcmToken',
+                                  token: 'snapshot.data[index].fcmToken',
+                                  urlAvatar2: provider.client_profile_image,
+                                  name2: provider.client_first_name,
+                                  recieveruserId2: provider.client_user_id,
+                                  recieveruserId: users[0].idUser,
+                                  idArtisan: provider.client_user_id.toString(),
+                                  artisanMobile: provider.client_phone,
+                                  userMobile: users[0].userMobile,
+                                  idUser: users[0].idUser.toString(),
+                                  urlAvatar: users[0].urlAvatar,
+                                  name: users[0].name,
+                                ); 
+
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) {
+                              return ChatPage(
+                                newchat: true,
+                                support: true, 
+                                user: users[0]);
+                            },
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                          )
+                        );
                       },
                       child: Container(
                         height: 40,
@@ -233,22 +286,26 @@ super.initState();
                     SizedBox(width: 10,),
                     InkWell(
                       onTap: (){
-                        // Navigator.push(
-                        //   context,
-                        //   PageRouteBuilder(
-                        //     pageBuilder: (context, animation, secondaryAnimation) {
-                        //       return Notifications();
-                        //       // MainOnboard();
-                        //       // HomePageWidget();
-                        //     },
-                        //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                        //       return FadeTransition(
-                        //         opacity: animation,
-                        //         child: child,
-                        //       );
-                        //     },
-                        //   )
-                        // );
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) {
+                              return CallsScreen(
+                                target_id: widget.offerDetail["sender_user_id"],
+                                target_name: widget.offerDetail["sender"],
+                                target_img: widget.offerDetail["sender_profile_image"],
+                                );
+                              // MainOnboard();
+                              // HomePageWidget();
+                            },
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                          )
+                        );
                       },
                       child: Container(
                         height: 40,

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dara_app/screens/authentication/login.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/chatHistory.dart';
@@ -30,7 +31,7 @@ class _OffersState extends State<Offers> {
 
   makeOfferRequest(){
 
-    mywidgets.displayToast(msg: "In the Make offer method and the user type is ${widget.userType}");
+    // mywidgets.displayToast(msg: "In the Make offer method and the user type is ${widget.userType}");
 
     // DataProvider provider = Provider.of<DataProvider>(context, listen: true);
     setState((){
@@ -38,13 +39,12 @@ class _OffersState extends State<Offers> {
       });
 
      (widget.userType == "serviceProvider")? getOffers().then((value) {
-      mywidgets.displayToast(msg: "making the request");
+      // mywidgets.displayToast(msg: "making the request");
     print("The final Value of what was resulted from the request was :$value");
 
     if(value["status"]== true && value["message"]=="Data fetched successfully"){
-      mywidgets.displayToast(msg: "Data fetched successfully and the data is ${value["data"]}");
       setState(() {
-        // offers = value["data"];
+        offers = value["data"];
       });
     }
     else if(value["status"] == "Network Error"){
@@ -395,11 +395,24 @@ class _OffersState extends State<Offers> {
                               padding: EdgeInsets.only(right: 8.0),
                               child: Stack(
                                 children: [
-                                  CircleAvatar(
-                                    radius: 22,
-                                    backgroundImage:
-                                    AssetImage("assets/profile1.png"),
-                                  ),
+                                  CachedNetworkImage(
+                                          imageUrl: offers[index]["sender_profile_image"],
+                                          imageBuilder: (context, imageProvider) => Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                image: imageProvider, fit: BoxFit.cover),
+                                            ),
+                                          ),
+                                          placeholder: (context, url) => Container(
+                                            width: 50,
+                                            height: 50,
+                                            child: CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) => Icon(Icons.person,
+                                         size: 50, color:Colors.grey),
+                                          ),
                                   Padding(
                                     padding: EdgeInsets.only(left: 32),
                                     child: Container(
@@ -424,13 +437,13 @@ class _OffersState extends State<Offers> {
                                   width: MediaQuery.of(context).size.width*0.75,
                                   child: RichText(text: TextSpan(children: [
                                     TextSpan(
-                                      text:  offers[index]["data"]["sender"],
+                                      text:  offers[index]["sender"],
                                       style: TextStyle(fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black),
                                     ),
                                     TextSpan(
-                                      text:  "sent a request to hire your services for a project",
+                                      text:  "\t sent a request to hire your services for a project",
                                       style: TextStyle(fontSize: 12, color: Colors.black),
                                     )])),
                                 ),
@@ -459,7 +472,7 @@ class _OffersState extends State<Offers> {
                             context,
                             PageRouteBuilder(
                               pageBuilder: (context, animation, secondaryAnimation) {
-                                return ViewOffers();
+                                return ViewOffers(offerDetail: offers[index],);
                               },
                               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                 return FadeTransition(
@@ -490,7 +503,29 @@ class _OffersState extends State<Offers> {
                           padding: const EdgeInsets.only(left: 10.0),
                           child: InkWell(
                             onTap: (){
-                              CustomSuccessDialog();
+
+                              acceptOffers(offer_id: offers[index]["offer_id"]).then((value) {
+                                  // mywidgets.displayToast(msg: "making the request");
+                                print("The final Value of what was resulted from the request was :$value");
+
+                                if(value["status"]== true ){
+                                  setState(() {
+                                    offers.removeAt(index);
+                                    CustomSuccessDialog();
+                                  });
+                                }
+                                else if(value["status"] == "Network Error"){
+                                  mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
+                                }
+                                else{
+                                  mywidgets.displayToast(msg: value["message"]);
+                                }
+
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              });
+                              
                             },
                             child: Container(
                               width: 88,
@@ -515,7 +550,29 @@ class _OffersState extends State<Offers> {
                           padding: const EdgeInsets.only(left: 10.0),
                           child: InkWell(
                             onTap: (){
-                              CustomAcknowledgedDialog();
+
+                              rejectOffers(offer_id: offers[index]["offer_id"]).then((value) {
+                                  // mywidgets.displayToast(msg: "making the request");
+                                print("The final Value of what was resulted from the request was :$value");
+
+                                if(value["status"]== true){
+                                  setState(() {
+                                    offers.removeAt(index);
+                                    CustomAcknowledgedDialog();
+                                  });
+                                }
+                                else if(value["status"] == "Network Error"){
+                                  mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
+                                }
+                                else{
+                                  mywidgets.displayToast(msg: value["message"]);
+                                }
+
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              });
+                              
                             },
                             child: Container(
                               width: 88,
@@ -561,11 +618,24 @@ class _OffersState extends State<Offers> {
                               padding: EdgeInsets.only(right: 8.0),
                               child: Stack(
                                 children: [
-                                  CircleAvatar(
-                                    radius: 22,
-                                    backgroundImage:
-                                    AssetImage("assets/profile1.png"),
-                                  ),
+                                  CachedNetworkImage(
+                                          imageUrl: offers[index]["sender_profile_image"],
+                                          imageBuilder: (context, imageProvider) => Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                image: imageProvider, fit: BoxFit.cover),
+                                            ),
+                                          ),
+                                          placeholder: (context, url) => Container(
+                                            width: 60,
+                                            height: 60,
+                                            child: CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) => Icon(Icons.person,
+                                         size: 50, color:Colors.grey),
+                                          ),
                                   Padding(
                                     padding: EdgeInsets.only(left: 32),
                                     child: Container(
@@ -646,7 +716,7 @@ class _OffersState extends State<Offers> {
                             context,
                             PageRouteBuilder(
                               pageBuilder: (context, animation, secondaryAnimation) {
-                                return ViewOffers();
+                                return ViewOffers(offerDetail: offers[index],);
                               },
                               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                 return FadeTransition(
