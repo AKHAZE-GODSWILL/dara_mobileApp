@@ -5,6 +5,7 @@ import 'package:dara_app/Firebase/Model/User.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dara_app/screens/chat/Chat.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/callsScreen.dart';
+import 'package:dara_app/utils/apiRequest.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,14 +15,17 @@ import 'package:provider/provider.dart';
 import '../../main.dart';
 
 class ViewOffers extends StatefulWidget {
-  const ViewOffers({Key? key, required this.offerDetail}) : super(key: key);
+  const ViewOffers({Key? key, required this.offerDetail, required this.refreshOfferPage, required this.offerIndex}) : super(key: key);
   final offerDetail;
+  final offerIndex;
+  final Function refreshOfferPage;
   @override
   State<ViewOffers> createState() => _ViewOffersState();
 }
 
 class _ViewOffersState extends State<ViewOffers> {
 
+  bool isLoading = false;
   @override
 void initState() {
 super.initState();
@@ -218,6 +222,7 @@ super.initState();
                     InkWell(
                       onTap: (){
 
+                        ///////////// The list is not necessary
                         List<User> users = [
                                   User(
                                     lastMessage: '',
@@ -286,6 +291,7 @@ super.initState();
                     SizedBox(width: 10,),
                     InkWell(
                       onTap: (){
+                        /////////
                         Navigator.push(
                           context,
                           PageRouteBuilder(
@@ -338,7 +344,29 @@ super.initState();
                             
                             InkWell(
                               onTap: (){
-                                CustomAcknowledgedDialog();
+
+                                rejectOffers(offer_id: widget.offerDetail["offer_id"]).then((value) {
+                                  // mywidgets.displayToast(msg: "making the request");
+                                print("The final Value of what was resulted from the request was :$value");
+
+                                if(value["status"]== true){
+                                  setState(() {
+                                    widget.refreshOfferPage(offerIndex: widget.offerIndex);
+                                    CustomAcknowledgedDialog();
+                                  });
+                                }
+                                else if(value["status"] == "Network Error"){
+                                  mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
+                                }
+                                else{
+                                  mywidgets.displayToast(msg: value["message"]);
+                                }
+
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              });
+                                // CustomAcknowledgedDialog();
                               },
                               child: Container(
                                 width: 160,
@@ -350,7 +378,7 @@ super.initState();
                                     borderRadius: BorderRadius.circular(200)
                                 ),
                                 child: Center(
-                                  child: Text(
+                                  child: isLoading? Center(child: CircularProgressIndicator(),):Text(
                                     "Decline",
                                     style: TextStyle(
                                         color:  Color(0XFFEF4444),
@@ -362,7 +390,29 @@ super.initState();
                             SizedBox(width: 5,),
                             InkWell(
                               onTap: (){
-                                CustomSuccessDialog();
+                                // mywidgets.displayToast(msg: "${widget.offerDetail["offer_id"]}");
+                                acceptOffers(offer_id: widget.offerDetail["offer_id"]).then((value) {
+                                  // mywidgets.displayToast(msg: "making the request");
+                                print("The final Value of what was resulted from the request was :$value");
+
+                                if(value["status"]== "true" ){
+                                  setState(() {
+                                    widget.refreshOfferPage(offerIndex: widget.offerIndex);
+                                    CustomSuccessDialog();
+                                  });
+                                }
+                                else if(value["status"] == "Network Error"){
+                                  mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
+                                }
+                                else{
+                                  mywidgets.displayToast(msg: value["message"]);
+                                }
+
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              });
+                                // CustomSuccessDialog();
                               },
                               child: Container(
                                 width: 160,
@@ -372,7 +422,7 @@ super.initState();
                                     borderRadius: BorderRadius.circular(200)
                                 ),
                                 child: Center(
-                                  child: Text(
+                                  child: isLoading? Center(child: CircularProgressIndicator(),) :Text(
                                     "Accept",
                                     style: TextStyle(
                                         color:  Colors.white,

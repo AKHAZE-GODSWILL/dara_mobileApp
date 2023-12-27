@@ -179,7 +179,7 @@ class _ProjectsState extends State<Projects> {
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation, secondaryAnimation) {
-                            return ViewProject(selected: selected);
+                            return ViewProject(selected: selected,projectDetail: ongoingProjects[index]);
                           },
                           transitionsBuilder: (context, animation, secondaryAnimation, child) {
                             return FadeTransition(
@@ -208,8 +208,8 @@ class _ProjectsState extends State<Projects> {
                                     CachedNetworkImage(
                                           imageUrl: ongoingProjects[index]["profile_image"],
                                           imageBuilder: (context, imageProvider) => Container(
-                                            width: 48,
-                                            height: 48,
+                                            width: 46,
+                                            height: 46,
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
                                               image: DecorationImage(
@@ -334,7 +334,7 @@ class _ProjectsState extends State<Projects> {
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation, secondaryAnimation) {
-                            return ViewProject(selected: selected);
+                            return ViewProject(selected: selected, projectDetail: completedProjects[index],);
                           },
                           transitionsBuilder: (context, animation, secondaryAnimation, child) {
                             return FadeTransition(

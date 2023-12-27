@@ -336,6 +336,7 @@ Future<dynamic> acceptOffers({required offer_id}) async {
   print("Register service provider started running");
   try{
     String token = getX.read(constants.GETX_TOKEN);
+    String baseUrl = "https://base.usedara.com/api/v1/offer/$offer_id/accept";
   print("In the try method");
   final Map<String, String> headers = {
     'Content-Type': 'application/json',
@@ -347,7 +348,7 @@ Future<dynamic> acceptOffers({required offer_id}) async {
   http.Client client = http.Client();
   print("After defining the client object");
   final response = await client.get(
-    Uri.https(url,"/api/v1/offers/", {"offer_id":"$offer_id/accept"}),
+    Uri.parse(baseUrl),
     headers: headers
   );
   // mywidgets.displayToast(msg: "after making the get request");
@@ -373,18 +374,21 @@ Future<dynamic> rejectOffers({required offer_id}) async {
   print("Register service provider started running");
   try{
     String token = getX.read(constants.GETX_TOKEN);
+    String baseUrl = "https://base.usedara.com/api/v1/offer/$offer_id/reject";
   print("In the try method");
   final Map<String, String> headers = {
     'Content-Type': 'application/json',
     'Authorization':'Bearer $token'
   };
 
+  
+
   print("Before postin the request");
   // mywidgets.displayToast(msg: "Before making the get request");
   http.Client client = http.Client();
   print("After defining the client object");
   final response = await client.get(
-    Uri.https(url,"/api/v1/offers",{"offer_id":"$offer_id/reject"}),
+    Uri.parse(baseUrl),
     headers: headers
   );
   // mywidgets.displayToast(msg: "after making the get request");

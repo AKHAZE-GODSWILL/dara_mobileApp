@@ -1,5 +1,9 @@
 
+import 'package:dara_app/Firebase/Firebase_service.dart';
+import 'package:dara_app/Firebase/Model/User.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
+import 'package:dara_app/screens/chat/Chat.dart';
+import 'package:dara_app/screens/homepage/drawerRoutes/callsScreen.dart';
 import 'package:dara_app/screens/homepage/reviewPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
@@ -9,9 +13,10 @@ import 'package:provider/provider.dart';
 import '../../main.dart';
 
 class ViewProject extends StatefulWidget {
-  const ViewProject({Key? key, required this.selected}) : super(key: key);
+  const ViewProject({Key? key, required this.selected, required this.projectDetail}) : super(key: key);
 
   final bool selected;
+  final projectDetail;
   @override
   State<ViewProject> createState() => _ViewProjectState();
 }
@@ -92,7 +97,7 @@ super.initState();
                     children: [
                       Text("Skill Needed", style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
                       SizedBox(height: 10,),
-                      Text("Laundry Service",style: TextStyle(color: Colors.black54)),
+                      Text(widget.projectDetail["skill_needed"],style: TextStyle(color: Colors.black54)),
                     ],
                   ),
                 ),
@@ -107,8 +112,7 @@ super.initState();
                     children: [
                       Text("Project Description", style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
                       SizedBox(height: 10,),
-                      Text("Lorem ipsum dolor sit amet consectetur. Donec vulputate tristique sit quis tristique sit ut ultrices. "
-                                "Adipiscing pulvinar eros arcu scelerisque lectus scelerisque... See more",
+                      Text(widget.projectDetail["description"],
                             style: TextStyle(color: Colors.black54)
                       ),
                     ],
@@ -143,7 +147,7 @@ super.initState();
                     children: [
                       Text("Price", style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
                       SizedBox(height: 10,),
-                      Text("N 25000",style: TextStyle(color: Colors.black54)),
+                      Text("N ${widget.projectDetail["price"]}",style: TextStyle(color: Colors.black54)),
                     ],
                   ),
                 ),
@@ -176,7 +180,7 @@ super.initState();
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Daniel Smith",
+                          widget.projectDetail["customer_first_name"],
                           style:
                               TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                         ),
@@ -216,22 +220,57 @@ super.initState();
                     Spacer(),
                     InkWell(
                       onTap: (){
-                        // Navigator.push(
-                        //   context,
-                        //   PageRouteBuilder(
-                        //     pageBuilder: (context, animation, secondaryAnimation) {
-                        //       return Notifications();
-                        //       // MainOnboard();
-                        //       // HomePageWidget();
-                        //     },
-                        //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                        //       return FadeTransition(
-                        //         opacity: animation,
-                        //         child: child,
-                        //       );
-                        //     },
-                        //   )
-                        // );
+                        ///////////// The list is not necessary
+                        List<User> users = [
+                                  User(
+                                    lastMessage: '',
+                                    urlAvatar: "",
+                                    userMobile: "",
+                                    lastMessageTime: DateTime.now(),
+                                    idUser: widget.projectDetail["customer"],
+                                    name:
+                                        '${widget.projectDetail["customer_first_name"]}',
+                                    read: true,
+                                    id: widget.projectDetail["service_provider"],
+                                    status: true,
+                                    docid: widget.projectDetail["service_provider"],
+                                  )
+                                ];
+
+                        //----------------------//
+                                FirebaseApi.addUserChat(
+                                  // shipment: e.value,
+                                  token2: 'data.fcmToken',
+                                  token: 'snapshot.data[index].fcmToken',
+                                  urlAvatar2: provider.client_profile_image,
+                                  name2: provider.client_first_name,
+                                  recieveruserId2: provider.client_user_id,
+                                  recieveruserId: users[0].idUser,
+                                  idArtisan: provider.client_user_id.toString(),
+                                  artisanMobile: provider.client_phone,
+                                  userMobile: users[0].userMobile,
+                                  idUser: users[0].idUser.toString(),
+                                  urlAvatar: users[0].urlAvatar,
+                                  name: users[0].name,
+                                ); 
+
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) {
+                              return ChatPage(
+                                newchat: true,
+                                support: true, 
+                                user: users[0]);
+                            },
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                          )
+                        );
                       },
                       child: Container(
                         height: 40,
@@ -250,22 +289,27 @@ super.initState();
                     SizedBox(width: 10,),
                     InkWell(
                       onTap: (){
-                        // Navigator.push(
-                        //   context,
-                        //   PageRouteBuilder(
-                        //     pageBuilder: (context, animation, secondaryAnimation) {
-                        //       return Notifications();
-                        //       // MainOnboard();
-                        //       // HomePageWidget();
-                        //     },
-                        //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                        //       return FadeTransition(
-                        //         opacity: animation,
-                        //         child: child,
-                        //       );
-                        //     },
-                        //   )
-                        // );
+                        /////////
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) {
+                              return CallsScreen(
+                                target_id: widget.projectDetail["customer"],
+                                target_name: widget.projectDetail["customer_first_name"],
+                                target_img: widget.projectDetail["profile_image"],
+                                );
+                              // MainOnboard();
+                              // HomePageWidget();
+                            },
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                          )
+                        );
                       },
                       child: Container(
                         height: 40,

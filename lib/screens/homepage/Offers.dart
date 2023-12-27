@@ -62,6 +62,12 @@ class _OffersState extends State<Offers> {
   :();
   }
 
+  void refreshOfferPage({required offerIndex}){
+    // mywidgets.displayToast(msg: "Offer Index initiated");
+    setState(() {
+      offers.removeAt(offerIndex);
+    });  }
+
   @override
   initState(){
 
@@ -472,7 +478,7 @@ class _OffersState extends State<Offers> {
                             context,
                             PageRouteBuilder(
                               pageBuilder: (context, animation, secondaryAnimation) {
-                                return ViewOffers(offerDetail: offers[index],);
+                                return ViewOffers(offerDetail: offers[index], refreshOfferPage: refreshOfferPage,offerIndex: index,);
                               },
                               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                 return FadeTransition(
@@ -508,9 +514,11 @@ class _OffersState extends State<Offers> {
                                   // mywidgets.displayToast(msg: "making the request");
                                 print("The final Value of what was resulted from the request was :$value");
 
-                                if(value["status"]== true ){
+                                if(value["status"]== "true" ){
                                   setState(() {
+                                    // refreshOfferPage(offerIndex: index);
                                     offers.removeAt(index);
+                                    print("After accepting the offers and before calling successdialog");
                                     CustomSuccessDialog();
                                   });
                                 }
@@ -557,6 +565,7 @@ class _OffersState extends State<Offers> {
 
                                 if(value["status"]== true){
                                   setState(() {
+                                    // refreshOfferPage(offerIndex: index);
                                     offers.removeAt(index);
                                     CustomAcknowledgedDialog();
                                   });
@@ -716,7 +725,7 @@ class _OffersState extends State<Offers> {
                             context,
                             PageRouteBuilder(
                               pageBuilder: (context, animation, secondaryAnimation) {
-                                return ViewOffers(offerDetail: offers[index],);
+                                return ViewOffers(offerDetail: offers[index], refreshOfferPage: refreshOfferPage,offerIndex: index,);
                               },
                               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                 return FadeTransition(
