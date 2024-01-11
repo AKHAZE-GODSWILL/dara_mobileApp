@@ -1,4 +1,5 @@
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dara_app/Firebase/Firebase_service.dart';
 import 'package:dara_app/Firebase/Model/User.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
@@ -170,17 +171,33 @@ super.initState();
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: CircleAvatar(
-                        radius: 25,
-                        backgroundImage: AssetImage("assets/profile.png"),
-                      ),
+                      child: ///////// Image //////
+                                    CachedNetworkImage(
+                                          imageUrl: widget.projectDetail["profile_image"],
+                                          imageBuilder: (context, imageProvider) => Container(
+                                            width: 46,
+                                            height: 46,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                image: imageProvider, fit: BoxFit.cover),
+                                            ),
+                                          ),
+                                          placeholder: (context, url) => Container(
+                                            width: 46,
+                                            height: 46,
+                                            child: CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) => Icon(Icons.person,
+                                         size: 50, color:Colors.grey),
+                                          ),
                     ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.projectDetail["customer_first_name"],
+                          (provider.userType == "serviceProvider")? widget.projectDetail["customer_first_name"]
+                            :widget.projectDetail["service_provider_first_name"],
                           style:
                               TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                         ),
@@ -227,13 +244,12 @@ super.initState();
                                     urlAvatar: "",
                                     userMobile: "",
                                     lastMessageTime: DateTime.now(),
-                                    idUser: widget.projectDetail["customer"],
-                                    name:
-                                        '${widget.projectDetail["customer_first_name"]}',
+                                    idUser: (provider.userType == "serviceProvider")? widget.projectDetail["customer"]: widget.projectDetail["service_provider"],
+                                    name: (provider.userType == "serviceProvider")?'${widget.projectDetail["customer_first_name"]}':'${widget.projectDetail["service_provider_first_name"]}',
                                     read: true,
-                                    id: widget.projectDetail["service_provider"],
+                                    id: (provider.userType == "serviceProvider")? widget.projectDetail["service_provider"]: widget.projectDetail["customer"],
                                     status: true,
-                                    docid: widget.projectDetail["service_provider"],
+                                    docid: (provider.userType == "serviceProvider")? widget.projectDetail["service_provider"]: widget.projectDetail["customer"]
                                   )
                                 ];
 
@@ -295,8 +311,8 @@ super.initState();
                           PageRouteBuilder(
                             pageBuilder: (context, animation, secondaryAnimation) {
                               return CallsScreen(
-                                target_id: widget.projectDetail["customer"],
-                                target_name: widget.projectDetail["customer_first_name"],
+                                target_id: (provider.userType == "serviceProvider")?widget.projectDetail["customer"]: widget.projectDetail["service_provider"],
+                                target_name: (provider.userType == "serviceProvider")? widget.projectDetail["customer_first_name"]:widget.projectDetail["service_provider_first_name"],
                                 target_img: widget.projectDetail["profile_image"],
                                 );
                               // MainOnboard();

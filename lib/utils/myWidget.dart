@@ -552,6 +552,8 @@ class Mywidget {
                                 
                                 if(message.isNotEmpty && skillRequired.isNotEmpty && price.isNotEmpty){
 
+                                  
+
                                       setState((){
                                   isLoading =true;
                                 });

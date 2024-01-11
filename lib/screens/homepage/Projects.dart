@@ -27,35 +27,63 @@ class _ProjectsState extends State<Projects> {
         isLoading =true;
       });
 
-      myProjects().then((value) {
+      (widget.userType == "serviceProvider")? myProjects().then((value) {
       // mywidgets.displayToast(msg: "making the request");
-    print("The final Value of what was resulted from the request was :$value");
+      print("The final Value of what was resulted from the request was :$value");
 
-    if(value["status"]== true && value["message"]=="success"){
-      setState(() {
-        allProjects = value["data"];
+        if(value["status"]== true && value["message"]=="success"){
+          setState(() {
+            allProjects = value["data"];
 
-        allProjects.forEach((element) {
-          if(element["status"] == "ongoing"){
-            ongoingProjects.add(element);
-          }
-          else if(element["status"] == "completed"){
-            completedProjects.add(element);
-          }
-         });
+            allProjects.forEach((element) {
+              if(element["status"] == "ongoing"){
+                ongoingProjects.add(element);
+              }
+              else if(element["status"] == "completed"){
+                completedProjects.add(element);
+              }
+            });
+          });
+        }
+        else if(value["status"] == "Network Error"){
+          mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
+        }
+        else{
+          mywidgets.displayToast(msg: value["message"]);
+        }
+
+        setState(() {
+          isLoading = false;
+        });
+      }):allClientsProjects().then((value) {
+      // mywidgets.displayToast(msg: "making the request");
+      print("The final Value of what was resulted from the request was :$value");
+
+        if(value["status"]== true && value["message"]=="success"){
+          setState(() {
+            allProjects = value["data"];
+
+            allProjects.forEach((element) {
+              if(element["status"] == "ongoing"){
+                ongoingProjects.add(element);
+              }
+              else if(element["status"] == "completed"){
+                completedProjects.add(element);
+              }
+            });
+          });
+        }
+        else if(value["status"] == "Network Error"){
+          mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
+        }
+        else{
+          mywidgets.displayToast(msg: value["message"]);
+        }
+
+        setState(() {
+          isLoading = false;
+        });
       });
-    }
-    else if(value["status"] == "Network Error"){
-      mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
-    }
-    else{
-      mywidgets.displayToast(msg: value["message"]);
-    }
-
-    setState(() {
-      isLoading = false;
-    });
-  });
   }
 
   @override
@@ -205,6 +233,8 @@ class _ProjectsState extends State<Projects> {
                                 padding: EdgeInsets.only(right: 8.0),
                                 child: Stack(
                                   children: [
+
+                                    ///////// Image //////
                                     CachedNetworkImage(
                                           imageUrl: ongoingProjects[index]["profile_image"],
                                           imageBuilder: (context, imageProvider) => Container(
@@ -217,8 +247,8 @@ class _ProjectsState extends State<Projects> {
                                             ),
                                           ),
                                           placeholder: (context, url) => Container(
-                                            width: 50,
-                                            height: 50,
+                                            width: 46,
+                                            height: 46,
                                             child: CircularProgressIndicator()),
                                           errorWidget: (context, url, error) => Icon(Icons.person,
                                          size: 50, color:Colors.grey),

@@ -47,6 +47,8 @@ class DataProvider with ChangeNotifier {
   String? securityQuestion;
   String? securityAnswer;
 
+  bool? just_confirmed_project = false;
+
   setValue(value){
     pageIndex = value;
     notifyListeners();
@@ -163,6 +165,11 @@ class DataProvider with ChangeNotifier {
   setSecurityDetails({required securedQuestion, required securedAnswer}){
     securityQuestion = securedQuestion;
     securityAnswer = securedAnswer;
+    notifyListeners();
+  }
+
+  setConfirmedProject(){
+    just_confirmed_project = true;
     notifyListeners();
   }
 }

@@ -58,8 +58,26 @@ class _OffersState extends State<Offers> {
       isLoading = false;
     });
   })
-  
-  :();
+  :getClientOffers().then((value) {
+      // mywidgets.displayToast(msg: "$value");
+    print("The final Value of what was resulted from the request was :$value");
+
+    if(value["status"]== false && value["message"]=="Data fetched successfully."){
+      setState(() {
+        offers = value["data"];
+      });
+    }
+    else if(value["status"] == "Network Error"){
+      mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
+    }
+    else{
+      mywidgets.displayToast(msg: value["message"]);
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  });
   }
 
   void refreshOfferPage({required offerIndex}){
@@ -628,7 +646,7 @@ class _OffersState extends State<Offers> {
                               child: Stack(
                                 children: [
                                   CachedNetworkImage(
-                                          imageUrl: offers[index]["sender_profile_image"],
+                                          imageUrl: offers[index]["service_provider_profile_image"],
                                           imageBuilder: (context, imageProvider) => Container(
                                             width: 50,
                                             height: 50,

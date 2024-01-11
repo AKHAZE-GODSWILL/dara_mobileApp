@@ -197,7 +197,8 @@ class _RecommendationState extends State<Recommendation> {
                                         "Hire me",
                                         style: TextStyle(
                                             color:   constants.appMainColor,
-                                            fontSize: 14),),
+                                            fontSize: 14),
+                                        ),
                                     ),
                                   ),
                                 ),

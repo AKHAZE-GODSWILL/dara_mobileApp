@@ -583,6 +583,7 @@ class _ClientAddressInfo extends State<ClientAddressInfo>{
 
                             if(value["status"]== true){
                               mywidgets.displayToast(msg: "Before updating firestore, id is ${provider.client_user_id}, first name is ${provider.client_first_name} last name is ${provider.client_last_name}");
+
                               FirebaseFirestore.instance.collection("users").doc("${provider.client_user_id}").set({
                                 "id":provider.client_user_id,
                                 "first_name":provider.client_first_name,
@@ -595,6 +596,7 @@ class _ClientAddressInfo extends State<ClientAddressInfo>{
                                 "channel_name":"",
                                 "call_token":""
                               });
+                              
                               mywidgets.displayToast(msg: "after the Firestore update");
                               getX.write(constants.GETX_LOGGED_IN,true);
                               /// Navigation.push to the OTP screen
