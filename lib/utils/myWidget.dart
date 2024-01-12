@@ -1,8 +1,9 @@
 import 'package:dara_app/main.dart';
-import 'package:dara_app/utils/apiRequest.dart';
 import 'package:flutter/material.dart';
+import 'package:dara_app/utils/apiRequest.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:dara_app/widget/custom_circle.dart';
 
 class Mywidget {
 
@@ -550,7 +551,9 @@ class Mywidget {
                             child: InkWell(
                               onTap: (){
                                 
+                                
                                 if(message.isNotEmpty && skillRequired.isNotEmpty && price.isNotEmpty){
+                                  circularCustom(context);
 
                                       setState((){
                                   isLoading =true;
@@ -566,11 +569,16 @@ class Mywidget {
                                   
                                 });
                                 Navigator.pop(context);
+                                 Navigator.pop(context);
                               }
                               else if(value["status"] == "Network Error"){
+                               
+                                   Navigator.pop(context);
                                 mywidgets.displayToast(msg: "Network Error. Check your Network Connection and try again");
                               }
                               else{
+                            
+                                 Navigator.pop(context);
                                 mywidgets.displayToast(msg: value["message"]);
                               }
                     

@@ -38,6 +38,7 @@ dependencies:
   agora_rtc_engine: ^5.2.0
   audioplayers: ^5.2.0
   firebase_messaging:
+  dio:
   bubble:
   firebase_storage:
   cloud_firestore:

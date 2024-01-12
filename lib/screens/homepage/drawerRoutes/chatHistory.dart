@@ -1,18 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dara_app/Firebase/Model/User.dart';
+import '../../chat/Chat.dart';
+import 'package:intl/intl.dart';
 import 'package:dara_app/main.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../Provider/DataProvider.dart';
 import 'package:dara_app/utils/constants.dart';
+import '../../../Firebase/Model/UserChat.dart';
+import '../../../Firebase/Firebase_service.dart';
+import 'package:dara_app/Firebase/Model/User.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // import 'package:dara_app/screens/homepage/drawerRoutes/chat/chatPage.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-
-import '../../../Firebase/Firebase_service.dart';
-import '../../../Firebase/Model/UserChat.dart';
-import '../../../Provider/DataProvider.dart';
-import '../../chat/Chat.dart';
 
 class ChatHistory extends StatefulWidget {
   const ChatHistory({Key? key}) : super(key: key);
@@ -77,7 +76,7 @@ class _ChatHistoryState extends State<ChatHistory> {
     var utils = Provider.of<DataProvider>(context, listen: true);
     return Scaffold(
         appBar: AppBar(
-          leading: null,
+          leading: Container(),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(
@@ -287,7 +286,9 @@ class _ChatHistoryState extends State<ChatHistory> {
         var utils = Provider.of<DataProvider>(context, listen: false);
         FirebaseApi.updateUsertoRead(
             idUser: user.idUser,
-            idArtisan:  utils.userType == "serviceProvider"? utils.sp_user_id:utils.client_user_id);
+            idArtisan: utils.userType == "serviceProvider"
+                ? utils.sp_user_id
+                : utils.client_user_id);
 
         // if (users[index].fcmToken.toString() !=
         //     data.fcmToken) {

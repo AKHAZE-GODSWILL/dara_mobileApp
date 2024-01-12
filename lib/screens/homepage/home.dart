@@ -1,26 +1,26 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dara_app/main.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:readmore/readmore.dart';
+import 'package:dara_app/utils/apiRequest.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:dara_app/Provider/DataProvider.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dara_app/screens/authentication/login.dart';
 import 'package:dara_app/screens/homepage/Notification.dart';
+import 'package:dara_app/screens/homepage/searchScreen.dart';
 import 'package:dara_app/screens/homepage/categoriesPage.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dara_app/screens/homepage/expandableWidget.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:dara_app/screens/homepage/drawerRoutes/wallet.dart';
+import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+import 'package:dara_app/screens/homepage/drawerRoutes/shareApp.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/chatHistory.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/daraSupport.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/settingsPage.dart';
-import 'package:dara_app/screens/homepage/drawerRoutes/shareApp.dart';
-import 'package:dara_app/screens/homepage/drawerRoutes/wallet.dart';
-import 'package:dara_app/screens/homepage/expandableWidget.dart';
-import 'package:dara_app/screens/homepage/searchScreen.dart';
 import 'package:dara_app/screens/homepage/serviceProviderProfile/ServiceProviderAccount.dart';
-import 'package:dara_app/utils/apiRequest.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'package:readmore/readmore.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.userType}) : super(key: key);
@@ -1064,7 +1064,8 @@ class _HomePageState extends State<HomePage> {
                                                 image: imageProvider, fit: BoxFit.cover),
                                             ),
                                           ),
-                                          placeholder: (context, url) => CircularProgressIndicator(),
+                                          placeholder: (context, url) => Icon(Icons.person,
+                                         size: 50, color:Colors.grey),
                                           errorWidget: (context, url, error) => Icon(Icons.person,
                                          size: 50, color:Colors.grey),
                         )
