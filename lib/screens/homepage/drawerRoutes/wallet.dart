@@ -2,7 +2,13 @@ import '../../../main.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:get_time_ago/get_time_ago.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:dara_app/utils/apiRequest.dart';
+import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:dara_app/screens/homepage/drawerRoutes/Bank/banks.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/withdrawFunds.dart';
 
 class WalletPage extends StatefulWidget {
@@ -20,22 +26,35 @@ class _WalletPageState extends State<WalletPage> {
     "Last month",
   ];
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  Map? banks;
+  List? history;
 
-// @override
-// void dispose() {
-// super.dispose();
-// _controller.dispose();
-// }
+  @override
+  initState() {
+    super.initState();
+    fetchBanks().then((value) {
+      setState(() {
+        banks = value;
+      });
+    });
+
+    fetchHistory().then((value) {
+      setState(() {
+        history = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    DataProvider provider = Provider.of<DataProvider>(context, listen: true);
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(
@@ -74,7 +93,50 @@ class _WalletPageState extends State<WalletPage> {
                         fontWeight: FontWeight.bold),
                   ),
                 ),
-                // Spacer(),
+                Spacer(),
+                Container(
+                  width: 80,
+                  height: 40,
+                  decoration: BoxDecoration(),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) {
+                                return Banks();
+                              },
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                            ));
+                      },
+                      child: Container(
+                        width:80,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 2, color: constants.appMainColor),
+                            borderRadius: BorderRadius.circular(200)),
+                        child: Center(
+                          child: Text(
+                            "Banks",
+                            style: TextStyle(
+                                color: constants.appMainColor, fontSize: 14),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -136,7 +198,7 @@ class _WalletPageState extends State<WalletPage> {
                                       height: 5,
                                     ),
                                     Text(
-                                      "N 155000",
+                                      "NGN ${provider.value["user_object"]["personal_information"]["wallet"]}",
                                       style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
@@ -155,7 +217,8 @@ class _WalletPageState extends State<WalletPage> {
                                                 color: Colors.white),
                                           ),
                                           TextSpan(
-                                            text: 'N 210000',
+                                            text:
+                                                'NGN ${provider.value["user_object"]["personal_information"]["wallet"]}',
                                             style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.bold,
@@ -257,13 +320,38 @@ class _WalletPageState extends State<WalletPage> {
                       child: Container(
                           height: MediaQuery.of(context).size.height * 0.52,
                           // color: Colors.red,
-                          child: ListView.builder(
-                              itemCount: 6,
-                              itemBuilder: (context, index) {
-                                return (index % 2 == 0)
-                                    ? incomeCard()
-                                    : withdrawalCard();
-                              })),
+                          child: history == null
+                              ? Center(child: CircularProgressIndicator())
+                              : history!.length == 0
+                                  ? Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Center(
+                                          child: Text(
+                                            "No History Found",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.1,
+                                        ),
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount:
+                                          history == null ? 0 : history!.length,
+                                      itemBuilder: (context, index) {
+                                        return incomeCard(index);
+                                        // : withdrawalCard();
+                                      })),
                     ),
                   ],
                 ),
@@ -290,21 +378,36 @@ class _WalletPageState extends State<WalletPage> {
                           horizontal: 20, vertical: 15),
                       child: InkWell(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) {
-                                  return WithdrawFunds();
-                                },
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  return FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  );
-                                },
-                              ));
+                          if (banks!.isEmpty) {
+                            Fluttertoast.showToast(
+                                msg:
+                                    "Update bank details, before you can proceed.");
+                          } else {
+                            Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation, secondaryAnimation) {
+                                    return WithdrawFunds();
+                                  },
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                                )).then((value) {
+                              setState(() {
+                                fetchHistory().then((value) {
+                                  setState(() {
+                                    history = null;
+                                    history = value;
+                                  });
+                                });
+                              });
+                            });
+                          }
                         },
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.85,
@@ -329,7 +432,7 @@ class _WalletPageState extends State<WalletPage> {
             )));
   }
 
-  incomeCard() {
+  incomeCard(index) {
     return InkWell(
       onTap: () {
         // Navigator.push(
@@ -380,7 +483,7 @@ class _WalletPageState extends State<WalletPage> {
                             // color: Colors.green,
                             width: MediaQuery.of(context).size.width * 0.5,
                             child: Text(
-                              "Fumigation project charge from Daniel Smith ",
+                              "Withdrawal Request. ",
                               style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -390,7 +493,7 @@ class _WalletPageState extends State<WalletPage> {
                           Padding(
                             padding: const EdgeInsets.only(top: 5.0),
                             child: Text(
-                              "21/04/23 - 08/05/23",
+                              "${GetTimeAgo.parse(DateTime.parse(history![index]["created_at"]))}",
                               style: TextStyle(
                                   fontSize: 10, color: Color(0XFF374151)),
                             ),
@@ -406,7 +509,7 @@ class _WalletPageState extends State<WalletPage> {
                 height: 48,
                 width: MediaQuery.of(context).size.width * 0.2,
                 child: Text(
-                  "N 25,0000",
+                  "NGN ${history![index]["amount"]}",
                   style: TextStyle(fontSize: 12, color: Colors.black),
                 ),
               ),

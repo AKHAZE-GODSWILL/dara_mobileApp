@@ -25,7 +25,11 @@ class _LoginSettingsState extends State<LoginSettings> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(

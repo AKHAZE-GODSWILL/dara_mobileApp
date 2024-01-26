@@ -53,7 +53,11 @@ class _GetVerifiedState extends State<GetVerified> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(
@@ -277,7 +281,6 @@ class _GetVerifiedState extends State<GetVerified> {
                                           ? PopupMenuButton<String>(
                                               onSelected: (value) {
                                                 // Handle the selected option here
-                                                print('You selected: $value');
 
                                                 if (value == "Option 1") {
                                                   getImageCamera(index: 0);
@@ -287,8 +290,6 @@ class _GetVerifiedState extends State<GetVerified> {
                                                 } else {
                                                   _pickFile(index: 0);
                                                 }
-
-                                                print(filesInfo);
                                               },
                                               itemBuilder:
                                                   (BuildContext context) {
@@ -391,7 +392,6 @@ class _GetVerifiedState extends State<GetVerified> {
                                           ? PopupMenuButton<String>(
                                               onSelected: (value) {
                                                 // Handle the selected option here
-                                                print('You selected: $value');
 
                                                 if (value == "Option 1") {
                                                   getImageCamera(index: 1);
@@ -401,8 +401,6 @@ class _GetVerifiedState extends State<GetVerified> {
                                                 } else {
                                                   _pickFile(index: 1);
                                                 }
-
-                                                print(filesInfo);
                                               },
                                               itemBuilder:
                                                   (BuildContext context) {
@@ -706,7 +704,6 @@ class _GetVerifiedState extends State<GetVerified> {
                                           ? PopupMenuButton<String>(
                                               onSelected: (value) {
                                                 // Handle the selected option here
-                                                print('You selected: $value');
 
                                                 if (value == "Option 1") {
                                                   getImageCamera(index: 2);
@@ -716,8 +713,6 @@ class _GetVerifiedState extends State<GetVerified> {
                                                 } else {
                                                   _pickFile(index: 2);
                                                 }
-
-                                                print(filesInfo);
                                               },
                                               itemBuilder:
                                                   (BuildContext context) {
@@ -908,11 +903,9 @@ class _GetVerifiedState extends State<GetVerified> {
       if (selectedImage == null) return;
 
       readyUploadImage = File(selectedImage.path);
-      print(readyUploadImage!.path);
       setState(() {
         filesInfo[index]["path"] = selectedImage.path!;
         filesInfo[index]["type"] = "photo";
-        print(filesInfo);
       });
     });
   }
@@ -922,12 +915,9 @@ class _GetVerifiedState extends State<GetVerified> {
       if (selectedImage == null) return;
 
       readyUploadImage = File(selectedImage.path);
-      print(readyUploadImage!.path);
       setState(() {
         filesInfo[index]["path"] = selectedImage.path!;
         filesInfo[index]["type"] = "photo";
-
-        print(filesInfo);
       });
     });
   }
@@ -960,8 +950,6 @@ class _GetVerifiedState extends State<GetVerified> {
         setState(() {
           filesInfo[index]["path"] = result.files.single.path!;
           filesInfo[index]["type"] = "document";
-
-          print(filesInfo);
         });
       }
     });

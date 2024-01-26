@@ -86,7 +86,11 @@ class _ChatPage extends State<ChatPage> with TickerProviderStateMixin {
     return Scaffold(
       // I'll run a request in the init state to get me the names of the receiver or the person I am chatting with
       appBar: AppBar(
-        leading: Container(),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Text("")),
         centerTitle: false,
         titleSpacing: 0,
         title: Transform(
@@ -347,8 +351,7 @@ class _ChatPage extends State<ChatPage> with TickerProviderStateMixin {
 
                                   if (isRecording) {
                                     await _soundRecorder!.stopRecorder();
-                                    print(
-                                        "The current Path id is $recordingPath");
+
                                     sendMediaMessage(
                                         type: "source",
                                         mediaType: "sound recording",
@@ -489,7 +492,6 @@ class _ChatPage extends State<ChatPage> with TickerProviderStateMixin {
       if (selectedmedia.isEmpty) return;
 
       // readyUpload = File(selectedmedia[0].path);
-      // print(readyUpload!.path);
 
       selectedmedia.forEach((element) {
         setState(() {
@@ -505,13 +507,10 @@ class _ChatPage extends State<ChatPage> with TickerProviderStateMixin {
 
       // readyUploadImage = File(selectedImage.path);
 
-      // print(readyUploadImage!.path);
       setState(() {
         openMedia(filePath: selectedImage.path, type: "source");
         // filesInfo[index]["path"] = selectedImage.path!;
         // filesInfo[index]["type"] =  "photo";
-
-        // print(filesInfo);
       });
     });
   }
@@ -521,7 +520,6 @@ class _ChatPage extends State<ChatPage> with TickerProviderStateMixin {
       if (selectedVideo == null) return;
 
       readyUpload = File(selectedVideo.path);
-      print(readyUpload!.path);
       setState(() {});
     });
   }

@@ -1,12 +1,12 @@
-import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'dart:async';
+import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
 class Utils with ChangeNotifier {
@@ -188,12 +188,19 @@ class Utils with ChangeNotifier {
   // }
   // }
 
-  opeLink(link) async {
-    var url = '$link';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
+  // opeLink(link) async {
+  //   var url = '$link';
+  //   if (await canLaunch(url)) {
+  //     await launch(url);
+  //   } else {
+  //     throw 'Could not launch $url';
+  //   }
+  // }
+
+  Future<void> opeLink(link) async {
+    var _url = Uri.parse('$link');
+    if (!await launchUrl(_url)) {
+      throw Exception('Could not launch $_url');
     }
   }
 
@@ -206,17 +213,17 @@ class Utils with ChangeNotifier {
   }
 
   Future storeData(String name, data) async {
-    GetStorage prefs =  GetStorage();
+    GetStorage prefs = GetStorage();
     prefs.write(name, data);
   }
 
   Future storeDataInt(String name, data) async {
-    GetStorage prefs =  GetStorage();
+    GetStorage prefs = GetStorage();
     prefs.write(name, data);
   }
 
   Future getData(String name) async {
-    GetStorage prefs =  GetStorage();
+    GetStorage prefs = GetStorage();
     String? data = prefs.read(name);
     return data;
   }

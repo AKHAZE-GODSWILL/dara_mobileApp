@@ -1,15 +1,16 @@
+import 'package:dara_app/main.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:dara_app/screens/chat/Chat.dart';
+import '../../../Firebase/Firebase_service.dart';
 import 'package:dara_app/Firebase/Model/User.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
-import 'package:dara_app/main.dart';
-import 'package:dara_app/screens/chat/Chat.dart';
-import 'package:dara_app/screens/homepage/serviceProviderProfile/serviceProviderOverview.dart';
+import 'package:dara_app/screens/homepage/Account/Posts.dart';
+import 'package:dara_app/screens/homepage/Account/Reviews.dart';
 import 'package:dara_app/screens/homepage/serviceProviderProfile/serviceProviderPosts.dart';
 import 'package:dara_app/screens/homepage/serviceProviderProfile/serviceProviderReviews.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
-
-import '../../../Firebase/Firebase_service.dart';
+import 'package:dara_app/screens/homepage/serviceProviderProfile/serviceProviderOverview.dart';
 
 enum TypeSelected { OVERVIEW, POST, REVIEW }
 
@@ -106,19 +107,18 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                           children: [
                             CircleAvatar(
                               radius: 40,
-                              backgroundImage:
-                                  AssetImage("assets/profile1.png"),
+                              backgroundImage: NetworkImage(
+                                  "${widget.user["data"]["author_image"]}"),
                               backgroundColor: Colors.white,
                               foregroundColor: Colors.white,
                             ),
                             InkWell(
                               onTap: () {
-                                print(
-                                    "'${widget.user["first_name"]} ${widget.user["last_name"]}'");
                                 List<User> users = [
                                   User(
                                     lastMessage: '',
-                                    urlAvatar: "",
+                                    urlAvatar:
+                                        "${widget.user["data"]["author_image"]}",
                                     userMobile: "",
                                     lastMessageTime: DateTime.now(),
                                     idUser: widget.user["user_id"],
@@ -138,9 +138,15 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                                   token: 'snapshot.data[index].fcmToken',
                                   urlAvatar2: provider.client_profile_image,
                                   name2: provider.client_first_name,
-                                  recieveruserId2: provider.client_user_id,
+                                  recieveruserId2:
+                                      provider.sp_user_id.toString() == null
+                                          ? provider.client_user_id.toString()
+                                          : provider.sp_user_id.toString(),
                                   recieveruserId: users[0].idUser,
-                                  idArtisan: provider.client_user_id.toString(),
+                                  idArtisan:
+                                      provider.sp_user_id.toString() == null
+                                          ? provider.client_user_id.toString()
+                                          : provider.sp_user_id.toString(),
                                   artisanMobile: provider.client_phone,
                                   userMobile: users[0].userMobile,
                                   idUser: users[0].idUser.toString(),
@@ -226,7 +232,10 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                         padding: const EdgeInsets.only(left: 10.0),
                         child: InkWell(
                           onTap: () {
-                            mywidgets.showHireSheet(context: context, sp_id: "");
+                            mywidgets.showHireSheet(
+                                context: context,
+                                sp_id:
+                                    "${widget.user["data"]["service_provider_id"]}");
                           },
                           child: Container(
                             width: 69,
@@ -275,8 +284,7 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                   RichText(
                       text: TextSpan(children: [
                     TextSpan(
-                      text:
-                          "Plumbing Problems? We've Got the Fix! Your Local Plumbing Experts",
+                      text: "${widget.user["data"]["service"]}",
                       style: TextStyle(fontSize: 13, color: Colors.black54),
                     ),
                     TextSpan(
@@ -298,7 +306,7 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "156",
+                        "0",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -320,7 +328,7 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "4.8/5.0",
+                        "${widget.user["data"]["service_provider_rating"]}/5.0",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -342,7 +350,7 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "98",
+                        "0",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -372,7 +380,6 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                                     setState(() {
                                       selected = TypeSelected.OVERVIEW;
                                     });
-                                    print("first");
                                   },
                                   child: Center(
                                     child: Container(
@@ -396,7 +403,6 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                           selected != TypeSelected.POST
                               ? InkWell(
                                   onTap: () {
-                                    print("second");
                                     setState(() {
                                       selected = TypeSelected.POST;
                                     });
@@ -423,7 +429,6 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                           selected != TypeSelected.REVIEW
                               ? InkWell(
                                   onTap: () {
-                                    print("second");
                                     setState(() {
                                       selected = TypeSelected.REVIEW;
                                     });
@@ -490,7 +495,7 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                 ? Overview()
                 : selected == TypeSelected.POST
                     ? Posts()
-                    : Reviews()
+                    : Reviews(widget.user["data"]["service_provider_id"])
           ],
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
+import 'package:dara_app/screens/homepage/drawerRoutes/wallet.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/aboutMe.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/getVerified.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/businnesInfo.dart';
@@ -33,7 +34,11 @@ class _SettingsState extends State<Settings> {
     DataProvider provider = Provider.of<DataProvider>(context, listen: true);
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(
@@ -427,7 +432,7 @@ class _SettingsState extends State<Settings> {
                                             PageRouteBuilder(
                                               pageBuilder: (context, animation,
                                                   secondaryAnimation) {
-                                                return WithdrawalAccount();
+                                                return WalletPage();
                                               },
                                               transitionsBuilder: (context,
                                                   animation,

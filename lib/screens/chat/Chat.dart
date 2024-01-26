@@ -16,14 +16,19 @@ import '../../Firebase/Utils/Provider.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../Firebase/Firebase_service.dart';
 import 'package:dara_app/utils/constants.dart';
+import 'package:dara_app/utils/apiRequest.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:get_time_ago/get_time_ago.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import '../homepage/drawerRoutes/callsScreen.dart';
+import 'package:dara_app/widget/custom_circle.dart';
 import '../../Firebase/Widgets/messages_widget.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/chat/recordingVisualizer.dart';
@@ -138,6 +143,9 @@ class _ChatPageState extends State<ChatPage> {
         '.aac';
   }
 
+  List? projects = [];
+  List? allProjects = [];
+
   @override
   void initState() {
     // TODO: implement initState
@@ -146,6 +154,47 @@ class _ChatPageState extends State<ChatPage> {
     openAudio();
     initRecordingPath();
     super.initState();
+
+    myProjects(context).then((value) {
+      if (value["status"] == true && value["message"] == "success") {
+        print(value["data"]);
+        setState(() {
+          allProjects = value["data"];
+          allProjects!.forEach((element) {
+            if (element["status"] == "ongoing") {
+              projects!.add(element);
+            }
+          });
+        });
+      } else if (value["status"] == "Network Error") {
+        mywidgets.displayToast(
+            msg: "Network Error. Check your Network Connection and try again");
+      } else {
+        allProjects = [];
+        mywidgets.displayToast(msg: value["message"]);
+      }
+    });
+  }
+
+  sendMessage() async {
+    var utils = Provider.of<DataProvider>(context, listen: false);
+    var data = Provider.of<Utils>(context, listen: false);
+    var datas = Provider.of<DataProviders>(context, listen: false);
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+    FirebaseApi.uploadCheckChat(widget.user.idUser);
+    _controller.clear();
+    datas.setWritingTo(false);
+    await FirebaseApi.uploadmessage(
+        widget.user.idUser,
+        "${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}",
+        message,
+        context,
+        '${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
+        widget.user.name);
+    // sendAndRetrieveMessage(message, widget.user.fcmToken);
   }
 
   @override
@@ -155,11 +204,16 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
+  Map? dropdownvalueProject;
+  String? dropdownvalueProjectID;
+
   @override
   Widget build(BuildContext context) {
     var utils = Provider.of<DataProvider>(context, listen: false);
     var data = Provider.of<Utils>(context, listen: false);
     var datas = Provider.of<DataProviders>(context, listen: false);
+    DataProvider provider = Provider.of<DataProvider>(context, listen: true);
+
     // var utils = Provider.of<DataProvider>(context, listen: false);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -194,6 +248,7 @@ class _ChatPageState extends State<ChatPage> {
                         'image',
                         widget.user.name)
                     .then((value) {
+                  Navigator.pop(context);
                   // sendAndRetrieveMessage(message, widget.user.fcmToken);
                 });
               } else if (media.path.endsWith('.mp4') ||
@@ -222,6 +277,7 @@ class _ChatPageState extends State<ChatPage> {
                         'video',
                         widget.user.name)
                     .then((value) {
+                  Navigator.pop(context);
                   // sendAndRetrieveMessage(message, widget.user.fcmToken);
                 });
               } else {
@@ -243,6 +299,7 @@ class _ChatPageState extends State<ChatPage> {
                       'image',
                       widget.user.name)
                   .then((value) {
+                Navigator.pop(context);
                 // sendAndRetrieveMessage(message, widget.user.fcmToken);
               });
             });
@@ -294,6 +351,7 @@ class _ChatPageState extends State<ChatPage> {
           true,
           'document',
           widget.user.name);
+      Navigator.pop(context);
       // sendAndRetrieveMessage(message, widget.user.fcmToken);
     }
 
@@ -309,24 +367,6 @@ class _ChatPageState extends State<ChatPage> {
           context,
           '${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
           'voice_recording',
-          widget.user.name);
-      // sendAndRetrieveMessage(message, widget.user.fcmToken);
-    }
-
-    sendMessage() async {
-      FocusScopeNode currentFocus = FocusScope.of(context);
-      if (!currentFocus.hasPrimaryFocus) {
-        currentFocus.unfocus();
-      }
-      FirebaseApi.uploadCheckChat(widget.user.idUser);
-      _controller.clear();
-      datas.setWritingTo(false);
-      await FirebaseApi.uploadmessage(
-          widget.user.idUser,
-          "${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}",
-          message,
-          context,
-          '${(utils.userType == "serviceProvider" ? utils.sp_user_id : utils.client_user_id)}-${widget.user.id}',
           widget.user.name);
       // sendAndRetrieveMessage(message, widget.user.fcmToken);
     }
@@ -491,62 +531,6 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     Widget scaffold = Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: messagesendercontainercolor,
-      //   leading: IconButton(
-      //     onPressed: () {
-      //       Navigator.pop(context);
-      //       _stopExit();
-      //       initilizeExit();
-      //     },
-      //     icon: Icon(
-      //       Icons.arrow_back,
-      //     ),
-      //   ),
-      //   centerTitle: false,
-      //   title: Text(
-      //     '${widget.user.name}'.capitalizeFirstOfEach,
-      //   ),
-      //   actions: <Widget>[
-      //     widget.user.idUser == null ||
-      //             widget.user.idUser.toString().isEmpty ||
-      //             widget.user.id == null
-      //         ? Text('')
-      //         : SizedBox(),
-
-      // IconButton(
-      //     icon: Icon(
-      //       Icons.videocam,
-      //       size: 30,
-      //     ),
-      //     onPressed: () {
-      //     },
-      //   ),
-      // IconButton(
-      //   icon: Icon(
-      //     Icons.phone,
-      //     size: 25,
-      //   ),
-      //   onPressed: widget.user.idUser == null ||
-      //           widget.user.idUser.toString().isEmpty ||
-      //           widget.user.id == null
-      //       ? () {
-      //           data.makePhoneCall(widget.user.userMobile);
-      //         }
-      //       : () {
-      //         },
-      // ),
-      // Padding(
-      //   padding: const EdgeInsets.only(right: 10.0),
-      //   child: PopUpMenu(
-      //       idUser: widget.user.idUser,
-      //       user: widget.user,
-      //       scaffoldKey: scaffoldKey,
-      //       popData: widget.popData),
-      // ),
-
-      //   ],
-      // ),
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
       body: WillPopScope(
@@ -597,7 +581,7 @@ class _ChatPageState extends State<ChatPage> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(
-                              left: 15.0, right: 15, bottom: 0, top: 30),
+                              left: 5.0, right: 15, bottom: 0, top: 30),
                           child: Row(
                             children: [
                               InkWell(
@@ -607,7 +591,7 @@ class _ChatPageState extends State<ChatPage> {
                                 child: Row(
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
+                                      padding: const EdgeInsets.only(left: 0.0),
                                       child: Icon(
                                           PhosphorIcons.caret_left_light,
                                           size: 25,
@@ -666,6 +650,7 @@ class _ChatPageState extends State<ChatPage> {
                                             child: Text(
                                               "Active ${GetTimeAgo.parse(widget.user.lastMessageTime)}",
                                               style: TextStyle(
+                                                  fontSize: 12,
                                                   color: Colors.black),
                                             ),
                                           );
@@ -676,28 +661,47 @@ class _ChatPageState extends State<ChatPage> {
                                 ],
                               ),
                               Spacer(),
+                              (provider.userType != "client") &&
+                                      projects!.isNotEmpty
+                                  ? Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 10.0),
+                                      child: InkWell(
+                                        onTap: () {
+                                          showInvoiceSheet(context: context);
+                                        },
+                                        child: Container(
+                                          width: 110,
+                                          height: 32,
+                                          decoration: BoxDecoration(
+                                              color: constants.appMainColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(200)),
+                                          child: Center(
+                                            child: Text(
+                                              "Create Invoice",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
                               Row(
                                 children: [
                                   InkWell(
                                     onTap: () {
-                                      // Future<void> _launchUrl(_url) async {
-                                      //   if (!await launchUrl(_url)) {
-                                      //     throw 'Could not launch $_url';
-                                      //   }
-                                      // }
-                                      // final Uri _url = Uri.parse('tel:+2340${widget.user.userMobile}');
-                                      //
-                                      // _launchUrl(_url);
                                       Navigator.push(
                                           context,
                                           PageRouteBuilder(
                                             pageBuilder: (context, animation,
                                                 secondaryAnimation) {
                                               return CallsScreen(
-                                                  target_id:widget.user.idUser,
+                                                  target_id: widget.user.idUser,
                                                   target_name: widget.user.name,
-                                                  target_img:widget.user.name
-                                              );
+                                                  target_img: widget.user.name);
                                             },
                                             transitionsBuilder: (context,
                                                 animation,
@@ -712,20 +716,11 @@ class _ChatPageState extends State<ChatPage> {
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
-                                          right: 8.0, top: 5, bottom: 5),
+                                          right: 0.0, top: 5, bottom: 5),
                                       child: Icon(PhosphorIcons.phone,
                                           size: 30, color: Colors.black),
                                     ),
                                   ),
-
-                                  // SizedBox(width: 4),
-                                  // Text(
-                                  //   '${widget.user.urlAvatar}',
-                                  //   style: TextStyle(
-                                  //       fontWeight: FontWeight.w400,
-                                  //       color: Colors.white,
-                                  //       fontSize: 16),
-                                  // ),
                                 ],
                               ),
                             ],
@@ -759,7 +754,6 @@ class _ChatPageState extends State<ChatPage> {
                               SizedBox(
                                 width: 13,
                               ),
-
                               (isRecording)
                                   ? Container(
                                       width: MediaQuery.of(context).size.width *
@@ -882,38 +876,33 @@ class _ChatPageState extends State<ChatPage> {
                                         ),
                                       ],
                                     ),
-
                               Container(
                                 margin: EdgeInsets.only(left: 9),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Color(0XFFF3F4F6),
+                                  color: (datas.isWriting)
+                                      ? Color.fromARGB(255, 31, 106, 255)
+                                      : Color(0XFFF3F4F6),
                                 ),
                                 height: 48,
                                 width: 48,
                                 child: Center(
                                   child: IconButton(
                                       onPressed: () async {
-                                        print(
-                                            "The send/ recording button pushed");
                                         if (datas.isWriting) {
                                           sendMessage();
                                         } else {
-                                          print(
-                                              "In the else block of the send button");
                                           // var tempDir = await getTemporaryDirectory();
                                           // var path = "${tempDir.path}/flutter_sound.aac";
 
                                           if (isRecorderInit == false) {
-                                            print("is Recorder init is false");
                                             return;
                                           }
 
                                           if (isRecording) {
                                             await _soundRecorder!
                                                 .stopRecorder();
-                                            print(
-                                                "The current Path id is $recordingPath");
+
                                             // sendMediaMessage(type: "source",mediaType: "sound recording" ,mediaPath: recordingPath);
                                             record(
                                                 record: recordingPath,
@@ -941,48 +930,6 @@ class _ChatPageState extends State<ChatPage> {
                                                 )),
                                 ),
                               )
-
-                              // : Container(
-                              //     margin: EdgeInsets.only(left: 5),
-                              //     decoration: BoxDecoration(
-                              //         color: messagesendercontainercolor,
-                              //         borderRadius:
-                              //             BorderRadius.circular(100)),
-                              //     height: 44,
-                              //     width: 44,
-                              //     child: Center(
-                              //       child: IconButton(
-                              //         onPressed: () {
-                              //           setState(() {
-                              //             recordStatus = true;
-                              //           });
-                              //           switch (_currentStatus) {
-                              //             case RecordingStatus
-                              //                 .Initialized:
-                              //               {
-                              //                 _start();
-                              //                 break;
-                              //               }
-                              //             case RecordingStatus.Stopped:
-                              //               {
-                              //                 initilize();
-                              //                 break;
-                              //               }
-                              //             default:
-                              //               break;
-                              //           }
-                              //         },
-                              //         icon: Icon(
-                              //           Icons.mic,
-                              //           color: Colors.white,
-                              //           size: 30,
-                              //         ),
-                              //       ),
-                              //     ),
-                              //   )
-                              //;
-                              //   },
-                              // ),
                             ],
                           ),
                   );
@@ -996,8 +943,338 @@ class _ChatPageState extends State<ChatPage> {
 
     return scaffold;
   }
-}
 
-//message.trim().isEmpty
-//? null
-//:
+  showInvoiceSheet({context}) {
+    String message = "";
+    String price = "";
+
+    // bool? isLoading = false;
+    return showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30.0),
+          topRight: Radius.circular(30.0),
+        ),
+      ),
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, setState) {
+          bool isLoading = false;
+          return Container(
+              height: 400,
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 40,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Create Invoice",
+                              style: GoogleFonts.inter(
+                                  fontSize: 14, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                                "Feel free to leave a note for the client in the provided box.Provide a brief description of the price break down.",
+                                style: GoogleFonts.inter(
+                                    fontSize: 12, color: Color(0XFF374151))),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10, right: 10),
+                      child: Text(
+                        "Project",
+                        style: GoogleFonts.inter(
+                            fontSize: 12, color: Color(0XFF6B7280)),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Container(
+                      height: 48,
+                      width: MediaQuery.of(context).size.width * 0.95,
+                      margin: EdgeInsets.only(left: 10, right: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border:
+                              Border.all(width: 1, color: Color(0XFFE5E7EB))),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton2(
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: Colors.black38,
+                            ),
+                            hint: Text('Select Project',
+                                style: GoogleFonts.inter(
+                                    fontSize: 14, color: Color(0XFF6B7280))),
+                            items: projects!
+                                .map((ongoingProjects) =>
+                                    DropdownMenuItem<dynamic>(
+                                      value: ongoingProjects,
+                                      child: Row(
+                                        children: [
+                                          CachedNetworkImage(
+                                            imageUrl: ongoingProjects[
+                                                "profile_image"],
+                                            imageBuilder:
+                                                (context, imageProvider) =>
+                                                    Container(
+                                              width: 25,
+                                              height: 25,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: DecorationImage(
+                                                    image: imageProvider,
+                                                    fit: BoxFit.cover),
+                                              ),
+                                            ),
+                                            placeholder: (context, url) =>
+                                                Container(
+                                                    width: 25,
+                                                    height: 25,
+                                                    child:
+                                                        CircularProgressIndicator()),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    const Icon(Icons.person,
+                                                        size: 30,
+                                                        color: Colors.grey),
+                                          ),
+                                          Text(
+                                            "  ${ongoingProjects["customer_first_name"] ?? ongoingProjects["service_provider_first_name"]}",
+                                            style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
+                                    ))
+                                .toList(),
+                            value: dropdownvalueProject,
+                            onChanged: (ongoingProjects) {
+                              setState(() {
+                                print(ongoingProjects);
+                                dropdownvalueProject = ongoingProjects;
+                                dropdownvalueProjectID = ongoingProjects["project_id"];
+                              });
+                            },
+                            buttonHeight: 40,
+                            buttonWidth: 140,
+                            itemHeight: 40,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    /////// The Demacation //////////
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Price",
+                              style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0XFF6B7280)),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              height: 48,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                      width: 1, color: Color(0XFFE5E7EB))),
+                              child: TextFormField(
+                                // focusNode: textNode,
+                                onChanged: (value) {
+                                  price = value;
+                                },
+                                keyboardType: TextInputType.number,
+                                textAlignVertical: TextAlignVertical.top,
+
+                                // controller: bioController,
+                                decoration: InputDecoration(
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide
+                                        .none, // Remove the border when focused
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide
+                                        .none, // Remove the border when enabled
+                                  ),
+                                  hintText: "Total price of work",
+                                  hintStyle: GoogleFonts.inter(
+                                      fontSize: 12, color: Color(0XFF6B7280)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    /////// The Demacation //////////
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Message (Optional)",
+                              style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0XFF6B7280)),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              height: 140,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                      width: 1, color: Color(0XFFE5E7EB))),
+                              child: TextFormField(
+                                // focusNode: textNode,
+                                onChanged: (value) {
+                                  message = value;
+                                },
+                                keyboardType: TextInputType.multiline,
+                                textAlignVertical: TextAlignVertical.top,
+                                maxLines: null,
+                                expands: true,
+                                minLines: null,
+                                // controller: bioController,
+                                decoration: InputDecoration(
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide
+                                        .none, // Remove the border when focused
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide
+                                        .none, // Remove the border when enabled
+                                  ),
+                                  hintText: "Describe the price break down",
+                                  hintStyle: GoogleFonts.inter(
+                                      fontSize: 12, color: Color(0XFF6B7280)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: InkWell(
+                        onTap: () {
+                          if (message.isNotEmpty &&
+                              dropdownvalueProjectID != null &&
+                              price.isNotEmpty) {
+                            circularCustom(context);
+
+                            setState(() {
+                              isLoading = true;
+                            });
+
+                            setProjectAmount(
+                                    amount: price,
+                                    project_id: dropdownvalueProjectID)
+                                .then((value) {
+                                  print(value);
+                              if (value["status"] == true &&
+                                  value["message"] ==
+                                      "You have set the final amount for the selected project.") {
+                                mywidgets.displayToast(
+                                    msg: "Invoice sent successfully");
+                                setState(() {});
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                this.message =
+                                    "Invoice for project has been sent. Please check your mail to make payment";
+                                sendMessage();
+                              } else if (value["status"] == "Network Error") {
+                                Navigator.pop(context);
+                                mywidgets.displayToast(
+                                    msg:
+                                        "Network Error. Check your Network Connection and try again");
+                              } else {
+                                Navigator.pop(context);
+                                mywidgets.displayToast(msg: value["message"]);
+                              }
+
+                              setState(() {
+                                isLoading = false;
+                              });
+                            });
+                          } else {}
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 48,
+                          decoration: BoxDecoration(
+                              color: constants.appMainColor,
+                              borderRadius: BorderRadius.circular(200)),
+                          child: Center(
+                            child: (isLoading == true)
+                                ? CircularProgressIndicator()
+                                : Text(
+                                    "Submit",
+                                    style: GoogleFonts.inter(
+                                        color: Colors.white, fontSize: 14),
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(
+                      height: 20,
+                    )
+                  ],
+                ),
+              ));
+        });
+      },
+    );
+  }
+}

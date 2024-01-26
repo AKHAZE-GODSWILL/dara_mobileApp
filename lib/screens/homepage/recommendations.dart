@@ -16,7 +16,11 @@ class _RecommendationState extends State<Recommendation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Container(),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Text("")),
         centerTitle: false,
         titleSpacing: 0,
         title: Transform(
@@ -158,7 +162,7 @@ class _RecommendationState extends State<Recommendation> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: Text(
-                                "51 Completed Projects",
+                                "0 Completed Projects",
                                 style: TextStyle(
                                     fontSize: 8,
                                     fontWeight: FontWeight.bold,

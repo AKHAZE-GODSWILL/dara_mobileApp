@@ -50,7 +50,11 @@ class _ResetPassword extends State<ResetPassword> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        leading: Container(),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Text("")),
         centerTitle: false,
         titleSpacing: 0,
         title: Transform(
@@ -330,7 +334,6 @@ class _ResetPassword extends State<ResetPassword> {
                           // Handle the tap gesture for 'World!'
 
                           Navigator.pop(context);
-                          print('Terms and conditions tapped');
                         }),
                 ],
               ),

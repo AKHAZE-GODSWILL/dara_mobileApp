@@ -1,4 +1,5 @@
 import '../../../../main.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,30 +8,36 @@ import 'package:dara_app/utils/apiRequest.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dara_app/widget/custom_circle.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
-class WithdrawFunds extends StatefulWidget {
-  const WithdrawFunds({Key? key}) : super(key: key);
+class AddBank extends StatefulWidget {
+  List? banks;
+  AddBank({this.banks});
 
   @override
-  State<WithdrawFunds> createState() => _WithdrawFundsState();
+  State<AddBank> createState() => _AddBankState();
 }
 
-class _WithdrawFundsState extends State<WithdrawFunds> {
-  final amountController = TextEditingController();
-  final passwordController = TextEditingController();
+class _AddBankState extends State<AddBank> {
+  TextEditingController? accountController;
+  TextEditingController? passwordController;
+  TextEditingController? nameController;
 
   final securityAnswerController = TextEditingController();
+  Map? dropdownvalueBank;
+  String? dropdownvalueBankValue;
 
   @override
   void initState() {
     super.initState();
+    accountController = TextEditingController();
+    passwordController = TextEditingController();
+    nameController = TextEditingController();
+    setState(() {
+      dropdownvalueBank = widget.banks![0];
+      dropdownvalueBankValue = widget.banks![0]["name"];
+    });
   }
-
-// @override
-// void dispose() {
-// super.dispose();
-// _controller.dispose();
-// }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +81,7 @@ class _WithdrawFundsState extends State<WithdrawFunds> {
                 Padding(
                   padding: const EdgeInsets.only(left: 12.0),
                   child: Text(
-                    "Withdraw Funds",
+                    "Banks",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 20,
@@ -104,18 +111,9 @@ class _WithdrawFundsState extends State<WithdrawFunds> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Available Balance: NGN ${provider.value["user_object"]["personal_information"]["wallet"]}",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-
-                      SizedBox(
-                        height: 10,
-                      ),
                       // Bio
                       Text(
-                        "Complete the form below to withdraw your funds.",
+                        "Complete the form below to add bank for withdrawal.",
                         style: TextStyle(fontSize: 12, color: Colors.black54),
                       ),
                     ],
@@ -123,16 +121,87 @@ class _WithdrawFundsState extends State<WithdrawFunds> {
                 ),
               ),
               SizedBox(
-                height: 5,
+                height: 20,
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Container(
+                  width: MediaQuery.of(context).size.width,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Amount to withdraw",
+                        "Destination",
+                        style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Container(
+                        height: 48,
+                        width: MediaQuery.of(context).size.width * 0.95,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border:
+                                Border.all(width: 1, color: Color(0XFFE5E7EB))),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton2(
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.black38,
+                              ),
+                              hint: Text('Select Your Bank',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 14, color: Color(0XFF6B7280))),
+                              items: widget.banks!
+                                  .map((item) => DropdownMenuItem<String>(
+                                        value: item["name"],
+                                        child: Text(item["name"].toString(),
+                                            style: GoogleFonts.inter(
+                                                fontSize: 14,
+                                                color: Colors.black)),
+                                      ))
+                                  .toList(),
+                              value: dropdownvalueBankValue.toString(),
+                              onChanged: (value) {
+                                setState(() {
+                                  print(value);
+                                  dropdownvalueBank = widget.banks!.singleWhere(
+                                          (element) => element["name"] == value)
+                                      as Map;
+                                  dropdownvalueBankValue = value;
+                                  print(dropdownvalueBank.toString());
+                                  // print(dropdownvalueBankValue.toString());
+                                });
+                              },
+                              buttonHeight: 40,
+                              buttonWidth: 140,
+                              itemHeight: 40,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        provider.accountNumber ?? "Account Number",
                         style: TextStyle(
                             color: Colors.black54,
                             fontSize: 12,
@@ -150,10 +219,29 @@ class _WithdrawFundsState extends State<WithdrawFunds> {
                         child: TextFormField(
                           // focusNode: textNode,
                           onChanged: (value) {
-                            setState(() {});
+                            if (value.toString().length == 10) {
+                              circularCustom(context);
+                              validateAccount(value, dropdownvalueBank!["code"])
+                                  .then((value) {
+                                Navigator.pop(context);
+                                if (value["status"] == false) {
+                                  Fluttertoast.showToast(
+                                      msg: value["message"],
+                                      gravity: ToastGravity.BOTTOM);
+                                } else {
+                                  setState(() {
+                                    nameController!.text =
+                                        value["data"]["account_name"];
+                                  });
+                                }
+                              });
+                            }
                           },
                           keyboardType: TextInputType.number,
-                          controller: amountController,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(10),
+                          ],
+                          controller: accountController,
                           decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide
@@ -163,7 +251,54 @@ class _WithdrawFundsState extends State<WithdrawFunds> {
                                 borderSide: BorderSide
                                     .none, // Remove the border when enabled
                               ),
-                              hintText: "Minimum of N 1000",
+                              hintText: "123456789",
+                              hintStyle: TextStyle(color: Colors.black54)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Account Name",
+                        style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border:
+                                Border.all(width: 1, color: Color(0XFFE5E7EB))),
+                        child: TextFormField(
+                          enabled: false,
+                          keyboardType: TextInputType.text,
+                          controller: nameController,
+                          decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide
+                                    .none, // Remove the border when focused
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide
+                                    .none, // Remove the border when enabled
+                              ),
+                              hintText: "",
                               hintStyle: TextStyle(color: Colors.black54)),
                         ),
                       ),
@@ -176,39 +311,22 @@ class _WithdrawFundsState extends State<WithdrawFunds> {
               ),
               InkWell(
                 onTap: () {
-                  // CustomSecurityQuestionWidget();
                   circularCustom(context);
-                  submitWithdrawal(amountController.text).then((value) {
-                    // Navigator.pop(context);
-                    if (value["status"] == false) {
-                      Navigator.pop(context);
-                      Fluttertoast.showToast(msg: value["message"]);
+                  saveBankAccount(
+                          account_name: nameController!.text,
+                          account_number: accountController!.text,
+                          bank: dropdownvalueBank!["code"])
+                      .then((value) {
+                    Navigator.pop(context);
+
+                    if (value["status"] == true) {
+                      Navigator.of(context).pop();
+                    } else if (value["status"] == "Network Error") {
+                      mywidgets.displayToast(
+                          msg:
+                              "Network Error. Check your Network Connectxion and try again");
                     } else {
-                      reloadUserObject().then((value) {
-                        provider.set_sp_login_info(
-                            value: value,
-                            firstName: value["user_object"]
-                                ["personal_information"]["first_name"],
-                            lastName: value["user_object"]
-                                ["personal_information"]["last_name"],
-                            email: value["user_object"]["personal_information"]
-                                ["email"],
-                            id: value["user_object"]["personal_information"]
-                                    ["id"]
-                                .toString(),
-                            access_token: value["access_token"],
-                            profile_image: (value["user_object"]
-                                        ["address_information"] !=
-                                    null)
-                                ? value["user_object"]["address_information"]
-                                    ["profile_image"]
-                                : "");
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                        Fluttertoast.showToast(msg: "Request Submited");
-                      });
-                      // Navigator.pop(context);
-                      // Fluttertoast.showToast(msg: value["message"]);
+                      mywidgets.displayToast(msg: value["message"]);
                     }
                   });
                 },

@@ -1,6 +1,8 @@
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:get_time_ago/get_time_ago.dart';
+import 'package:dara_app/utils/apiRequest.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 
@@ -12,12 +14,28 @@ class Notifications extends StatefulWidget {
 }
 
 class _NotificationState extends State<Notifications> {
+  List? notification;
+
+  @override
+  initState() {
+    super.initState();
+    getNotifications().then((value) {
+      setState(() {
+        notification = value;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     DataProvider provider = Provider.of<DataProvider>(context, listen: true);
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(
@@ -63,117 +81,165 @@ class _NotificationState extends State<Notifications> {
           backgroundColor: Colors.white,
           elevation: 0,
         ),
-        body: (provider.userType == "serviceProvider")
-            ? ListView(
-                children: [
-                  confirmedCompletion(context: context),
-                  reviewedProjectCompletion(context: context),
-                  subScribedToNetwork(context: context),
-                  likedPost(context: context),
-                  commentedOnPost(context: context)
-                ],
-              )
-            : ListView(
-                children: [
-                  acceptedProjectHire(context: context),
-                  repliedProfileReview(context: context),
-                  projectCompletion(context: context)
-                ],
-              )
-
-        // ListView.builder(
-        //   itemCount: 5,
-        //   itemBuilder: (context,index){
-        //   return Column(
-        //         children: [
-        //           Column(
-        //             children: [
-        //               Padding(
-        //                 padding: EdgeInsets.only(left: 12.0, right: 12),
-        //                 child: Column(
-        //                   children: [
-        //                     Padding(
-        //                       padding: EdgeInsets.only(top: 8.0, bottom: 0),
-        //                       child: Row(
-        //                         children: [
-        //                           Padding(
-        //                             padding: EdgeInsets.only(right: 8.0),
-        //                             child: Stack(
-        //                               children: [
-        //                                 CircleAvatar(
-        //                                   radius: 25,
-        //                                   backgroundImage:
-        //                                   AssetImage("assets/profile1.png"),
-        //                                 ),
-        //                                 Padding(
-        //                                   padding: EdgeInsets.only(left: 38),
-        //                                   child: Container(
-        //                                     child: Text(""),
-        //                                     height: 12,
-        //                                     width: 12,
-        //                                     decoration: BoxDecoration(
-        //                                         borderRadius: BorderRadius.circular(100),
-        //                                         border: Border.all(color: Colors.white, width: 2),
-        //                                         color: Colors.green
-        //                                     ),
-        //                                   ),
-        //                                 )
-        //                               ],
-        //                             ),
-        //                           ),
-        //                           Column(
-        //                             mainAxisAlignment: MainAxisAlignment.start,
-        //                             crossAxisAlignment: CrossAxisAlignment.start,
-        //                             children: [
-        //                               Row(
-        //                                 children: [
-        //                                   Container(
-        //                                     width: MediaQuery.of(context).size.width*0.62,
-        //                                     child: RichText(text: TextSpan(children: [
-        //                                       TextSpan(
-        //                                         text: (provider.userType == "client")?  "Daniel Smith ": "Daniel ",
-        //                                         style: GoogleFonts.inter(fontSize: 12,
-        //                                             fontWeight: FontWeight.bold,
-        //                                             color: Colors.black),
-        //                                       ),
-        //                                       TextSpan(
-        //                                         text:  "gave you review on your successful project completion",
-        //                                         style: GoogleFonts.inter(fontSize: 12, color: Colors.black),
-        //                                       )])),
-        //                                   ),
-        //                                   SizedBox(width:MediaQuery.of(context).size.width*0.08),
-        //                                   SvgPicture.asset("assets/svg/more.svg")
-        //                                 ],
-        //                               ),
-
-        //                               Padding(
-        //                                 padding: const EdgeInsets.all(2.0),
-        //                                 child: Text(
-        //                                   "2m",
-        //                                   style: GoogleFonts.inter(
-        //                                       fontSize: 12, color: Colors.black),
-        //                                 ),
-        //                               ),
-        //                             ],
-        //                           ),
-
-        //                         ],
-        //                       ),
-        //                     ),
-
-        //                   ],
-        //                 ),
-        //               ),
-        //               Padding(
-        //                 padding: const EdgeInsets.only(left: 8.0, right: 8),
-        //                 child: Divider(),
-        //               )
-        //             ],
-        //           ),
-        //         ],
-        //       );
-        // })
-        );
+        body: notification == null
+            ? Center(child: CircularProgressIndicator())
+            : notification!.length == 0
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.4,
+                      ),
+                      Center(
+                        child: Text(
+                          "No Notification Found",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.4,
+                      ),
+                    ],
+                  )
+                : ListView(
+                    children: [
+                      ...notification!.map((e) => Column(
+                            children: [
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 12.0, right: 12),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              top: 8.0, bottom: 0),
+                                          child: Row(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(right: 8.0),
+                                                child: Stack(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      radius: 25,
+                                                      backgroundImage: NetworkImage(
+                                                          "${e["profile_image"]}"),
+                                                    ),
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: 38),
+                                                      child: Container(
+                                                        child: Text(""),
+                                                        height: 12,
+                                                        width: 12,
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        100),
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .white,
+                                                                width: 2),
+                                                            color:
+                                                                Colors.green),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.62,
+                                                        child: RichText(
+                                                            text: TextSpan(
+                                                                children: [
+                                                              TextSpan(
+                                                                text: (provider
+                                                                            .userType ==
+                                                                        "client")
+                                                                    ? "${e["first_name"]}"
+                                                                    : "${e["first_name"]} ",
+                                                                style: GoogleFonts.inter(
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
+                                                              TextSpan(
+                                                                text:
+                                                                    " ${e["details"]}",
+                                                                style: GoogleFonts.inter(
+                                                                    fontSize:
+                                                                        12,
+                                                                    color: Colors
+                                                                        .black),
+                                                              )
+                                                            ])),
+                                                      ),
+                                                      SizedBox(
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.08),
+                                                      SvgPicture.asset(
+                                                          "assets/svg/more.svg")
+                                                    ],
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            2.0),
+                                                    child: Text(
+                                                      "${GetTimeAgo.parse(DateTime.parse(e["created_at"]))}",
+                                                      style: GoogleFonts.inter(
+                                                          fontSize: 12,
+                                                          color: Colors.black),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 8.0, right: 8),
+                                    child: Divider(),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ))
+                      // confirmedCompletion(context: context),
+                      // reviewedProjectCompletion(context: context),
+                      // subScribedToNetwork(context: context),
+                      // likedPost(context: context),
+                      // commentedOnPost(context: context)
+                    ],
+                  ));
   }
 
   Widget acceptedProjectHire({required context}) {

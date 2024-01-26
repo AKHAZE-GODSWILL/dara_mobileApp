@@ -1,27 +1,27 @@
-
+import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'package:dara_app/utils/constants.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:google_search_place/google_search_place.dart';
-import 'package:google_search_place/model/prediction.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:flutter/material.dart';
+import 'package:dara_app/utils/constants.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:google_search_place/model/prediction.dart';
+import 'package:google_search_place/google_search_place.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+
 // import '../../Utils/utils.dart';
 
-
 class SearchPlace extends StatefulWidget {
-  String ?title;
+  String? title;
   SearchPlace({this.title});
 
   @override
   State<SearchPlace> createState() => _SearchPlaceState();
 }
 
-class _SearchPlaceState extends State<SearchPlace> with TickerProviderStateMixin {
+class _SearchPlaceState extends State<SearchPlace>
+    with TickerProviderStateMixin {
   double portforlioHeight = 55.0;
   int currentindex = 0;
   TabController? tabController;
@@ -35,19 +35,12 @@ class _SearchPlaceState extends State<SearchPlace> with TickerProviderStateMixin
 
   // var auth = FirebaseAuth.instance;
 
-
   var pickupController = TextEditingController();
   var destinationController = TextEditingController();
 
   var focusDestination = FocusNode();
 
-
-
-
-
-
   bool done = false;
-
 
   @override
   void initState() {
@@ -58,11 +51,11 @@ class _SearchPlaceState extends State<SearchPlace> with TickerProviderStateMixin
       vsync: this,
     );
   }
+
   final TextEditingController _searchPlaceController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-
     // AuthProvider authProvider = Provider.of<AuthProvider>(context, listen:true);
     // InvoiceService invoiceProvider = Provider.of<InvoiceService>(context, listen: true);
     // InvoiceService invoiceService = Provider.of<InvoiceService>(context, listen: true);
@@ -111,7 +104,7 @@ class _SearchPlaceState extends State<SearchPlace> with TickerProviderStateMixin
                                     alignment: Alignment.topLeft,
                                     child: Padding(
                                       padding:
-                                      EdgeInsets.only(top: 25, bottom: 0),
+                                          EdgeInsets.only(top: 25, bottom: 0),
                                       child: Row(
                                         children: [
                                           //
@@ -134,45 +127,44 @@ class _SearchPlaceState extends State<SearchPlace> with TickerProviderStateMixin
                                           left: 0.0, right: 0),
                                       child: Column(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.start,
+                                            MainAxisAlignment.start,
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.only(left:8.0, right:8),
+                                            padding: const EdgeInsets.only(
+                                                left: 8.0, right: 8),
                                             child: Align(
                                                 alignment: Alignment.topLeft,
                                                 child: Text(
                                                   "${widget.title}",
                                                   style: TextStyle(
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                       fontSize: 18),
                                                 )),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only( top: 5, bottom:5, left:8.0, right:8),
-                                            child: Text("",
-                                              style: TextStyle(color: Colors.black54), textAlign: TextAlign.center,),
+                                            padding: const EdgeInsets.only(
+                                                top: 5,
+                                                bottom: 5,
+                                                left: 8.0,
+                                                right: 8),
+                                            child: Text(
+                                              "",
+                                              style: TextStyle(
+                                                  color: Colors.black54),
+                                              textAlign: TextAlign.center,
+                                            ),
                                           ),
-
-
-
-
-
-
-
-
-
                                           Container(
                                             height: MediaQuery.of(context)
-                                                .size
-                                                .height *
+                                                    .size
+                                                    .height *
                                                 0.75,
                                             // color: Colors.red,
-                                            child:   Column(
+                                            child: Column(
                                               children: [
-
-
                                                 Row(
                                                   children: <Widget>[
                                                     Expanded(
@@ -181,65 +173,90 @@ class _SearchPlaceState extends State<SearchPlace> with TickerProviderStateMixin
                                                         // decoration: BoxDecoration(
                                                         //     color: Color(0xFFEEEEEE),
                                                         //     borderRadius: BorderRadius.circular(4)),
-                                                        child:Column(
+                                                        child: Column(
                                                           children: [
                                                             Column(
                                                               children: [
                                                                 Padding(
-                                                                  padding: const EdgeInsets.all(8.0),
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          8.0),
                                                                   child: SearchPlaceAutoCompletedTextField(
-                                                                      inputDecoration:  InputDecoration(
-                                                                        suffixIcon: Icon(PhosphorIcons.light.mapPin, color: Constants().appMainColor,),
-                                                                        hintText: 'Enter Address',
+                                                                      inputDecoration: InputDecoration(
+                                                                        suffixIcon:
+                                                                            Icon(
+                                                                          PhosphorIcons
+                                                                              .light
+                                                                              .mapPin,
+                                                                          color:
+                                                                              Constants().appMainColor,
+                                                                        ),
+                                                                        hintText:
+                                                                            'Enter Address',
                                                                         // fillColor: Color(0xFFEEEEEE),
                                                                         // filled: true,
                                                                         border: OutlineInputBorder(
-                                                                            borderSide: BorderSide(width: 0.8, color: Colors.black26)
-                                                                        ),
-                                                                        enabledBorder: OutlineInputBorder(
-                                                                            borderSide: BorderSide(width: 0.8, color: Colors.black26)
-                                                                        ),
-                                                                        focusedBorder:  OutlineInputBorder(
-                                                                            borderSide: BorderSide(width: 0.8, color: Colors.black26)
-                                                                        ),
-                                                                        isDense: true,
+                                                                            borderSide:
+                                                                                BorderSide(width: 0.8, color: Colors.black26)),
+                                                                        enabledBorder:
+                                                                            OutlineInputBorder(borderSide: BorderSide(width: 0.8, color: Colors.black26)),
+                                                                        focusedBorder:
+                                                                            OutlineInputBorder(borderSide: BorderSide(width: 0.8, color: Colors.black26)),
+                                                                        isDense:
+                                                                            true,
                                                                         contentPadding: EdgeInsets.only(
-                                                                            left: 10, top: 8, bottom: 8),
+                                                                            left:
+                                                                                10,
+                                                                            top:
+                                                                                8,
+                                                                            bottom:
+                                                                                8),
                                                                       ),
                                                                       googleAPIKey: Constants().mapKey,
                                                                       controller: _searchPlaceController,
                                                                       countries: ["NG"],
                                                                       itmOnTap: (Prediction prediction) {
-                                                                        _searchPlaceController.text = prediction.description ?? "";
+                                                                        _searchPlaceController
+                                                                            .text = prediction
+                                                                                .description ??
+                                                                            "";
 
-                                                                        _searchPlaceController.selection = TextSelection.fromPosition(
-                                                                            TextPosition(
-                                                                                offset: prediction.description?.length ?? 0));
-
-
+                                                                        _searchPlaceController.selection =
+                                                                            TextSelection.fromPosition(TextPosition(offset: prediction.description?.length ?? 0));
                                                                       },
                                                                       getPlaceDetailWithLatLng: (Prediction prediction) {
-                                                                        _searchPlaceController.text = prediction.description ?? "";
+                                                                        _searchPlaceController
+                                                                            .text = prediction
+                                                                                .description ??
+                                                                            "";
 
-                                                                        _searchPlaceController.selection = TextSelection.fromPosition(
-                                                                            TextPosition(
-                                                                                offset: prediction.description?.length ?? 0));
+                                                                        _searchPlaceController.selection =
+                                                                            TextSelection.fromPosition(TextPosition(offset: prediction.description?.length ?? 0));
 
                                                                         // Get search place latitude and longitude
-                                                                        print("${prediction.lat} ${prediction.lng}");
-                                                                        Map place = {
-                                                                          "longitude": prediction.lng.toString(),
-                                                                          "latitude": prediction.lat.toString(),
-                                                                          "mainText": "${prediction.placeDetails!.result!.name.toString()}"
+                                                                        Map place =
+                                                                            {
+                                                                          "longitude": prediction
+                                                                              .lng
+                                                                              .toString(),
+                                                                          "latitude": prediction
+                                                                              .lat
+                                                                              .toString(),
+                                                                          "mainText":
+                                                                              "${prediction.placeDetails!.result!.name.toString()}"
                                                                         };
                                                                         // Navigator.pop(context);
-                                                                        Navigator.pop(context, place);
+                                                                        Navigator.pop(
+                                                                            context,
+                                                                            place);
                                                                         // Navigator.pop(context,  "${prediction.placeDetails!.result!.name.toString()}");
 
                                                                         // Get place Detail
-                                                                        // print("Place Detail : ${prediction.placeDetails!.result!.formattedAddress.toString()}");
+                                                                      
                                                                       }),
-                                                                )],
+                                                                )
+                                                              ],
                                                             )
                                                           ],
                                                         ),
@@ -247,10 +264,6 @@ class _SearchPlaceState extends State<SearchPlace> with TickerProviderStateMixin
                                                     )
                                                   ],
                                                 ),
-
-
-
-
                                               ],
                                             ),
                                           )
@@ -272,8 +285,4 @@ class _SearchPlaceState extends State<SearchPlace> with TickerProviderStateMixin
           ),
         ));
   }
-
-
-
 }
-

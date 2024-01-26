@@ -3,8 +3,10 @@ import '../../../../main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:dara_app/utils/apiRequest.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dara_app/widget/custom_circle.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
@@ -25,12 +27,12 @@ class _PersonalInfoState extends State<PersonalInfo> {
   File? readyUploadImage;
   bool hasImg = false;
 
-  final firstNameController = TextEditingController();
-  final lastNameController = TextEditingController();
-  final phoneController = TextEditingController();
-  final emailAddressController = TextEditingController();
-  final bioController = TextEditingController();
-  final specificAddressController = TextEditingController();
+  TextEditingController? firstNameController;
+  TextEditingController? lastNameController;
+  TextEditingController? phoneController;
+  TextEditingController? emailAddressController;
+  TextEditingController? bioController;
+  TextEditingController? specificAddressController;
 
   String? dropdownvalueCountry;
   String? dropdownvalueState;
@@ -61,7 +63,26 @@ class _PersonalInfoState extends State<PersonalInfo> {
 
   @override
   void initState() {
+    DataProvider provider = Provider.of<DataProvider>(context, listen: false);
     super.initState();
+    firstNameController = TextEditingController(
+        text:
+            "${provider.value["user_object"]["personal_information"]["first_name"]}");
+    lastNameController = TextEditingController(
+        text:
+            "${provider.value["user_object"]["personal_information"]["last_name"]}");
+    phoneController = TextEditingController(
+        text:
+            "${provider.value["user_object"]["personal_information"]["phone"]}");
+    emailAddressController = TextEditingController(
+        text:
+            "${provider.value["user_object"]["personal_information"]["email"]}");
+    bioController = TextEditingController(
+        text:
+            "${provider.value["user_object"]["service_information"][0]["bio"]}");
+    specificAddressController = TextEditingController(
+        text:
+            "${provider.value["user_object"]["address_information"]["address"]}");
   }
 
 // @override
@@ -75,7 +96,11 @@ class _PersonalInfoState extends State<PersonalInfo> {
     DataProvider provider = Provider.of<DataProvider>(context, listen: true);
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(
@@ -137,8 +162,11 @@ class _PersonalInfoState extends State<PersonalInfo> {
                     height: 64,
                     decoration: BoxDecoration(shape: BoxShape.circle),
                     child: ClipOval(
-                      child:
-                          Image.asset("assets/profile.png", fit: BoxFit.cover),
+                      child: readyUploadImage == null
+                          ? Image.network(
+                              "${provider.value["user_object"]["address_information"]["profile_image"]}",
+                              fit: BoxFit.cover)
+                          : Image.file(File(readyUploadImage!.path)),
                     )),
 
                 // Add/Change Image
@@ -173,8 +201,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
                                   onTap: () {
                                     /////////// Call the pick image method and change the image to replace the icon
                                     getImageGallery();
-                                    print(
-                                        ">>>>>>>>>>>> Printing the get image place");
                                   },
                                   child: Text(
                                     "Upload Image",
@@ -317,6 +343,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
                               setState(() {});
                             },
                             keyboardType: TextInputType.number,
+                            enabled: false,
                             controller: phoneController,
                             decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
@@ -367,6 +394,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
                             },
                             keyboardType: TextInputType.emailAddress,
                             controller: emailAddressController,
+                            enabled: false,
                             decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide
@@ -755,9 +783,34 @@ class _PersonalInfoState extends State<PersonalInfo> {
 
                 InkWell(
                   onTap: () {
-                    Navigator.pop(context);
+                     circularCustom(context);
+                    updatePersonalInfo(
+                        imageFile: readyUploadImage,
+                        first_name: firstNameController!.text,
+                        last_name: lastNameController!.text,
+                        phone: phoneController!.text,
+                        email: emailAddressController!.text,
+                        bio: bioController!.text)
+                      ..then((value) {
+                        print(value);
+                       
+                        if (value["status"] == true) {
+                           mywidgets.displayToast(
+                              msg:
+                                  "Profile Updated");
+                          
+                        } else if (value["status"] == "Network Error") {
+                          mywidgets.displayToast(
+                              msg:
+                                  "Network Error. Check your Network Connection and try again");
+                        } else {
+                          mywidgets.displayToast(msg: value["message"]);
+                        }
 
-                    //will save this parameter to state management later
+                        Navigator.pop(context);
+                      });
+
+                    //will save this parasmeter to state management later
                   },
                   child: Container(
                     width: MediaQuery.of(context).size.width * 0.85,
@@ -788,7 +841,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
       if (selectedImage == null) return;
 
       readyUploadImage = File(selectedImage.path);
-      print(readyUploadImage!.path);
       setState(() {
         imgPath = readyUploadImage!.path;
         imgExt = imgPath.split(".").last;
@@ -804,7 +856,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
   }
 
   void _detectWordCount() {
-    final text = bioController.text;
+    final text = bioController!.text;
     if (text.isEmpty) {
       setState(() {
         wordCount = 0;

@@ -1,14 +1,14 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dara_app/Provider/DataProvider.dart';
-import 'package:dara_app/main.dart';
-import 'package:dara_app/screens/homepage/drawerRoutes/settings/personalInfo.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
-
-import 'Overview.dart';
 import 'Posts.dart';
 import 'Reviews.dart';
+import 'Overview.dart';
+import 'package:dara_app/main.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:dara_app/Provider/DataProvider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dara_app/screens/homepage/drawerRoutes/settings/personalInfo.dart';
+
 
 enum TypeSelected { OVERVIEW, POST, REVIEW }
 
@@ -154,7 +154,10 @@ class _AccountMainState extends State<AccountMain> {
                                     )
                                   );
                               },
-                              child: SvgPicture.asset("assets/svg/edit.svg"))
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SvgPicture.asset("assets/svg/edit.svg"),
+                              ))
                           ],
                         ),
                       ),
@@ -170,19 +173,19 @@ class _AccountMainState extends State<AccountMain> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "${provider.sp_first_name} ${provider.sp_last_name}",
+                    "${provider.value["user_object"]["personal_information"]["first_name"]} ${provider.value["user_object"]["personal_information"]["last_name"]}",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   RichText(
                       text: TextSpan(children: [
                     TextSpan(
                       text:
-                          "Laundry Perfectionist at your Servioce! Discover the Art of Flawless laundry",
+                          "${provider.value["user_object"]["service_information"][0]["service"]}",
                       style: TextStyle(fontSize: 13, color: Colors.black54),
                     ),
                     TextSpan(
                       text:
-                          " #CleanFreaks #Laundrymargic #StainRemoval #LAundryGuru #CustomerSatisfaction",
+                          "# ${provider.value["user_object"]["service_information"][0]["skills"]} ",
                       style:
                           TextStyle(fontSize: 13, color: constants.appMainColor),
                     )
@@ -200,7 +203,7 @@ class _AccountMainState extends State<AccountMain> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "156",
+                        "${provider.value["user_object"]["personal_information"]["projects_completed"]}",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -222,7 +225,7 @@ class _AccountMainState extends State<AccountMain> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "4.8/5.0",
+                        "${provider.value["user_object"]["personal_information"]["rating"]}/5.0",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -244,7 +247,7 @@ class _AccountMainState extends State<AccountMain> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "98",
+                        "0",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -274,7 +277,6 @@ class _AccountMainState extends State<AccountMain> {
                                     setState(() {
                                       selected = TypeSelected.OVERVIEW;
                                     });
-                                    print("first");
                                   },
                                   child: Center(
                                     child: Container(
@@ -296,7 +298,6 @@ class _AccountMainState extends State<AccountMain> {
                           selected != TypeSelected.POST
                               ? InkWell(
                                   onTap: () {
-                                    print("second");
                                     setState(() {
                                       selected = TypeSelected.POST;
                                     });
@@ -321,7 +322,6 @@ class _AccountMainState extends State<AccountMain> {
                           selected != TypeSelected.REVIEW
                               ? InkWell(
                                   onTap: () {
-                                    print("second");
                                     setState(() {
                                       selected = TypeSelected.REVIEW;
                                     });
@@ -389,7 +389,8 @@ class _AccountMainState extends State<AccountMain> {
                 ? Overview()
                 : selected == TypeSelected.POST
                     ? Posts()
-                    : Reviews()
+                    : Reviews(provider.value["user_object"]["personal_information"]
+            ["service_provider"])
           ],
         ),
       ),

@@ -50,7 +50,11 @@ class _WithdrawalAccountState extends State<WithdrawalAccount> {
     DataProvider provider = Provider.of<DataProvider>(context, listen: true);
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(
@@ -480,7 +484,6 @@ class _WithdrawalAccountState extends State<WithdrawalAccount> {
                                 // Handle the tap gesture for 'World!'
 
                                 Navigator.pop(context);
-                                print('Terms and conditions tapped');
                               }),
                       ],
                     ),

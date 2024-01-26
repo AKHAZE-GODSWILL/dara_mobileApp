@@ -110,7 +110,6 @@ class _SelectTierState extends State<SelectTier>{
                       setState(() {
                         selectedTier = "serviceProvider";
                         provider.setUserType(userTier: "serviceProvider");
-                        print(provider.userType);
                       });
                     },
                     child: AnimatedContainer(
@@ -191,7 +190,6 @@ class _SelectTierState extends State<SelectTier>{
                       setState(() {
                         selectedTier = "client";
                         provider.setUserType(userTier: "client");
-                        print(provider.userType);
                       });
                     },
                     child: AnimatedContainer(

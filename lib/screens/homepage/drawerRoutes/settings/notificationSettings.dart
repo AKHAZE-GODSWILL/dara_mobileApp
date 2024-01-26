@@ -31,7 +31,11 @@ class _NotificationSettingsState extends State<NotificationSettings> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(
@@ -139,7 +143,6 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                                       receivePushNotification =
                                                           !receivePushNotification;
                                                     });
-                                                    print("only");
                                                   },
                                                   child: Center(
                                                     child: Container(
@@ -221,7 +224,6 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                                     setState(() {
                                                       playSound = !playSound;
                                                     });
-                                                    print("only");
                                                   },
                                                   child: Center(
                                                     child: Container(
@@ -327,7 +329,6 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                                       likePostAlert =
                                                           !likePostAlert;
                                                     });
-                                                    print("only");
                                                   },
                                                   child: Center(
                                                     child: Container(
@@ -408,7 +409,6 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                                       recommendationAlert =
                                                           !recommendationAlert;
                                                     });
-                                                    print("only");
                                                   },
                                                   child: Center(
                                                     child: Container(
@@ -490,7 +490,6 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                                     setState(() {
                                                       hireAlert = !hireAlert;
                                                     });
-                                                    print("only");
                                                   },
                                                   child: Center(
                                                     child: Container(
@@ -568,7 +567,6 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                                                       messageAlert =
                                                           !messageAlert;
                                                     });
-                                                    print("only");
                                                   },
                                                   child: Center(
                                                     child: Container(

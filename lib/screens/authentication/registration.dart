@@ -212,7 +212,6 @@ bool isLoading = false;
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
                                   // Handle the tap gesture for 'World!'
-                                  print('Terms and conditions tapped');
                                 }
                             ),
                             TextSpan(
@@ -227,7 +226,6 @@ bool isLoading = false;
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
                                   // Handle the tap gesture for 'World!'
-                                  print('Privacy Policy ckicked');
                                 }
                             ),
                           ],
@@ -252,7 +250,6 @@ bool isLoading = false;
                           // makes the request here
                           registerServiceProvider(countryCallCode: countryCallingCode,phoneNumber: formatPhone(phone: _textEditingController!.text.trim())).then((value) {
 
-                            print("The final Value of what was resulted from the request was :$value");
 
                             if(value["status"]== true){
                               ///// Navigation.push to the OTP screen
@@ -321,7 +318,6 @@ bool isLoading = false;
                                   Navigator.of(context).push(
                                     MaterialPageRoute(builder: (context) => Login())
                                   );
-                                  print('Terms and conditions tapped');
                                 }
                             ),
                           ],

@@ -1,11 +1,10 @@
-
 import 'package:flutter/cupertino.dart';
 
 class DataProvider with ChangeNotifier {
-
   int pageIndex = 0;
   String? userType;
-  
+  List services = [];
+  String address = "";
 
   ////////////////////////// Client live style /////////////////////////////
   String? client_user_id;
@@ -20,7 +19,6 @@ class DataProvider with ChangeNotifier {
   String? client_lga;
   String? client_address;
   String? client_profile_image;
-
 
   /////////////////////////// Service providers info ////////////////////////
   String? sp_user_id;
@@ -40,57 +38,71 @@ class DataProvider with ChangeNotifier {
   String? sp_service;
   String? sp_skills;
   String? sp_experience;
-  
+
   String? bankName;
   String? accountName;
   String? accountNumber;
   String? securityQuestion;
   String? securityAnswer;
 
-  setValue(value){
+  bool? just_confirmed_project = false;
+
+  setValue(value) {
     pageIndex = value;
     notifyListeners();
   }
 
   // String userId = "";
 
-  setUserType({required userTier}){
+  setUserType({required userTier}) {
     userType = userTier;
     notifyListeners();
   }
 
-  set_sp_user_id({required userId}){
+  set_sp_user_id({required userId}) {
     sp_user_id = userId;
     notifyListeners();
   }
-  set_sp_token({required token}){
+
+  set_sp_token({required token}) {
     sp_token = token;
     notifyListeners();
   }
 
-  set_sp_phone({required service_provider_phone}){
+  set_sp_phone({required service_provider_phone}) {
     serviceProviderPhone = service_provider_phone;
     notifyListeners();
   }
 
-  set_sp_personal_info({required firstName, required lastName, required email}){
+  set_sp_personal_info(
+      {required firstName, required lastName, required email}) {
     sp_first_name = firstName;
     sp_last_name = lastName;
     sp_email = email;
     notifyListeners();
   }
 
-  set_sp_login_info({required firstName, required lastName, required email,required id, required access_token, required profile_image}){
+  var value;
+  set_sp_login_info(
+      {required firstName,
+      required value,
+      required lastName,
+      required email,
+      required id,
+      required access_token,
+      required profile_image}) {
     sp_first_name = firstName;
     sp_last_name = lastName;
     sp_email = email;
+    this.value = value;
     sp_user_id = id;
     sp_token = access_token;
     sp_profile_image = profile_image;
     notifyListeners();
   }
 
-  set_sp_address_info({required country, required state, required lga, required address}){
+  set_sp_address_info(
+      {required country, required state, required lga, required address}) {
     sp_country = country;
     sp_state = state;
     sp_lga = lga;
@@ -98,7 +110,12 @@ class DataProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  set_sp_service_info({required profileImage, required bio, required service, required skills, required experience}){
+  set_sp_service_info(
+      {required profileImage,
+      required bio,
+      required service,
+      required skills,
+      required experience}) {
     sp_profile_image = profileImage;
     sp_bio = bio;
     sp_service = service;
@@ -107,27 +124,28 @@ class DataProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  set_sp_country_call_code({required country_call_code}){
+  set_sp_country_call_code({required country_call_code}) {
     sp_countryCallCode = country_call_code;
     notifyListeners();
   }
 
-  set_client_user_id({userId}){
+  set_client_user_id({userId}) {
     client_user_id = userId;
     notifyListeners();
   }
 
-  set_client_token({required token}){
+  set_client_token({required token}) {
     client_token = token;
     notifyListeners();
   }
 
-  set_client_email({required clientEmail}){
+  set_client_email({required clientEmail}) {
     client_email = clientEmail;
     notifyListeners();
   }
 
-  set_client_personal_info({required firstName, required lastName, required email, required phone}){
+  set_client_personal_info(
+      {required firstName, required lastName, required email, required phone}) {
     client_first_name = firstName;
     client_last_name = lastName;
     client_email = email;
@@ -135,7 +153,12 @@ class DataProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  set_client_address_info({required profileImage,required country, required state, required lga, required address}){
+  set_client_address_info(
+      {required profileImage,
+      required country,
+      required state,
+      required lga,
+      required address}) {
     client_profile_image = profileImage;
     client_country = country;
     client_state = state;
@@ -144,25 +167,38 @@ class DataProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  set_client_login_info({required firstName, required lastName, required email,required id, required access_token, required profile_image}){
+  set_client_login_info(
+      {required firstName,
+      required lastName,
+      required email,
+      required id,
+      required value,
+      required access_token,
+      required profile_image}) {
     client_first_name = firstName;
     client_last_name = lastName;
     client_email = email;
+    this.value = value;
     client_user_id = id;
     client_token = access_token;
     client_profile_image = profile_image;
     notifyListeners();
   }
 
-  setBankDetails({required nameOfBank, required accNumber}){
+  setBankDetails({required nameOfBank, required accNumber}) {
     bankName = nameOfBank;
     accountNumber = accNumber;
     notifyListeners();
   }
 
-  setSecurityDetails({required securedQuestion, required securedAnswer}){
+  setSecurityDetails({required securedQuestion, required securedAnswer}) {
     securityQuestion = securedQuestion;
     securityAnswer = securedAnswer;
+    notifyListeners();
+  }
+
+  setConfirmedProject() {
+    just_confirmed_project = true;
     notifyListeners();
   }
 }

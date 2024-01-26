@@ -1,10 +1,10 @@
-import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dara_app/main.dart';
-import 'package:dara_app/screens/homepage/drawerRoutes/settings/personalInfo.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:dara_app/Provider/DataProvider.dart';
+import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+import 'package:dara_app/screens/homepage/drawerRoutes/settings/personalInfo.dart';
 
 class ClientAccount extends StatefulWidget {
   const ClientAccount({Key? key, required this. backToHome}) : super(key: key);
@@ -136,7 +136,10 @@ class _ClientAccountState extends State<ClientAccount> {
                                       )
                                     );
                               },
-                              child: SvgPicture.asset("assets/svg/edit.svg")),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SvgPicture.asset("assets/svg/edit.svg"),
+                              )),
                           ],
                         ),
                       ),

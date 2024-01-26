@@ -10,7 +10,8 @@ import 'package:dara_app/screens/homepage/drawerRoutes/settings/withDrawalAccoun
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/notificationSettings.dart';
 
 class Categories extends StatefulWidget {
-  const Categories({Key? key}) : super(key: key);
+  List? categories;
+  Categories(this.categories);
 
   @override
   State<Categories> createState() => _CategoriesState();
@@ -32,7 +33,11 @@ class _CategoriesState extends State<Categories> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(
@@ -81,80 +86,16 @@ class _CategoriesState extends State<Categories> {
         body: Container(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
-            child: ListView(
-              children: [
-                customListWidget(
-                    category: "Plumbing",
-                    svgImage: "assets/svg/water-tap-black.svg"),
-                customListWidget(
-                    category: "Car Repairs",
-                    svgImage: "assets/svg/automotive-black.svg"),
-                customListWidget(
-                    category: "Laundry",
-                    svgImage: "assets/svg/washing-machine-black.svg"),
-                customListWidget(
-                    category: "Electrical Works",
-                    svgImage: "assets/svg/plug-black.svg"),
-                customListWidget(
-                    category: "Painting",
-                    svgImage: "assets/svg/roller-black.svg"),
-                customListWidget(
-                    category: "Carpentry",
-                    svgImage: "assets/svg/tools-black.svg"),
-                customListWidget(
-                    category: "Hair Salon",
-                    svgImage: "assets/svg/haircut-black.svg"),
-                customListWidget(
-                    category: "Generator",
-                    svgImage: "assets/svg/generator-black.svg"),
-                customListWidget(
-                    category: "Cleaning",
-                    svgImage: "assets/svg/cleaning-black.svg"),
-                customListWidget(
-                    category: "Gas Refill",
-                    svgImage: "assets/svg/gas-cylinder-black.svg"),
-                customListWidget(
-                    category: "Fumigation",
-                    svgImage: "assets/svg/pesticide-black.svg"),
-                customListWidget(
-                    category: "AC/Refrigerator",
-                    svgImage: "assets/svg/air-conditioner-black.svg"),
-                customListWidget(
-                    category: "Beautification/Makeup",
-                    svgImage: "assets/svg/cosmetics-black.svg"),
-                customListWidget(
-                    category: "Tv repair",
-                    svgImage: "assets/svg/television-black.svg"),
-                customListWidget(
-                    category: "Home renovation",
-                    svgImage: "assets/svg/renovation-black.svg"),
-                customListWidget(
-                    category: "Chef", svgImage: "assets/svg/chef-black.svg"),
-                customListWidget(
-                    category: "Catering",
-                    svgImage: "assets/svg/buffet-black.svg"),
-                customListWidget(
-                    category: "Logistics/Dispatch",
-                    svgImage: "assets/svg/delivery-black.svg"),
-                customListWidget(
-                    category: "Installation",
-                    svgImage: "assets/svg/service-black.svg"),
-                customListWidget(
-                    category: "Gadget",
-                    svgImage: "assets/svg/device-black.svg"),
-                customListWidget(
-                    category: "Photography/videography",
-                    svgImage: "assets/svg/camera-black.svg"),
-                customListWidget(
-                    category: "Vehicle towing",
-                    svgImage: "assets/svg/crane-truck-black.svg"),
-                customListWidget(
-                    category: "Vulcanizer",
-                    svgImage: "assets/svg/vulcan-black.svg"),
-                customListWidget(
-                    category: "Welder", svgImage: "assets/svg/weld-black.svg"),
-              ],
-            )));
+            child: widget.categories == null
+                ? SizedBox()
+                : ListView(
+                    children: [
+                      ...widget.categories!.map((e) {
+                        return customListWidget(
+                            category: "${e["name"]}", svgImage: "${e["icon"]}");
+                      })
+                    ],
+                  )));
   }
 
   customListWidget({required String category, required String svgImage}) {
@@ -194,7 +135,7 @@ class _CategoriesState extends State<Categories> {
                   height: 20,
                   width: 20,
                   alignment: Alignment.center,
-                  child: SvgPicture.asset(svgImage),
+                  child: Image.network(svgImage),
                 ),
                 SizedBox(
                   width: 10,

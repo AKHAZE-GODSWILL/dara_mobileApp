@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:dara_app/main.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:geocode/geocode.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
@@ -20,33 +21,6 @@ class DiscoverPage extends StatefulWidget {
 }
 
 class _DiscoverPageState extends State<DiscoverPage> {
-  List skills = [
-    "Plumbing",
-    "Car Repairs",
-    "Laundry",
-    "Electrical Works",
-    "Painting",
-    "Carpentry",
-    "Hair Salon",
-    "Generator",
-    "Cleaning",
-    "Gas Refill",
-    "Fumigation",
-    "AC/Refrigerator",
-    "Beautifaction/Makeup",
-    "TV repair",
-    "Home renovation",
-    "Chef",
-    "Catering",
-    "Logistics/Dispatch",
-    "Installation",
-    "Gadget",
-    "Photography/Videography",
-    "Vehicle towing",
-    "Vulcanizer",
-    "Welder"
-  ];
-
   int currentIndex = -1;
   late Position position;
   Completer<GoogleMapController> _controller = Completer();
@@ -56,20 +30,33 @@ class _DiscoverPageState extends State<DiscoverPage> {
   bool findServices = false;
   bool isSearching = false;
   List<dynamic> serviceProviders = [];
-  late final CameraPosition googlePlex;
+  CameraPosition? googlePlex;
+  List? result;
 
   @override
   void initState() {
-    print("The init state running successfully");
+    void getLocation() async {
+      position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        googlePlex = CameraPosition(
+          target: LatLng(position.latitude, position.longitude),
+          zoom: 12,
+        );
+      });
+    }
+
     setState(() {
       isLoading = true;
     });
 
-    googlePlex = const CameraPosition(
-      target: LatLng(6.6442, 5.9304),
-      zoom: 10,
-    );
+    getLocation();
     determinePosition();
+    ServiceProviderMap().then((value) {
+      setState(() {
+        result = value;
+      });
+    });
     super.initState();
   }
 
@@ -95,29 +82,32 @@ class _DiscoverPageState extends State<DiscoverPage> {
               margin: EdgeInsets.only(top: 25),
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
-              child: GoogleMap(
-                padding: EdgeInsets.only(bottom: 6),
-                mapType: MapType.normal,
-                myLocationEnabled: false,
-                initialCameraPosition: googlePlex,
-                myLocationButtonEnabled: false,
-                zoomGesturesEnabled: false,
-                zoomControlsEnabled: false,
-                compassEnabled: false,
-                rotateGesturesEnabled: false,
-                tiltGesturesEnabled: false,
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                  mapController = controller;
-                  setState(() {
-                    mapController!.animateCamera(
-                        CameraUpdate.newCameraPosition(CameraPosition(
-                      target: LatLng(6.6442, 5.9304),
-                      zoom: 10,
-                    )));
-                  });
-                },
-              ),
+              child: googlePlex == null
+                  ? SizedBox()
+                  : GoogleMap(
+                      padding: EdgeInsets.only(bottom: 6),
+                      mapType: MapType.normal,
+                      myLocationEnabled: false,
+                      initialCameraPosition: googlePlex!,
+                      myLocationButtonEnabled: false,
+                      zoomGesturesEnabled: false,
+                      zoomControlsEnabled: false,
+                      compassEnabled: false,
+                      rotateGesturesEnabled: false,
+                      tiltGesturesEnabled: false,
+                      onMapCreated: (GoogleMapController controller) {
+                        _controller.complete(controller);
+                        mapController = controller;
+                        setState(() {
+                          mapController!.animateCamera(
+                              CameraUpdate.newCameraPosition(CameraPosition(
+                            target:
+                                LatLng(position.latitude, position.longitude),
+                            zoom: 12,
+                          )));
+                        });
+                      },
+                    ),
             ),
 
             // Spacer()
@@ -153,7 +143,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
                             width: MediaQuery.of(context).size.width * 0.75,
                             child: TextFormField(
                               // focusNode: textNode,
-                              onChanged: (value) {
+                              textInputAction: TextInputAction.go,
+                              onFieldSubmitted: (value) {
                                 if (value.isNotEmpty) {
                                   setState(() {
                                     isSearching = true;
@@ -161,15 +152,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                   });
                                   searchServiceProviders(query: value.trim())
                                       .then((value) {
-                                    print(
-                                        "The final Value of what was resulted from the request was :$value");
-
                                     if (value["status"] == true) {
                                       setState(() {
                                         // getX.write((widget.userType == "serviceProvider")? constants.GETX_SP_FEEDS:constants.GETX_CLIENT_FEEDS, value["user_object"]["posts"]);
                                         // serviceProviders.clear();
                                         serviceProviders = value["data"];
-                                        print(serviceProviders);
                                       });
                                     } else if (value["status"] ==
                                         "Network Error") {
@@ -215,23 +202,56 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   ),
                   (SearchController.text.isNotEmpty)
                       ? Container(
-                          height: 32,
+                          height: 35,
                           // color: Colors.red,
                           child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: skills.length,
+                              itemCount: provider.services == null
+                                  ? 0
+                                  : provider.services.length,
                               itemBuilder: (context, index) {
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 10),
                                   child: InkWell(
                                     onTap: () {
+                                      // setState(() {
+                                      //   currentIndex = index;
+                                      // });
                                       setState(() {
-                                        currentIndex = index;
+                                        isSearching = true;
+                                        serviceProviders.clear();
+                                      });
+                                      searchServiceProviders(
+                                              query: provider.services[index]
+                                                      ["name"]
+                                                  .toString()
+                                                  .trim())
+                                          .then((value) {
+                                        if (value["status"] == true) {
+                                          setState(() {
+                                            // getX.write((widget.userType == "serviceProvider")? constants.GETX_SP_FEEDS:constants.GETX_CLIENT_FEEDS, value["user_object"]["posts"]);
+                                            // serviceProviders.clear();
+                                            serviceProviders = value["data"];
+                                          });
+                                        } else if (value["status"] ==
+                                            "Network Error") {
+                                          mywidgets.displayToast(
+                                              msg:
+                                                  "Network Error. Check your Network Connection and try again");
+                                        } else {
+                                          mywidgets.displayToast(
+                                              msg: value["message"]);
+                                        }
+
+                                        setState(() {
+                                          // isLoading = false;
+                                          isSearching = false;
+                                        });
                                       });
                                     },
                                     child: Container(
-                                      height: 32,
+                                      height: 35,
                                       decoration: BoxDecoration(
                                           color: (currentIndex == index)
                                               ? constants.appMainColor
@@ -242,7 +262,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                         child: Padding(
                                           padding: const EdgeInsets.all(10),
                                           child: Text(
-                                            skills[index],
+                                            provider.services[index]["name"]
+                                                .toString(),
                                             style: TextStyle(
                                                 color: (currentIndex == index)
                                                     ? Colors.white
@@ -276,7 +297,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                   padding: const EdgeInsets.only(
                                       top: 8.0, bottom: 8),
                                   child: Container(
-                                    height: 68,
+                                    height: 80,
                                     width: MediaQuery.of(context).size.width,
                                     decoration: BoxDecoration(
                                         border: Border.all(
@@ -313,8 +334,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                               },
                                               child: CircleAvatar(
                                                 radius: 25,
-                                                backgroundImage: AssetImage(
-                                                    "assets/profile1.png"),
+                                                backgroundImage: NetworkImage(
+                                                    "${serviceProviders[index]["service_provider profile_image"]}"),
                                               ),
                                             ),
                                           ),
@@ -325,7 +346,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                "${serviceProviders[index]["first_name"]} ${serviceProviders[index]["last_name"]}",
+                                                "${serviceProviders[index]["first_name"] ?? ""} ${serviceProviders[index]["last_name"] ?? ""}",
                                                 style: GoogleFonts.inter(
                                                     fontSize: 17,
                                                     fontWeight:
@@ -367,7 +388,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    "Plumber",
+                                                    "${serviceProviders[index]["service"]}",
                                                     style: GoogleFonts.inter(
                                                         fontSize: 12,
                                                         color:
@@ -412,7 +433,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                                         const EdgeInsets.all(
                                                             2.0),
                                                     child: Text(
-                                                      "51 Completed Projects",
+                                                      "${serviceProviders[index]["projects_completed"]} Completed Projects",
                                                       style: GoogleFonts.inter(
                                                           fontSize: 8,
                                                           fontWeight:
@@ -480,112 +501,177 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                   ? Container(
                                       height: 148,
                                       // color: Colors.red,
-                                      child: ListView.builder(
-                                          scrollDirection: Axis.horizontal,
-                                          itemCount: 3,
-                                          itemBuilder: (context, index) {
-                                            return Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                      child: result == null
+                                          ? SizedBox()
+                                          : ListView.builder(
+                                              scrollDirection: Axis.horizontal,
+                                              itemCount: result == null
+                                                  ? 0
+                                                  : result!.length,
+                                              itemBuilder: (context, index) {
+                                                return Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                       horizontal: 10),
-                                              child: Container(
-                                                height: 148,
-                                                width: 224,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(10),
-                                                  child: Column(
-                                                    children: [
-                                                      Row(
+                                                  child: Container(
+                                                    height: 148,
+                                                    width: 224,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                    ),
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      child: Column(
                                                         children: [
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    right: 8.0),
-                                                            child: CircleAvatar(
-                                                              radius: 25,
-                                                              backgroundImage:
-                                                                  AssetImage(
-                                                                      "assets/profile1.png"),
-                                                            ),
-                                                          ),
-                                                          Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
+                                                          Row(
                                                             children: [
-                                                              Text(
-                                                                "Daniel Smith",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        right:
+                                                                            8.0),
+                                                                child:
+                                                                    CircleAvatar(
+                                                                  radius: 25,
+                                                                  backgroundImage:
+                                                                      NetworkImage(
+                                                                          "${result![index]["profile_image"]}"),
+                                                                ),
                                                               ),
-                                                              Row(
+                                                              Column(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
-                                                                        .start,
+                                                                        .spaceBetween,
                                                                 crossAxisAlignment:
                                                                     CrossAxisAlignment
-                                                                        .center,
+                                                                        .start,
                                                                 children: [
-                                                                  Icon(
-                                                                    PhosphorIcons
-                                                                        .star_fill,
-                                                                    color: Colors
-                                                                        .orangeAccent,
-                                                                    size: 13,
-                                                                  ),
                                                                   Text(
-                                                                    "4.2",
+                                                                    "${result![index]["first_name"] ?? ""} ${result![index]["last_name"] ?? ""}",
                                                                     style: TextStyle(
                                                                         fontSize:
-                                                                            10,
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .start,
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      Icon(
+                                                                        PhosphorIcons
+                                                                            .star_fill,
                                                                         color: Colors
-                                                                            .black54),
+                                                                            .orangeAccent,
+                                                                        size:
+                                                                            13,
+                                                                      ),
+                                                                      Text(
+                                                                        "4.2",
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                10,
+                                                                            color:
+                                                                                Colors.black54),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .all(
+                                                                            4.0),
+                                                                        child:
+                                                                            Container(
+                                                                          height:
+                                                                              4.2,
+                                                                          width:
+                                                                              4.2,
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(10),
+                                                                            color:
+                                                                                Colors.black54,
+                                                                          ),
+                                                                          child:
+                                                                              Text(""),
+                                                                        ),
+                                                                      ),
+                                                                      Text(
+                                                                        "${result![index]["service"] ?? ""}",
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                10,
+                                                                            color:
+                                                                                Colors.black54),
+                                                                      ),
+                                                                    ],
                                                                   ),
                                                                   Padding(
                                                                     padding:
                                                                         const EdgeInsets
                                                                             .all(
-                                                                            4.0),
-                                                                    child:
-                                                                        Container(
-                                                                      height:
-                                                                          4.2,
-                                                                      width:
-                                                                          4.2,
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(10),
-                                                                        color: Colors
-                                                                            .black54,
-                                                                      ),
-                                                                      child: Text(
-                                                                          ""),
+                                                                            2.0),
+                                                                    child: Text(
+                                                                      "50 meters away",
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              10,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color:
+                                                                              Colors.black54),
                                                                     ),
                                                                   ),
-                                                                  Text(
-                                                                    "Plumber",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            10,
-                                                                        color: Colors
-                                                                            .black54),
-                                                                  ),
                                                                 ],
+                                                              )
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        2.0),
+                                                                child: Text(
+                                                                  "20 Recommended",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          8,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: Colors
+                                                                          .black54),
+                                                                ),
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        4.0),
+                                                                child:
+                                                                    Container(
+                                                                  height: 4.2,
+                                                                  width: 4.2,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                    color: Colors
+                                                                        .black54,
+                                                                  ),
+                                                                ),
                                                               ),
                                                               Padding(
                                                                 padding:
@@ -593,10 +679,10 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                                                         .all(
                                                                         2.0),
                                                                 child: Text(
-                                                                  "50 meters away",
+                                                                  "0 Completed Projects",
                                                                   style: TextStyle(
                                                                       fontSize:
-                                                                          10,
+                                                                          8,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
@@ -605,101 +691,50 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                                                 ),
                                                               ),
                                                             ],
-                                                          )
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(2.0),
-                                                            child: Text(
-                                                              "20 Recommended",
-                                                              style: TextStyle(
-                                                                  fontSize: 8,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color: Colors
-                                                                      .black54),
-                                                            ),
                                                           ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(4.0),
+                                                          Divider(),
+                                                          InkWell(
+                                                            onTap: () {
+                                                              mywidgets.showHireSheet(
+                                                                  context:
+                                                                      context,
+                                                                  sp_id: serviceProviders[
+                                                                          index]
+                                                                      [
+                                                                      "service_provider_id"]);
+                                                            },
                                                             child: Container(
-                                                              height: 4.2,
-                                                              width: 4.2,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            10),
-                                                                color: Colors
-                                                                    .black54,
+                                                              // width: 69,
+                                                              height: 40,
+                                                              decoration: BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  border: Border.all(
+                                                                      color: constants
+                                                                          .appMainColor,
+                                                                      width: 2),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              200)),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  "Hire me",
+                                                                  style: TextStyle(
+                                                                      color: constants
+                                                                          .appMainColor,
+                                                                      fontSize:
+                                                                          14),
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(2.0),
-                                                            child: Text(
-                                                              "51 Completed Projects",
-                                                              style: TextStyle(
-                                                                  fontSize: 8,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color: Colors
-                                                                      .black54),
-                                                            ),
-                                                          ),
                                                         ],
                                                       ),
-                                                      Divider(),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          mywidgets.showHireSheet(
-                                                              context: context,
-                                                              sp_id: serviceProviders[
-                                                                      index][
-                                                                  "service_provider_id"]);
-                                                        },
-                                                        child: Container(
-                                                          // width: 69,
-                                                          height: 40,
-                                                          decoration: BoxDecoration(
-                                                              color:
-                                                                  Colors.white,
-                                                              border: Border.all(
-                                                                  color: constants
-                                                                      .appMainColor,
-                                                                  width: 2),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          200)),
-                                                          child: Center(
-                                                            child: Text(
-                                                              "Hire me",
-                                                              style: TextStyle(
-                                                                  color: constants
-                                                                      .appMainColor,
-                                                                  fontSize: 14),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ),
-                                            );
-                                          }),
+                                                );
+                                              }),
                                     )
                                   : SizedBox(),
 
@@ -816,7 +851,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
   }
 
   void setupPositionLocator() async {
-    print(">>>>>>>>>>>>>>>>>>>> Set up position started");
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.bestForNavigation);
     LatLng pos = LatLng(position.latitude, position.longitude);
@@ -851,6 +885,15 @@ class _DiscoverPageState extends State<DiscoverPage> {
     }
 
     position = await Geolocator.getCurrentPosition();
+    final currentLocation = await Geolocator.getCurrentPosition();
+    final currentAddress = await GeoCode().reverseGeocoding(
+        latitude: currentLocation.latitude,
+        longitude: currentLocation.longitude);
+
+    DataProvider dataProvider =
+        Provider.of<DataProvider>(context, listen: false);
+        dataProvider.address =  "${currentAddress.streetAddress}";
+
 
     //   var response =
     //   await http.get(Uri.parse('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${position.latitude.toString()},${position.longitude.toString()}&radius=1000&key=${mapKey}'),
@@ -860,12 +903,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
     //       });
     //   var body = json.decode(response.body);
 
-    //   print(body);
-
     //   if (response.statusCode  <= 300) {
-
-    //   print(">>>>>>>>>>>>>>>>>>>About to print the result body of the response");
-    //   print(body["results"]);
 
     // //  List result = body["results"];
     // //  result.shuffle();
@@ -874,7 +912,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
     // // Provider.of<AppData>(context, listen: false).setSuggestedPlaces(newList);
 
     //   } else {
-    //     print('failed');
+
     //   }
   }
 }

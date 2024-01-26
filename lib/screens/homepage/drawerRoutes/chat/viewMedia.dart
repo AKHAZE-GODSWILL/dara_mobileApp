@@ -1,11 +1,10 @@
-
 import 'dart:io';
-
-import 'package:audioplayers/audioplayers.dart';
 import 'package:dara_app/main.dart';
-import 'package:dara_app/models/messageModel.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:dara_app/models/messageModel.dart';
+
+
 
 class ViewMedia extends StatefulWidget{
   ViewMedia({Key? key, required this.mediaType, required this.mediaPath}):super(key: key);

@@ -45,7 +45,11 @@ class _ViewOffersState extends State<ViewOffers> {
     DataProvider provider = Provider.of<DataProvider>(context, listen: true);
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(
@@ -256,7 +260,7 @@ class _ViewOffersState extends State<ViewOffers> {
                           List<User> users = [
                             User(
                               lastMessage: '',
-                              urlAvatar: "",
+                              urlAvatar:  widget.offerDetail["sender_profile_image"],
                               userMobile: "",
                               lastMessageTime: DateTime.now(),
                               idUser: widget.offerDetail["sender_user_id"],
@@ -275,9 +279,14 @@ class _ViewOffersState extends State<ViewOffers> {
                             token: 'snapshot.data[index].fcmToken',
                             urlAvatar2: provider.client_profile_image,
                             name2: provider.client_first_name,
-                            recieveruserId2: provider.client_user_id,
+                            recieveruserId2:
+                                provider.sp_user_id.toString() == null
+                                    ? provider.client_user_id.toString()
+                                    : provider.sp_user_id.toString(),
                             recieveruserId: users[0].idUser,
-                            idArtisan: provider.client_user_id.toString(),
+                            idArtisan: provider.sp_user_id.toString() == null
+                                ? provider.client_user_id.toString()
+                                : provider.sp_user_id.toString(),
                             artisanMobile: provider.client_phone,
                             userMobile: users[0].userMobile,
                             idUser: users[0].idUser.toString(),
@@ -378,8 +387,6 @@ class _ViewOffersState extends State<ViewOffers> {
                                     offer_id: widget.offerDetail["offer_id"])
                                 .then((value) {
                               // mywidgets.displayToast(msg: "making the request");
-                              print(
-                                  "The final Value of what was resulted from the request was :$value");
 
                               if (value["status"] == true) {
                                 setState(() {
@@ -437,8 +444,6 @@ class _ViewOffersState extends State<ViewOffers> {
                                     offer_id: widget.offerDetail["offer_id"])
                                 .then((value) {
                               // mywidgets.displayToast(msg: "making the request");
-                              print(
-                                  "The final Value of what was resulted from the request was :$value");
 
                               if (value["status"] == "true") {
                                 Navigator.pop(context);

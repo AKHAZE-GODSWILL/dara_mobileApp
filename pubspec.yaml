@@ -36,14 +36,20 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   agora_rtc_engine: ^5.2.0
-  audioplayers: ^5.2.0
+  easy_audio_player: ^0.0.1
   firebase_messaging:
+  print_remover: ^1.0.1
   dio:
   bubble:
   firebase_storage:
+  share_plus:
+  just_audio:
+  audioplayers:
   cloud_firestore:
+  audio_service:
   font_awesome_flutter:
   get_time_ago:
+  geocode:
   shimmer:
   url_launcher:
   cached_network_image: ^3.3.0

@@ -39,7 +39,11 @@ class _AccountConfirmState extends State<AccountConfirm> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(
@@ -199,7 +203,6 @@ class _AccountConfirmState extends State<AccountConfirm> {
                               // Handle the tap gesture for 'World!'
 
                               Navigator.pop(context);
-                              print('Terms and conditions tapped');
                             }),
                     ],
                   ),

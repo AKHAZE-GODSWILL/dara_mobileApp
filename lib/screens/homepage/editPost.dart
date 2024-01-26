@@ -138,7 +138,6 @@ int elapsedDuration = 0; // To track elapsed time
                                   videoPlayerController.pause();
                                   videoPlayerController.seekTo(Duration.zero);
                                   setState(() {
-                                    print("The Code got here and did the needfull");
                                     elapsedDuration = 0;
                                     isPlaying = false;
                                   });

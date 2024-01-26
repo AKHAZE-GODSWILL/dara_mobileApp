@@ -24,7 +24,6 @@ Future<void> checkBiometric() async{
   try{
     canCheckBiometric = await auth.canCheckBiometrics;
   } on PlatformException catch(e){
-    print(e);
   }
   if(!mounted) return;
   setState(() {
@@ -37,7 +36,6 @@ Future<void> getAvailableBiometric() async{
   try{
     availaleBiometrics = await auth.getAvailableBiometrics();
   } on PlatformException catch(e){
-    print(e);
   }
 
   setState(() {
@@ -59,12 +57,10 @@ Future<void> authenticate() async{
     );
   } on PlatformException catch(e){
     
-      print(e);
       setState(() {
     // here, we add what the app will do when user authenticates
     authorized = authenticated? "Authorized Success": "Failed to authenticate";
     authorized = e.message!;
-    print(authorized); 
   });
       
   }
@@ -74,13 +70,11 @@ Future<void> authenticate() async{
     authorized = authenticated? "Authorized Success": "Failed to authenticate";
     authenticated? getX.write(constants.GETX_BIOMETRICS_ENABLED,true):();
     authenticated? CustomSuccessDialog():();
-    print(authorized); 
   });
 }
 
   @override
   void initState() {
-    print("The init state");
     checkBiometric();
     getAvailableBiometric();
     super.initState();

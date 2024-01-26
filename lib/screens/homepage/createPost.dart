@@ -59,7 +59,11 @@ class _CreatePostState extends State<CreatePost> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        leading: Container(),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Text("")),
         centerTitle: false,
         titleSpacing: 0,
         title: Transform(
@@ -115,9 +119,6 @@ class _CreatePostState extends State<CreatePost> {
                         body: _captionController.text.trim(),
                         token: provider.sp_token!)
                     .then((value) {
-                  print(
-                      "The final Value of what was resulted from the request was :$value");
-
                   if (value["status"] == true) {
                     ///// Navigation.push to the OTP screen
                     // Navigator.pop(context);
@@ -323,7 +324,6 @@ class _CreatePostState extends State<CreatePost> {
                           ? Fluttertoast.showToast(
                               msg: "You can only post up to 30 photos")
                           : getImageGallerys();
-                      print(mediaFiles.length);
                     },
                     child: Container(
                       width: 120,
@@ -420,7 +420,6 @@ class _CreatePostState extends State<CreatePost> {
         filePath.endsWith('.heif')) {
       return InkWell(
         onTap: () {
-          print(photoCount);
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -462,7 +461,6 @@ class _CreatePostState extends State<CreatePost> {
             final image = Image.memory(snapshot.data!);
             return InkWell(
               onTap: () {
-                print(videoCount);
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -548,8 +546,6 @@ class _CreatePostState extends State<CreatePost> {
 
       readyUploadImage = File(selectedImage[0].path);
 
-      print(readyUploadImage!.path);
-
       setState(() {
         imgPath = readyUploadImage!.path;
         imgExt = imgPath.split(".").last;
@@ -578,8 +574,6 @@ class _CreatePostState extends State<CreatePost> {
     if (pickedVideo == null) return;
 
     final videoPath = File(pickedVideo.path);
-
-    print(videoPath.path);
 
     setState(() {
       imgPath = videoPath.path;

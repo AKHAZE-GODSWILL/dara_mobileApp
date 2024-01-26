@@ -600,7 +600,6 @@ class _Personal_Info extends State<Personal_Info>{
                                       password: passwordController.text.trim()
                                      ).then((value) {
 
-                                    print("The final Value of what was resulted from the request was :$value");
 
                                     if(value["status"]== true){
                                       ///// Navigation.push to the OTP screen
@@ -699,7 +698,6 @@ class _Personal_Info extends State<Personal_Info>{
                                       password: passwordController.text.trim()
                                      ).then((value) {
 
-                                    print("The final Value of what was resulted from the request was :$value");
 
                                     if(value["status"]== true){
                                       ///// Navigation.push to the OTP screen 

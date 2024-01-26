@@ -49,7 +49,6 @@ class _MainOnboardState extends State<MainOnboard>{
               onPageChanged: (index){
                 setState((){
                   currentIndex = index;
-                  print(currentIndex);
                 });
               },
               children: [
@@ -138,7 +137,6 @@ class _MainOnboardState extends State<MainOnboard>{
 
  void nextSlide(){
     if(currentIndex <3){
-      print("Current inde is $currentIndex and the next index is ");
 
       pageController.animateToPage(
         ++currentIndex,
@@ -147,7 +145,6 @@ class _MainOnboardState extends State<MainOnboard>{
     }
     else{
 
-      print("Currentl at last slide");
       Navigator.push(context,MaterialPageRoute(
                       builder: (context)=> SelectTier()
       ));

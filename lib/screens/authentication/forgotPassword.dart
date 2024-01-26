@@ -58,7 +58,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     DataProvider provider = Provider.of<DataProvider>(context, listen: true);
     return Scaffold(
       appBar: AppBar(
-        leading: Container(),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Text("")),
         centerTitle: false,
         titleSpacing: 0,
         title: Transform(
@@ -174,8 +178,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     setState(() {
                       isMaxPin = true;
                     });
-                    // print("DONE $text");
-                    // print("DONE CONTROLLER ${controller.text}");
                   },
                   controller: pinController,
                   pinBoxWidth: 50,
@@ -245,7 +247,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 ? Center(
                     child: InkWell(
                       onTap: () {
-                        print("The Resend code button clicked");
                         // FirebaseAuth.instance
                         //     .verifyPhoneNumber(
                         //   phoneNumber: widget.number,
@@ -253,10 +254,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         //     await auth
                         //         .signInWithCredential(credential)
                         //         .then((value)async {
-
-                        //       print(">>>>>>>>>>>>>>>>> About to print the value");
-
-                        //       print(value);
 
                         //       SharedPreferences prefs = await SharedPreferences.getInstance();
                         //       prefs.setString("token", "1");
@@ -365,7 +362,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             // Handle the tap gesture for 'World!'
 
                             Navigator.pop(context);
-                            print('Terms and conditions tapped');
                           }),
                   ],
                 ),

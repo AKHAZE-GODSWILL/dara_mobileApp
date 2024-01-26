@@ -37,12 +37,12 @@ class _OffersState extends State<Offers> {
     setState(() {
       isLoading = true;
     });
-
-    (widget.userType == "serviceProvider")
-        ? getOffers().then((value) {
+    DataProvider dataProvider = Provider.of(context, listen: false);
+   
+    // (widget.userType == "serviceProvider")
+        // ?
+         getOffers(context).then((value) {
             // mywidgets.displayToast(msg: "making the request");
-            print(
-                "The final Value of what was resulted from the request was :$value");
 
             if (value["status"] == true &&
                 value["message"] == "Data fetched successfully") {
@@ -61,8 +61,8 @@ class _OffersState extends State<Offers> {
             setState(() {
               isLoading = false;
             });
-          })
-        : ();
+          });
+        // : ();
   }
 
   void refreshOfferPage({required offerIndex}) {
@@ -113,6 +113,11 @@ class _OffersState extends State<Offers> {
                       ],
                     ),
                     Container(
+                      height: 24,
+                      width: 85,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xFFf97315)),
+                          borderRadius: BorderRadius.circular(10)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -126,11 +131,6 @@ class _OffersState extends State<Offers> {
                           )
                         ],
                       ),
-                      height: 24,
-                      width: 85,
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xFFf97315)),
-                          borderRadius: BorderRadius.circular(10)),
                     ),
                     SizedBox(
                       height: 5,
@@ -355,7 +355,6 @@ class _OffersState extends State<Offers> {
                             Spacer(),
                             InkWell(
                               onTap: () {
-                                print("The Open drawer button clicked");
                                 // Scaffold.of(context).openDrawer();
                                 _scaffoldKey.currentState?.openDrawer();
                               },
@@ -561,25 +560,22 @@ class _OffersState extends State<Offers> {
                         acceptOffers(offer_id: offers![index]["offer_id"])
                             .then((value) {
                           // mywidgets.displayToast(msg: "making the request");
-                          print(
-                              "The final Value of what was resulted from the request was :$value");
 
                           if (value["status"] == "true") {
                             Navigator.pop(context);
                             setState(() {
                               // refreshOfferPage(offerIndex: index);
                               offers!.removeAt(index);
-                              print(
-                                  "After accepting the offers and before calling successdialog");
+
                               CustomSuccessDialog();
                             });
                           } else if (value["status"] == "Network Error") {
-                             Navigator.pop(context);
+                            Navigator.pop(context);
                             mywidgets.displayToast(
                                 msg:
                                     "Network Error. Check your Network Connection and try again");
                           } else {
-                             Navigator.pop(context);
+                            Navigator.pop(context);
                             mywidgets.displayToast(msg: value["message"]);
                           }
 
@@ -614,23 +610,21 @@ class _OffersState extends State<Offers> {
                         rejectOffers(offer_id: offers![index]["offer_id"])
                             .then((value) {
                           // mywidgets.displayToast(msg: "making the request");
-                          print(
-                              "The final Value of what was resulted from the request was :$value");
 
                           if (value["status"] == true) {
-                             Navigator.pop(context);
+                            Navigator.pop(context);
                             setState(() {
                               // refreshOfferPage(offerIndex: index);
                               offers!.removeAt(index);
                               CustomAcknowledgedDialog();
                             });
                           } else if (value["status"] == "Network Error") {
-                             Navigator.pop(context);
+                            Navigator.pop(context);
                             mywidgets.displayToast(
                                 msg:
                                     "Network Error. Check your Network Connection and try again");
                           } else {
-                             Navigator.pop(context);
+                            Navigator.pop(context);
                             mywidgets.displayToast(msg: value["message"]);
                           }
 

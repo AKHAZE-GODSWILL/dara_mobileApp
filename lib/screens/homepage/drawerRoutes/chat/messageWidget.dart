@@ -1,18 +1,17 @@
-
-import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-
-import 'package:audioplayers/audioplayers.dart';
+import 'dart:async';
 import 'package:dara_app/main.dart';
+import 'package:flutter/material.dart';
+import 'package:path/path.dart' as path;
+import 'package:open_file/open_file.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:video_player/video_player.dart';
 import 'package:dara_app/models/messageModel.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/chat/viewMedia.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path/path.dart' as path;
 import 'package:simple_waveform_progressbar/simple_waveform_progressbar.dart';
-import 'package:video_player/video_player.dart';
+
 
 class MessageCard extends StatefulWidget{
   MessageCard({Key? key, required this.message}):super(key: key);
@@ -58,7 +57,6 @@ class _MessageCard extends State<MessageCard>{
 
     _audioPlayer.onPlayerComplete.listen((event) {
       // Add your action here, for example, showing a message when the audio is completed.
-      print('Audio playback completed');
       // You can also reset the slider and isPlaying state, or perform any other desired action.
       setState(() {
         _sliderValue = 0.0;

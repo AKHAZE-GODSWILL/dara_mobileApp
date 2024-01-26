@@ -1,6 +1,10 @@
+import 'dart:convert';
 import 'package:dara_app/main.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:dara_app/utils/apiRequest.dart';
+import 'package:dara_app/widget/custom_circle.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/aboutMe.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/getVerified.dart';
@@ -18,7 +22,8 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   List skills = ["Plumber", "Designer", "Solar", "Tailor", "Web developer"];
-  bool isSearching = false;
+  // bool isSearching = false;
+  List<dynamic>? serviceProviders;
   @override
   void initState() {
     super.initState();
@@ -34,7 +39,11 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           flexibleSpace: Padding(
@@ -81,27 +90,66 @@ class _SearchPageState extends State<SearchPage> {
                         Container(
                           height: 48,
                           width: MediaQuery.of(context).size.width * 0.65,
-                          child: TextFormField(
-                            // focusNode: textNode,
-                            onChanged: (value) {
-                              setState(() {
-                                isSearching = true;
-                              });
-                            },
-                            keyboardType: TextInputType.text,
-                            // controller: firstNameController,
+                          child: Center(
+                            child: TextFormField(
+                              // focusNode: textNode,
+                              // onChanged: (value) {
+                              //   setState(() {
+                              //     isSearching = true;
+                              //   });
+                              // },
+                              textInputAction: TextInputAction.go,
 
-                            decoration: InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                gapPadding: 0,
-                                borderSide: BorderSide
-                                    .none, // Remove the border when focused
+                              onFieldSubmitted: (value) {
+                                if (value.isNotEmpty) {
+                                  GetStorage box = GetStorage();
+                                  var recentList = box.read("search");
+
+                                  box.write(
+                                      "search",
+                                      recentList == null
+                                          ? [value]
+                                          : (recentList + [value]));
+                                  circularCustom(context);
+
+                                  searchServiceProviders(query: value.trim())
+                                      .then((value) {
+                                    if (value["status"] == true) {
+                                      setState(() {
+                                        // getX.write((widget.userType == "serviceProvider")? constants.GETX_SP_FEEDS:constants.GETX_CLIENT_FEEDS, value["user_object"]["posts"]);
+                                        // serviceProviders.clear();
+                                        serviceProviders = value["data"];
+                                      });
+                                    } else if (value["status"] ==
+                                        "Network Error") {
+                                      mywidgets.displayToast(
+                                          msg:
+                                              "Network Error. Check your Network Connection and try again");
+                                    } else {
+                                      mywidgets.displayToast(
+                                          msg: value["message"]);
+                                    }
+
+                                    Navigator.pop(context);
+                                  });
+                                }
+                              },
+                              keyboardType: TextInputType.text,
+                              // controller: firstNameController,
+
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(top: 20),
+                                focusedBorder: OutlineInputBorder(
+                                  gapPadding: 0,
+                                  borderSide: BorderSide
+                                      .none, // Remove the border when focused
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide
+                                      .none, // Remove the border when enabled
+                                ),
+                                hintText: "Search",
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide
-                                    .none, // Remove the border when enabled
-                              ),
-                              hintText: "Search",
                             ),
                           ),
                         )
@@ -121,7 +169,7 @@ class _SearchPageState extends State<SearchPage> {
           width: MediaQuery.of(context).size.width,
           child: SingleChildScrollView(
             physics: ScrollPhysics(),
-            child: (isSearching)
+            child: serviceProviders != null
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -131,7 +179,7 @@ class _SearchPageState extends State<SearchPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Text(
-                          "67 results found",
+                          "${serviceProviders!.length} results found",
                           style: TextStyle(
                               fontSize: 14, fontWeight: FontWeight.bold),
                         ),
@@ -145,13 +193,15 @@ class _SearchPageState extends State<SearchPage> {
                           padding: EdgeInsets.zero,
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: 10,
+                          itemCount: serviceProviders == null
+                              ? 0
+                              : serviceProviders!.length,
                           itemBuilder: (context, index) {
                             return Padding(
                               padding:
                                   const EdgeInsets.only(top: 8.0, bottom: 8),
                               child: Container(
-                                height: 68,
+                                height: 80,
                                 width: MediaQuery.of(context).size.width,
                                 decoration: BoxDecoration(
                                     border: Border.all(
@@ -168,8 +218,8 @@ class _SearchPageState extends State<SearchPage> {
                                             const EdgeInsets.only(right: 8.0),
                                         child: CircleAvatar(
                                           radius: 25,
-                                          backgroundImage:
-                                              AssetImage("assets/profile1.png"),
+                                          backgroundImage: NetworkImage(
+                                              "${serviceProviders![index]["service_provider profile_image"]}"),
                                         ),
                                       ),
                                       Column(
@@ -179,7 +229,7 @@ class _SearchPageState extends State<SearchPage> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            "Daniel Smith",
+                                            "${serviceProviders![index]["first_name"] ?? ""} ${serviceProviders![index]["last_name"] ?? ""}",
                                             style: TextStyle(
                                                 fontSize: 17,
                                                 fontWeight: FontWeight.bold),
@@ -196,7 +246,7 @@ class _SearchPageState extends State<SearchPage> {
                                                 size: 13,
                                               ),
                                               Text(
-                                                "4.2",
+                                                "${serviceProviders![index]["rating"]}",
                                                 style: TextStyle(
                                                     fontSize: 12,
                                                     color: Colors.black54),
@@ -217,7 +267,7 @@ class _SearchPageState extends State<SearchPage> {
                                                 ),
                                               ),
                                               Text(
-                                                "Plumber",
+                                                "${serviceProviders![index]["service"] ?? ""}",
                                                 style: TextStyle(
                                                     fontSize: 12,
                                                     color: Colors.black54),
@@ -230,9 +280,9 @@ class _SearchPageState extends State<SearchPage> {
                                                 padding:
                                                     const EdgeInsets.all(2.0),
                                                 child: Text(
-                                                  "20 Recommended",
+                                                  "0 Recommended",
                                                   style: TextStyle(
-                                                      fontSize: 8,
+                                                      fontSize: 10,
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: Colors.black54),
@@ -256,9 +306,9 @@ class _SearchPageState extends State<SearchPage> {
                                                 padding:
                                                     const EdgeInsets.all(2.0),
                                                 child: Text(
-                                                  "51 Completed Projects",
+                                                  "${serviceProviders![index]["projects_completed"]} Completed Projects",
                                                   style: TextStyle(
-                                                      fontSize: 8,
+                                                      fontSize: 10,
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: Colors.black54),
@@ -275,7 +325,9 @@ class _SearchPageState extends State<SearchPage> {
                                         child: InkWell(
                                           onTap: () {
                                             mywidgets.showHireSheet(
-                                                context: context, sp_id: "");
+                                                context: context,
+                                                sp_id: serviceProviders![index]
+                                                    ["service_provider_id"]);
                                           },
                                           child: Container(
                                             width: 69,
@@ -330,7 +382,9 @@ class _SearchPageState extends State<SearchPage> {
                             InkWell(
                               onTap: () {
                                 setState(() {
-                                  skills.clear();
+                                  // skills.clear();
+                                  GetStorage box = GetStorage();
+                                  box.remove("search");
                                 });
                               },
                               child: Text(
@@ -347,57 +401,99 @@ class _SearchPageState extends State<SearchPage> {
                       SizedBox(
                         height: 10,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: ListView.builder(
-                          padding: EdgeInsets.zero,
-                          physics: NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: skills.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 8.0, bottom: 8),
-                              child: Container(
-                                height: 40,
-                                width: MediaQuery.of(context).size.width,
-                                // decoration: BoxDecoration(
-                                //   border: Border.all(
-                                //     width: 2,
-                                //     color: Color(0XFFE5E7EB),
-                                //   ),
-                                //   borderRadius: BorderRadius.circular(8)
-                                // ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(5),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        skills[index],
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                      Spacer(),
-                                      InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            skills.removeAt(index);
-                                          });
-                                        },
-                                        child: Icon(
-                                          Icons.cancel_outlined,
-                                          color: Colors.grey,
+                      Builder(builder: (context) {
+                        GetStorage box = GetStorage();
+                        var recentList = box.read("search");
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero,
+                            // physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount:
+                                recentList == null ? 0 : recentList.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 8.0, bottom: 8),
+                                child: Container(
+                                  height: 40,
+                                  width: MediaQuery.of(context).size.width,
+                                  // decoration: BoxDecoration(
+                                  //   border: Border.all(
+                                  //     width: 2,
+                                  //     color: Color(0XFFE5E7EB),
+                                  //   ),
+                                  //   borderRadius: BorderRadius.circular(8)
+                                  // ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(5),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            circularCustom(context);
+
+                                            searchServiceProviders(
+                                                    query: recentList[index]
+                                                        .trim())
+                                                .then((value) {
+                                              if (value["status"] == true) {
+                                                setState(() {
+                                                  // getX.write((widget.userType == "serviceProvider")? constants.GETX_SP_FEEDS:constants.GETX_CLIENT_FEEDS, value["user_object"]["posts"]);
+                                                  // serviceProviders.clear();
+                                                  serviceProviders =
+                                                      value["data"];
+                                                });
+                                              } else if (value["status"] ==
+                                                  "Network Error") {
+                                                mywidgets.displayToast(
+                                                    msg:
+                                                        "Network Error. Check your Network Connection and try again");
+                                              } else {
+                                                mywidgets.displayToast(
+                                                    msg: value["message"]);
+                                              }
+
+                                              Navigator.pop(context);
+                                            });
+                                          },
+                                          child: Container(
+                                            height: 50,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.85,
+                                            child: Text(
+                                              recentList[index],
+                                              style: TextStyle(fontSize: 14),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              recentList.removeAt(index);
+                                              box.write("search", recentList);
+                                              recentList = box.read("search");
+                                            });
+                                          },
+                                          child: Icon(
+                                            Icons.cancel_outlined,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                              );
+                            },
+                          ),
+                        );
+                      }),
                     ],
                   ),
           ),

@@ -33,9 +33,6 @@ class FirebaseApi {
     final refMessages2 = FirebaseFirestore.instance
         .collection('chats/$idArtisan/messages')
         .doc();
-    print(idUser);
-    print(idArtisan);
-    print(chatId);
 
     final newMessage = {
       'productImage': productImage,

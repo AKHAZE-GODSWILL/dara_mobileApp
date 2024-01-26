@@ -59,7 +59,11 @@ class _ChangePassword extends State<ChangePassword> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        leading: Container(),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Text("")),
         centerTitle: false,
         titleSpacing: 0,
         title: Transform(
@@ -355,9 +359,6 @@ class _ChangePassword extends State<ChangePassword> {
                                 ? provider.sp_user_id
                                 : provider.client_user_id)
                         .then((value) {
-                      print(
-                          "The final Value of what was resulted from the request was :$value");
-
                       if (value["status"] == true) {
                         String encryptedPassword = encryptPassword(
                             currentPasswordController.text.trim());
@@ -444,7 +445,6 @@ class _ChangePassword extends State<ChangePassword> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ForgotPassword()));
-                          print('Terms and conditions tapped');
                         }),
                 ],
               ),
@@ -475,7 +475,6 @@ class _ChangePassword extends State<ChangePassword> {
                           // Handle the tap gesture for 'World!'
 
                           Navigator.pop(context);
-                          print('Terms and conditions tapped');
                         }),
                 ],
               ),

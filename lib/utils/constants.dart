@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+
 
 class Constants {
   Color appMainColor = Color(0XFF286FFF);
@@ -21,7 +21,7 @@ class Constants {
   
   String  GETX_BIOMETRICS_ENABLED = "biometricsEnabled";
 
-  String mapKey = 'AIzaSyAHCsxZ3KZB7uf8N_umGmfqiOOV-SomJH4';
+  String mapKey = 'AIzaSyB0Ra8Wv09iY0yu0xCU77J7mm0r3kbhjME';
   String encryptionKey = "hdsfksdfhjfkwe8w95831FJI^%*dbjkf";
   String GETX_LOGGED_IN = "loggedIn";
 }

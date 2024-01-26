@@ -1,26 +1,26 @@
 import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dara_app/main.dart';
-import 'package:dara_app/screens/homepage/Account/clientAccount.dart';
-import 'package:dara_app/screens/homepage/createPost.dart';
-import 'package:dara_app/screens/homepage/discoverPage.dart';
-import 'package:dara_app/screens/homepage/drawerRoutes/receivedCallScreen.dart';
-import 'package:dara_app/screens/homepage/home.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_callkit_incoming/entities/call_event.dart';
-import 'package:flutter_callkit_incoming/entities/entities.dart';
-import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
-import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-// import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'package:dara_app/Provider/DataProvider.dart';
-// import 'package:svg_flutter/svg.dart';
-import 'Account/AccountMain.dart';
 import 'Offers.dart';
 import 'Projects.dart';
+import 'Account/AccountMain.dart';
+import 'package:dara_app/main.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:dara_app/screens/homepage/home.dart';
+import 'package:dara_app/Provider/DataProvider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dara_app/screens/homepage/createPost.dart';
+import 'package:dara_app/screens/homepage/discoverPage.dart';
+import 'package:flutter_callkit_incoming/entities/entities.dart';
+import 'package:flutter_callkit_incoming/entities/call_event.dart';
+import 'package:dara_app/screens/homepage/Account/clientAccount.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+import 'package:dara_app/screens/homepage/drawerRoutes/receivedCallScreen.dart';
+
+// import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+// import 'package:svg_flutter/svg.dart';
 
 class Bottombar extends StatefulWidget {
   final initial;
@@ -74,7 +74,6 @@ class _BottombarState extends State<Bottombar> {
   FlutterCallkitIncoming.onEvent.listen((event) {
     
     if (event?.event == Event.actionCallAccept) {
-      print('>>>>>>>>>>>>>>>>>>>>>>> CALL ACCEPTED');
       
       //.......................................................... MAKE SURE YOU PUSH TO THE CALL SCREEN ...........................
       Navigator.push(
@@ -94,9 +93,8 @@ class _BottombarState extends State<Bottombar> {
 
 
     } else if (event?.event == Event.actionCallDecline) {
-      print('>>>>>>>>>>>>>>>>>>>>>>> ACTION_CALL_DECLINE');
       // Future.delayed(Duration(seconds: 2)).then((value) {
-      //   print('>>>>>>>>>>>>>>>>>>>>>>> AFTER 2 SECS ');
+   
       //   // FlutterCallkitIncoming.startCall(params);
       //   FlutterCallkitIncoming.endCall(params);
       // });
@@ -104,12 +102,10 @@ class _BottombarState extends State<Bottombar> {
       // FlutterCallkitIncoming.endCall(params);
       documentReference.update(reset);
     } else if (event?.event == Event.actionCallTimeout) {
-      print('>>>>>>>>>>>>>>>>>>>>>>> ACTION_CALL_TIMEOUT');
 
       // FlutterCallkitIncoming.endCall(params);
       documentReference.update(reset);
     } else if (event?.event == Event.actionCallEnded) {
-      print('>>>>>>>>>>>>>>>>>>>>>>> ACTION_CALL_ENDED');
       documentReference.update(reset);
     }
     //other actions exist, check the package for details
@@ -139,7 +135,6 @@ Map<String, dynamic> reset = {
     subscription = documentReference.snapshots().listen((event) {
 
       if (event['is_calling'] == false && event['call_in_progress'] == false) {
-        print('>>>>>>>>>>>>>>>>>>>>>>> NO CALLS COMING IN YET ');
         FlutterCallkitIncoming.endAllCalls();
         // player.stop();
       }
@@ -154,7 +149,6 @@ Map<String, dynamic> reset = {
       }
       }
       else{
-        print("Document does not exist");
       }
     });
     super.initState();

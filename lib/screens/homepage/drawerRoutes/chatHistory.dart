@@ -23,6 +23,7 @@ class ChatHistory extends StatefulWidget {
 class _ChatHistoryState extends State<ChatHistory> {
   bool isOnline = true;
   List<UserChat>? user;
+  var getUsers;
 
   formatTime(DateTime now) {
     final DateFormat formatter = DateFormat().add_jm();
@@ -52,6 +53,11 @@ class _ChatHistoryState extends State<ChatHistory> {
     }
   }
 
+  bool done = false;
+
+  List<UserChat> chatData = [];
+  List<UserChat> searchData = [];
+
   Widget buildText(String text) => Center(
         child: Text(
           text,
@@ -63,6 +69,10 @@ class _ChatHistoryState extends State<ChatHistory> {
   @override
   void initState() {
     super.initState();
+    var utils = Provider.of<DataProvider>(context, listen: false);
+    getUsers = FirebaseApi.userChatStream((utils.userType == "serviceProvider"
+        ? utils.sp_user_id
+        : utils.client_user_id));
   }
 
 // @override
@@ -76,7 +86,11 @@ class _ChatHistoryState extends State<ChatHistory> {
     var utils = Provider.of<DataProvider>(context, listen: true);
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Text("")),
           centerTitle: false,
           titleSpacing: 0,
           title: Transform(
@@ -167,7 +181,15 @@ class _ChatHistoryState extends State<ChatHistory> {
                           child: TextFormField(
                             // focusNode: textNode,
                             onChanged: (value) {
-                              setState(() {});
+                              setState(() {
+                                if (value.isEmpty) {
+                                  searchData = chatData;
+                                } else {
+                                  searchData = searchData
+                                      .where((e) => e.name!.contains(value))
+                                      .toList();
+                                }
+                              });
                             },
                             keyboardType: TextInputType.text,
                             // controller: firstNameController,
@@ -194,20 +216,31 @@ class _ChatHistoryState extends State<ChatHistory> {
                   height: 10,
                 ),
                 StreamBuilder(
-                  stream: FirebaseApi.userChatStream(
-                      (utils.userType == "serviceProvider"
-                          ? utils.sp_user_id
-                          : utils.client_user_id)),
+                  stream: getUsers,
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (snapshot.hasData) {
                       user = snapshot.data?.docs
                           .map((doc) => UserChat.fromMap(doc.data(), doc.id))
                           .toList();
-                      List<UserChat> chatData = [];
-                      for (var v in user!) {
-                        chatData.add(v);
+
+                      if (done == false) {
+                        int index = 0;
+                        for (var v in user!) {
+                          chatData.add(v);
+                          searchData.add(v);
+                          index++;
+                          print(index);
+                        }
+                        if (index == (user!.length)) {
+                          done = true;
+                        }
                       }
+
                       chatData
+                        ..sort((b, a) =>
+                            a.lastMessageTime.compareTo(b.lastMessageTime));
+
+                      searchData
                         ..sort((b, a) =>
                             a.lastMessageTime.compareTo(b.lastMessageTime));
                       switch (snapshot.connectionState) {
@@ -227,7 +260,7 @@ class _ChatHistoryState extends State<ChatHistory> {
                           if (snapshot.hasError) {
                             return buildText('Something Went Wrong Try later');
                           } else {
-                            final users = chatData;
+                            final users = searchData;
                             if (users.isEmpty) {
                               return buildText('No Users Found');
                             } else
@@ -312,7 +345,6 @@ class _ChatHistoryState extends State<ChatHistory> {
                 user: user);
           },
         ));
-        // print(user.isOnline);
         // Navigator.push(context, MaterialPageRoute(
         //   builder: (context) => ChatPage()
         // ));
@@ -333,7 +365,7 @@ class _ChatHistoryState extends State<ChatHistory> {
 
                   child: CircleAvatar(
                     radius: 30,
-                    backgroundImage: AssetImage("assets/profile.png"),
+                    backgroundImage: NetworkImage(user.urlAvatar.toString()),
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.white,
                   ),
@@ -403,23 +435,25 @@ class _ChatHistoryState extends State<ChatHistory> {
             overflow: TextOverflow.ellipsis,
           ),
           trailing: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 date,
                 style: TextStyle(
                   color: Colors.grey,
                   fontWeight: FontWeight.w400,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
-              SizedBox(
-                height: 10,
-              ),
+              // SizedBox(
+              //   height: 10,
+              // ),
               // user.seen == false?
-              CircleAvatar(
-                  radius: 10,
-                  backgroundColor: constants.appMainColor,
-                  child: Text("2", style: TextStyle(color: Colors.white)))
+              // CircleAvatar(
+              //     radius: 10,
+              //     backgroundColor: constants.appMainColor,
+              //     child: Text("2", style: TextStyle(color: Colors.white)))
             ],
           )),
     );

@@ -1,33 +1,36 @@
-import 'dart:async';
 import 'dart:io';
-
-import 'package:audioplayers/audioplayers.dart';
-import 'package:bubble/bubble.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dara_app/Firebase/Widgets/photoView.dart';
-import 'package:dara_app/Firebase/Widgets/recordPlayer.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
+import 'dart:async';
+import '../Utils/utils.dart';
+import '../Utils/colors.dart';
 import '../Model/Message.dart';
 import '../Utils/Provider.dart';
-import '../Utils/colors.dart';
-import '../Utils/utils.dart';
+import 'package:bubble/bubble.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:dara_app/Firebase/Widgets/photoView.dart';
+import 'package:dara_app/Firebase/Widgets/recordPlayer.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 
-class MessageWidget extends StatefulWidget{
-  MessageWidget({Key? key, required this.message, required this.isMe, required this.snapshot}):super(key:key);
+class MessageWidget extends StatefulWidget {
+  MessageWidget(
+      {Key? key,
+      required this.message,
+      required this.isMe,
+      required this.snapshot})
+      : super(key: key);
 
   final Message message;
   final bool isMe;
   final QueryDocumentSnapshot snapshot;
-  State<MessageWidget> createState()=> _MessageWidget();
+  State<MessageWidget> createState() => _MessageWidget();
 }
-class _MessageWidget extends State<MessageWidget> {
-  
 
+class _MessageWidget extends State<MessageWidget> {
   late AudioPlayer _audioPlayer;
   String recordingPath = "";
   bool isPlaying = false;
@@ -36,39 +39,32 @@ class _MessageWidget extends State<MessageWidget> {
   double audioDuration = 0.0;
   double currentDuration = 0.0;
   late Timer sliderUpdateTimer;
-  
-  initializeSound(){
+
+  initializeSound() {
     //
-        _audioPlayer = AudioPlayer();
-        _audioPlayer.setSourceUrl(widget.message.message!).then((value) {
+    _audioPlayer = AudioPlayer();
+    _audioPlayer.setSourceUrl(widget.message.message!).then((value) {
       _audioPlayer.getDuration().then((value) {
-      setState(() {
-        audioDuration = value!.inSeconds.toDouble();
+        setState(() {
+          audioDuration = value!.inSeconds.toDouble();
+        });
       });
     });
-    });
-
-    
 
     _audioPlayer.onDurationChanged.listen((Duration duration) {
       setState(() {
-        
         audioDuration = duration.inSeconds.toDouble();
       });
     });
 
-
     _audioPlayer.onPlayerComplete.listen((event) {
       // Add your action here, for example, showing a message when the audio is completed.
-      print('Audio playback completed');
       // You can also reset the slider and isPlaying state, or perform any other desired action.
       setState(() {
         _sliderValue = 0.0;
         isPlaying = false;
       });
     });
-
-
 
     // Create a timer to update the slider value every 1 second
     sliderUpdateTimer = Timer.periodic(Duration(seconds: 1), (timer) {
@@ -87,13 +83,12 @@ class _MessageWidget extends State<MessageWidget> {
   //       '.aac';
   // }
 
-
   @override
   void initState() {
     // TODO: implement initState
 
     ////////////////////
-    
+
     _audioPlayer = AudioPlayer();
     initializeSound();
     // initRecording();
@@ -103,7 +98,7 @@ class _MessageWidget extends State<MessageWidget> {
 
     super.initState();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -150,7 +145,8 @@ class _MessageWidget extends State<MessageWidget> {
             children: <Widget>[
               widget.message.message!.contains('https://') ||
                       widget.message.message!.contains('http://')
-                  ? datas.categorizeUrl(widget.message.message.toString()) == 'image'
+                  ? datas.categorizeUrl(widget.message.message.toString()) ==
+                          'image'
                       ? Padding(
                           padding: const EdgeInsets.only(top: 4.0),
                           child: Hero(
@@ -193,18 +189,20 @@ class _MessageWidget extends State<MessageWidget> {
                             ),
                           ),
                         )
-                      : datas.categorizeUrl(widget.message.message.toString()) ==
+                      : datas.categorizeUrl(
+                                  widget.message.message.toString()) ==
                               'audio'
                           ? GestureDetector(
                               onTap: () {
+                                print("ddd");
                                 Navigator.push(
                                   context,
                                   PageRouteBuilder(
                                     pageBuilder: (context, animation,
                                         secondaryAnimation) {
                                       return AudioApp(
-                                          kUrl: widget.message.message,
-                                          tag: widget.message.message);
+                                          url: widget.message.message,
+                                          );
                                     },
                                     transitionsBuilder: (context, animation,
                                         secondaryAnimation, child) {
@@ -227,22 +225,29 @@ class _MessageWidget extends State<MessageWidget> {
                                       )),
                                   SliderTheme(
                                     data: SliderTheme.of(context).copyWith(
-                                      activeTrackColor: Colors.white,
-                                      inactiveTrackColor: Colors.white,
+                                      activeTrackColor:
+                                          Color.fromARGB(255, 255, 255, 255),
+                                      inactiveTrackColor:
+                                          Color.fromARGB(255, 255, 255, 255),
                                       trackShape: RoundedRectSliderTrackShape(),
                                       trackHeight: 5.0,
                                       thumbShape: RoundSliderThumbShape(
                                           enabledThumbRadius: 12.0),
-                                      thumbColor: Color(0xFFEBCDEB),
-                                      overlayColor: Colors.white,
+                                      thumbColor:
+                                          Color.fromARGB(255, 160, 182, 255),
+                                      overlayColor:
+                                          Color.fromARGB(255, 255, 255, 255),
                                       overlayShape: RoundSliderOverlayShape(
                                           overlayRadius: 15.0),
                                       tickMarkShape: RoundSliderTickMarkShape(),
-                                      activeTickMarkColor: Colors.white,
-                                      inactiveTickMarkColor: Colors.white,
+                                      activeTickMarkColor:
+                                          Color.fromARGB(255, 254, 254, 254),
+                                      inactiveTickMarkColor:
+                                          Color.fromARGB(255, 255, 255, 255),
                                       valueIndicatorShape:
                                           PaddleSliderValueIndicatorShape(),
-                                      valueIndicatorColor: Color(0xFFEBCDEB),
+                                      valueIndicatorColor:
+                                          Color.fromARGB(255, 160, 182, 255),
                                       valueIndicatorTextStyle: TextStyle(
                                         color: Colors.white,
                                       ),
@@ -257,7 +262,8 @@ class _MessageWidget extends State<MessageWidget> {
                                 ],
                               ),
                             )
-                          : datas.categorizeUrl(widget.message.message.toString()) ==
+                          : datas.categorizeUrl(
+                                      widget.message.message.toString()) ==
                                   'doc'
                               ? InkWell(
                                   onTap: () {
@@ -265,7 +271,10 @@ class _MessageWidget extends State<MessageWidget> {
                                   },
                                   child: Tab(
                                     text: 'Open this Document/Download',
-                                    icon: Icon(FontAwesomeIcons.file, size: 40),
+                                    icon: Icon(
+                                      FontAwesomeIcons.file,
+                                      size: 40,
+                                    ),
                                   ))
                               : datas.categorizeUrl(
                                           widget.message.message.toString()) ==
@@ -334,7 +343,8 @@ class _MessageWidget extends State<MessageWidget> {
                                           child: Padding(
                                             padding: const EdgeInsets.all(3.0),
                                             child: Image.network(
-                                              widget.message.productImage.toString(),
+                                              widget.message.productImage
+                                                  .toString(),
                                               fit: BoxFit.cover,
                                             ),
                                           ),
@@ -348,71 +358,73 @@ class _MessageWidget extends State<MessageWidget> {
                             style: TextStyle(
                                 fontSize: 16,
                                 fontFamily: 'Roboto',
-                                color: widget.isMe
-                                    ? Colors.black
-                                    : Colors.black),
-                            textAlign: widget.isMe ? TextAlign.end : TextAlign.start, ////////////////////////////////////////////////////
+                                color:
+                                    widget.isMe ? Colors.black : Colors.black),
+                            textAlign: widget.isMe
+                                ? TextAlign.end
+                                : TextAlign
+                                    .start, ////////////////////////////////////////////////////
                           ),
                         ],
                       ),
                     ),
 
-
-                    ////////////////////
-                    widget.message.read == true && !widget.snapshot.metadata.hasPendingWrites
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Icon(
-                    PhosphorIcons.check_light,
-                    color: Color(0xFF4F4F4F),
-                    // messagesendercontainercolor
-                  ),
-                  Icon(
-                    PhosphorIcons.check_light,
-                    color: Color(0xFF4F4F4F),
-                    // messagesendercontainercolor
-                  ),
-                  Text(
-                    " $date",
-                    style: TextStyle(
-                      color: Color(0xFF4F4F4F),
-                    ),
-                  )
-                ],
-              )
-            : widget.message.read == false && widget.snapshot.metadata.hasPendingWrites
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Icon(
-                        PhosphorIcons.clock,
-                        size: 18,
-                        color: Color(0xFF4F4F4F),
-                      ),
-                      Text(
-                        " $date",
-                        style: TextStyle(color: Color(0xFF4F4F4F)),
-                      )
-                    ],
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Icon(
-                        PhosphorIcons.check_light,
-                        color: Color(0xFF4F4F4F),
-                      ),
-                      Text(
-                        " $date",
-                        style: TextStyle(color: Color(0xFF4F4F4F)),
-                      )
-                    ],
-                  )
+              ////////////////////
+              widget.message.read == true &&
+                      !widget.snapshot.metadata.hasPendingWrites
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Icon(
+                          PhosphorIcons.check_light,
+                          color: Color(0xFF4F4F4F),
+                          // messagesendercontainercolor
+                        ),
+                        Icon(
+                          PhosphorIcons.check_light,
+                          color: Color(0xFF4F4F4F),
+                          // messagesendercontainercolor
+                        ),
+                        Text(
+                          " $date",
+                          style: TextStyle(
+                            color: Color(0xFF4F4F4F),
+                          ),
+                        )
+                      ],
+                    )
+                  : widget.message.read == false &&
+                          widget.snapshot.metadata.hasPendingWrites
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Icon(
+                              PhosphorIcons.clock,
+                              size: 18,
+                              color: Color(0xFF4F4F4F),
+                            ),
+                            Text(
+                              " $date",
+                              style: TextStyle(color: Color(0xFF4F4F4F)),
+                            )
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Icon(
+                              PhosphorIcons.check_light,
+                              color: Color(0xFF4F4F4F),
+                            ),
+                            Text(
+                              " $date",
+                              style: TextStyle(color: Color(0xFF4F4F4F)),
+                            )
+                          ],
+                        )
             ],
           ),
         ),
-        
       ],
     );
   }
@@ -431,12 +443,14 @@ class _MessageWidget extends State<MessageWidget> {
           child: Column(
             children: [
               Column(
-                crossAxisAlignment:
-                    widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                crossAxisAlignment: widget.isMe
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
                 children: <Widget>[
                   widget.message.message!.contains('https://') ||
                           widget.message.message!.contains('http://')
-                      ? datas.categorizeUrl(widget.message.message.toString()) ==
+                      ? datas.categorizeUrl(
+                                  widget.message.message.toString()) ==
                               'image'
                           ? Padding(
                               padding: const EdgeInsets.only(top: 4.0),
@@ -480,133 +494,81 @@ class _MessageWidget extends State<MessageWidget> {
                                 ),
                               ),
                             )
-                          : datas.categorizeUrl(widget.message.message.toString()) ==
+                          : datas.categorizeUrl(
+                                      widget.message.message.toString()) ==
                                   'audio'
-                              ?  Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          InkWell(
-                                            onTap: () async {
-                                              if (isPlaying) {
-                                                await _audioPlayer.pause();
-                                              } else {
-                                                await _audioPlayer.play(UrlSource(widget.message.message!));
-                                              }
-                                              setState(() {
-                                                isPlaying = !isPlaying;
-                                              });
-                                            },
-                                            child: Icon(isPlaying ? Icons.pause_circle : Icons.play_circle, color: Colors.white),
-                                          ),
-                                          
-                                          Container(
-                                            width: 200,
-                                            height: 20,
-                                            child: Slider(
-                                              value: _sliderValue,
-                                              min: 0.0,
-                                              max: audioDuration,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _sliderValue = value;
-                                                  _audioPlayer.seek(Duration(seconds: value.toInt()));
-                                                });
-                                              },
-                                            ),
-                                          ),
-                                        ],
+                              ? GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation,
+                                            secondaryAnimation) {
+                                          return AudioApp(
+                                              url: widget.message.message
+                                                  .toString(),
+                                              );
+                                        },
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          return FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          );
+                                        },
                                       ),
-                                      
-                                
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 25),
-                                        child: StreamBuilder<Duration>(
-                                          stream: _audioPlayer.onDurationChanged,
-                                          builder: (context, snapshot) {
-                                            return Text(
-                                              '${_formatDuration(currentDuration)} / ${_formatDuration(audioDuration)}',
-                                              style: TextStyle(color: Colors.white),
-                                            );
-                                          },
+                                    );
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Hero(
+                                          tag:
+                                              widget.message.message.toString(),
+                                          child: Icon(
+                                            Icons.play_circle_filled,
+                                            size: 30,
+                                          )),
+                                      SliderTheme(
+                                        data: SliderTheme.of(context).copyWith(
+                                          activeTrackColor: Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          inactiveTrackColor: Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          trackShape:
+                                              RoundedRectSliderTrackShape(),
+                                          trackHeight: 5.0,
+                                          thumbShape: RoundSliderThumbShape(
+                                              enabledThumbRadius: 12.0),
+                                          thumbColor: Color.fromARGB(
+                                              255, 160, 182, 255),
+                                          overlayColor: Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          overlayShape: RoundSliderOverlayShape(
+                                              overlayRadius: 15.0),
+                                          tickMarkShape:
+                                              RoundSliderTickMarkShape(),
+                                          activeTickMarkColor: Color.fromARGB(
+                                              255, 254, 254, 254),
+                                          inactiveTickMarkColor: Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          valueIndicatorShape:
+                                              PaddleSliderValueIndicatorShape(),
+                                          valueIndicatorColor: Color.fromARGB(
+                                              255, 160, 182, 255),
+                                          valueIndicatorTextStyle: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        child: Slider(
+                                          value: 0,
+                                          onChanged: (double value) {},
+                                          min: 0.0,
+                                          max: 10.0,
                                         ),
                                       ),
                                     ],
                                   ),
                                 )
-                              
-                              // GestureDetector(
-                              //     onTap: () {
-                              //       Navigator.push(
-                              //         context,
-                              //         PageRouteBuilder(
-                              //           pageBuilder: (context, animation,
-                              //               secondaryAnimation) {
-                              //             return AudioApp(
-                              //                 kUrl: message.message,
-                              //                 tag: message.message);
-                              //           },
-                              //           transitionsBuilder: (context, animation,
-                              //               secondaryAnimation, child) {
-                              //             return FadeTransition(
-                              //               opacity: animation,
-                              //               child: child,
-                              //             );
-                              //           },
-                              //         ),
-                              //       );
-                              //     },
-                              //     child: Row(
-                              //       children: [
-                              //         Hero(
-                              //             tag: message.message.toString(),
-                              //             child: Icon(
-                              //               Icons.play_circle_filled,
-                              //               size: 35,
-                              //             )),
-                              //         SliderTheme(
-                              //           data: SliderTheme.of(context).copyWith(
-                              //             activeTrackColor: Color(0xFF9B049B),
-                              //             inactiveTrackColor: Color(0xFF9B049B),
-                              //             trackShape:
-                              //                 RoundedRectSliderTrackShape(),
-                              //             trackHeight: 5.0,
-                              //             thumbShape: RoundSliderThumbShape(
-                              //                 enabledThumbRadius: 12.0),
-                              //             thumbColor: Color(0xFFEBCDEB),
-                              //             overlayColor: Color(0xFF9B049B),
-                              //             overlayShape: RoundSliderOverlayShape(
-                              //                 overlayRadius: 15.0),
-                              //             tickMarkShape:
-                              //                 RoundSliderTickMarkShape(),
-                              //             activeTickMarkColor:
-                              //                 Color(0xFF9B049B),
-                              //             inactiveTickMarkColor:
-                              //                 Color(0xFF9B049B),
-                              //             valueIndicatorShape:
-                              //                 PaddleSliderValueIndicatorShape(),
-                              //             valueIndicatorColor:
-                              //                 Color(0xFFEBCDEB),
-                              //             valueIndicatorTextStyle: TextStyle(
-                              //               color: Colors.white,
-                              //             ),
-                              //           ),
-                              //           child: Slider(
-                              //             value: 0,
-                              //             onChanged: (double value) {},
-                              //             min: 0.0,
-                              //             max: 10.0,
-                              //           ),
-                              //         ),
-                              //       ],
-                              //     ),
-                              //   )
                               : datas.categorizeUrl(
                                           widget.message.message.toString()) ==
                                       'doc'
@@ -619,8 +581,8 @@ class _MessageWidget extends State<MessageWidget> {
                                         icon: Icon(FontAwesomeIcons.file,
                                             size: 40),
                                       ))
-                                  : datas.categorizeUrl(
-                                              widget.message.message.toString()) ==
+                                  : datas.categorizeUrl(widget.message.message
+                                              .toString()) ==
                                           'link'
                                       ? Container(
                                           width: MediaQuery.of(context)
@@ -629,7 +591,8 @@ class _MessageWidget extends State<MessageWidget> {
                                               1.3,
                                           child: InkWell(
                                             onTap: () {
-                                              data.opeLink(widget.message.message);
+                                              data.opeLink(
+                                                  widget.message.message);
                                             },
                                             child: Text(
                                               widget.message.message.toString(),
@@ -659,7 +622,8 @@ class _MessageWidget extends State<MessageWidget> {
                                           padding:
                                               const EdgeInsets.only(top: 4.0),
                                           child: Hero(
-                                            tag: widget.message.message.toString(),
+                                            tag: widget.message.message
+                                                .toString(),
                                             child: GestureDetector(
                                               onTap: () {
                                                 Navigator.push(
@@ -669,8 +633,10 @@ class _MessageWidget extends State<MessageWidget> {
                                                         animation,
                                                         secondaryAnimation) {
                                                       return PhotoView(
-                                                        widget.message.productImage,
-                                                        widget.message.productImage,
+                                                        widget.message
+                                                            .productImage,
+                                                        widget.message
+                                                            .productImage,
                                                       );
                                                     },
                                                     transitionsBuilder:
@@ -695,7 +661,8 @@ class _MessageWidget extends State<MessageWidget> {
                                                         const EdgeInsets.all(
                                                             3.0),
                                                     child: Image.network(
-                                                      widget.message.productImage
+                                                      widget
+                                                          .message.productImage
                                                           .toString(),
                                                       fit: BoxFit.cover,
                                                     ),
@@ -713,8 +680,9 @@ class _MessageWidget extends State<MessageWidget> {
                                         color: widget.isMe
                                             ? messagesendertextcolor
                                             : messagesendertextcolor),
-                                    textAlign:
-                                        widget.isMe ? TextAlign.end : TextAlign.start,
+                                    textAlign: widget.isMe
+                                        ? TextAlign.end
+                                        : TextAlign.start,
                                   ),
                                 ],
                               ),
@@ -744,65 +712,64 @@ class _MessageWidget extends State<MessageWidget> {
                   // ),
                 ],
               ),
-
-              widget.message.read == true && !widget.snapshot.metadata.hasPendingWrites
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(
-                    PhosphorIcons.check_light,
-                    color: messagesendercontainercolor,
-                    // messagesendercontainercolor
-                  ),
-                  Icon(
-                    PhosphorIcons.check_light,
-                    color: messagesendercontainercolor,
-                    // messagesendercontainercolor
-                  ),
-                  Text(
-                    " $date",
-                    style: TextStyle(
-                      color: messagesendercontainercolor,
-                    ),
-                  )
-                ],
-              )
-            : widget.message.read == false && widget.snapshot.metadata.hasPendingWrites
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Icon(
-                        PhosphorIcons.clock,
-                        size: 18,
-                        color: messagesendercontainercolor,
-                      ),
-                      Text(
-                        " $date",
-                        style: TextStyle(color: Colors.white),
-                      )
-                    ],
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Icon(
-                        PhosphorIcons.check_light,
-                        color: Colors.white,
-                      ),
-                      Text(
-                        " $date",
-                        style: TextStyle(color: Colors.white),
-                      )
-                    ],
-                  )
+              widget.message.read == true &&
+                      !widget.snapshot.metadata.hasPendingWrites
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(
+                          PhosphorIcons.check_light,
+                          color: messagesendercontainercolor,
+                          // messagesendercontainercolor
+                        ),
+                        Icon(
+                          PhosphorIcons.check_light,
+                          color: messagesendercontainercolor,
+                          // messagesendercontainercolor
+                        ),
+                        Text(
+                          " $date",
+                          style: TextStyle(
+                            color: messagesendercontainercolor,
+                          ),
+                        )
+                      ],
+                    )
+                  : widget.message.read == false &&
+                          widget.snapshot.metadata.hasPendingWrites
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Icon(
+                              PhosphorIcons.clock,
+                              size: 18,
+                              color: messagesendercontainercolor,
+                            ),
+                            Text(
+                              " $date",
+                              style: TextStyle(color: Colors.white),
+                            )
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Icon(
+                              PhosphorIcons.check_light,
+                              color: Colors.white,
+                            ),
+                            Text(
+                              " $date",
+                              style: TextStyle(color: Colors.white),
+                            )
+                          ],
+                        )
             ],
           ),
         ),
-        
       ],
     );
   }
-
 
   String _formatDuration(double seconds) {
     final int s = seconds.toInt() % 60;
@@ -811,17 +778,13 @@ class _MessageWidget extends State<MessageWidget> {
     return '$h:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
+  Future<void> downloadAudioFromFirebaseStorage(
+      String storagePath, String localFilePath) async {
+    try {
+      final ref = FirebaseStorage.instance.ref(storagePath);
+      final File localFile = File(localFilePath);
 
-Future<void> downloadAudioFromFirebaseStorage(String storagePath, String localFilePath) async {
-  try {
-    final ref = FirebaseStorage.instance.ref(storagePath);
-    final File localFile = File(localFilePath);
-
-    await ref.writeToFile(localFile);
-    print('Audio downloaded successfully to: $localFilePath');
-  } catch (e) {
-    print('Error downloading audio: $e');
+      await ref.writeToFile(localFile);
+    } catch (e) {}
   }
-}
-
 }

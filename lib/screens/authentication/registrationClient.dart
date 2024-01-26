@@ -153,7 +153,6 @@ class _RegistrationClientState extends State<RegistrationClient>{
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               // Handle the tap gesture for 'World!'
-                              print('Terms and conditions tapped');
                             }
                       ),
                       TextSpan(
@@ -168,7 +167,6 @@ class _RegistrationClientState extends State<RegistrationClient>{
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               // Handle the tap gesture for 'World!'
-                              print('Privacy Policy ckicked');
                             }
                       ),
                     ],
@@ -192,7 +190,6 @@ class _RegistrationClientState extends State<RegistrationClient>{
                           // makes the request here
                           registerClient(email: emailController!.text.trim()).then((value) {
 
-                            print("The final Value of what was resulted from the request was :$value");
 
                             if(value["status"]== true){
                               ///// Navigation.push to the OTP screen
@@ -261,7 +258,6 @@ class _RegistrationClientState extends State<RegistrationClient>{
                               Navigator.of(context).push(
                                   MaterialPageRoute(builder: (context) => Login())
                               );
-                              print('Terms and conditions tapped');
                             }
                       ),
                     ],
