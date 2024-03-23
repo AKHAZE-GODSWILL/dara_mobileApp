@@ -53,6 +53,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
     getLocation();
     determinePosition();
     ServiceProviderMap().then((value) {
+      print(value);
       setState(() {
         result = value;
       });
@@ -296,196 +297,232 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                 return Padding(
                                   padding: const EdgeInsets.only(
                                       top: 8.0, bottom: 8),
-                                  child: Container(
-                                    height: 80,
-                                    width: MediaQuery.of(context).size.width,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                          width: 2,
-                                          color: Color(0XFFE5E7EB),
-                                        ),
-                                        borderRadius: BorderRadius.circular(8)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(5),
-                                      child: Row(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 8.0),
-                                            child: InkWell(
-                                              onTap: () {
-                                                Map<String, String> user = {
-                                                  "first_name":
-                                                      serviceProviders[index]
-                                                          ["first_name"],
-                                                  "last_name":
-                                                      serviceProviders[index]
-                                                          ["last_name"],
-                                                  "user_id": serviceProviders[
-                                                          index]
-                                                      ["service_provider_id"]
-                                                };
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ServiceProviderAccount(
-                                                                user: user)));
-                                              },
-                                              child: CircleAvatar(
-                                                radius: 25,
-                                                backgroundImage: NetworkImage(
-                                                    "${serviceProviders[index]["service_provider profile_image"]}"),
-                                              ),
+                                  child: InkWell(
+                                      onTap: () {
+                                        print(serviceProviders[index]);
+                                      },
+                                      child: Container(
+                                        height: 80,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                              width: 2,
+                                              color: Color(0XFFE5E7EB),
                                             ),
-                                          ),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            borderRadius:
+                                                BorderRadius.circular(8)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(5),
+                                          child: Row(
                                             children: [
-                                              Text(
-                                                "${serviceProviders[index]["first_name"] ?? ""} ${serviceProviders[index]["last_name"] ?? ""}",
-                                                style: GoogleFonts.inter(
-                                                    fontSize: 17,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Icon(
-                                                    PhosphorIcons.star_fill,
-                                                    color: Colors.orangeAccent,
-                                                    size: 13,
-                                                  ),
-                                                  Text(
-                                                    "4.2",
-                                                    style: GoogleFonts.inter(
-                                                        fontSize: 12,
-                                                        color:
-                                                            Color(0XFF6B7280)),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            4.0),
-                                                    child: Container(
-                                                      height: 4.2,
-                                                      width: 4.2,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color:
-                                                            Color(0XFF6B7280),
-                                                      ),
-                                                      child: Text(""),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    "${serviceProviders[index]["service"]}",
-                                                    style: GoogleFonts.inter(
-                                                        fontSize: 12,
-                                                        color:
-                                                            Color(0XFF6B7280)),
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            2.0),
-                                                    child: Text(
-                                                      "20 Recommended",
-                                                      style: GoogleFonts.inter(
-                                                          fontSize: 8,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Color(
-                                                              0XFF6B7280)),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            4.0),
-                                                    child: Container(
-                                                      height: 4.2,
-                                                      width: 4.2,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color:
-                                                            Color(0XFF6B7280),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            2.0),
-                                                    child: Text(
-                                                      "${serviceProviders[index]["projects_completed"]} Completed Projects",
-                                                      style: GoogleFonts.inter(
-                                                          fontSize: 8,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Color(
-                                                              0XFF6B7280)),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          Spacer(),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0),
-                                            child: InkWell(
-                                              onTap: () {
-                                                mywidgets.showHireSheet(
-                                                    context: context,
-                                                    sp_id: serviceProviders[
-                                                            index][
-                                                        "service_provider_id"]);
-                                              },
-                                              child: Container(
-                                                width: 69,
-                                                height: 32,
-                                                decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    border: Border.all(
-                                                        color: constants
-                                                            .appMainColor,
-                                                        width: 2),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            200)),
-                                                child: Center(
-                                                  child: Text(
-                                                    "Hire me",
-                                                    style: GoogleFonts.inter(
-                                                        color: constants
-                                                            .appMainColor,
-                                                        fontSize: 14),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 8.0),
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    Map<String, String> user = {
+                                                      "first_name":
+                                                          serviceProviders[
+                                                                  index]
+                                                              ["first_name"],
+                                                      "last_name":
+                                                          serviceProviders[
+                                                                  index]
+                                                              ["last_name"],
+                                                      "user_id": serviceProviders[
+                                                              index][
+                                                          "service_provider_id"]
+                                                    };
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                ServiceProviderAccount(
+                                                                    user: serviceProviders[
+                                                                            index]
+                                                                        [
+                                                                        "service_provider_id"])));
+                                                  },
+                                                  child: CircleAvatar(
+                                                    radius: 25,
+                                                    backgroundImage: NetworkImage(
+                                                        "${serviceProviders[index]["service_provider profile_image"]}"),
                                                   ),
                                                 ),
                                               ),
-                                            ),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        "${serviceProviders[index]["first_name"] ?? ""} ${serviceProviders[index]["last_name"] ?? ""}",
+                                                        style:
+                                                            GoogleFonts.inter(
+                                                                fontSize: 17,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                      ),
+                                                      "${serviceProviders[index]!["kyc"]}"
+                                                                  .toString() ==
+                                                              "approved"
+                                                          ? SvgPicture.asset(
+                                                              "assets/svg/verified-badge.svg")
+                                                          : Container(),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Icon(
+                                                        PhosphorIcons.star_fill,
+                                                        color:
+                                                            Colors.orangeAccent,
+                                                        size: 13,
+                                                      ),
+                                                      Text(
+                                                        "${serviceProviders[index]["rating"]}",
+                                                        style: GoogleFonts.inter(
+                                                            fontSize: 12,
+                                                            color: Color(
+                                                                0XFF6B7280)),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(4.0),
+                                                        child: Container(
+                                                          height: 4.2,
+                                                          width: 4.2,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            color: Color(
+                                                                0XFF6B7280),
+                                                          ),
+                                                          child: Text(""),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "${serviceProviders[index]["service"]}",
+                                                        style: GoogleFonts.inter(
+                                                            fontSize: 12,
+                                                            color: Color(
+                                                                0XFF6B7280)),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(2.0),
+                                                        child: Text(
+                                                          "${serviceProviders[index]["projects_completed"]} Recommended",
+                                                          style: GoogleFonts.inter(
+                                                              fontSize: 8,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: Color(
+                                                                  0XFF6B7280)),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(4.0),
+                                                        child: Container(
+                                                          height: 4.2,
+                                                          width: 4.2,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            color: Color(
+                                                                0XFF6B7280),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(2.0),
+                                                        child: Text(
+                                                          "${serviceProviders[index]["projects_completed"]} Completed Projects",
+                                                          style: GoogleFonts.inter(
+                                                              fontSize: 8,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: Color(
+                                                                  0XFF6B7280)),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              Spacer(),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10.0),
+                                                child: InkWell(
+                                                  onTap: () {
+                                                   
+                                                    mywidgets.showHireSheet(
+                                                        context: context,
+                                                        sp_id: serviceProviders[
+                                                                index][
+                                                            "service_provider_id"],
+                                                        service: serviceProviders[
+                                                                index][
+                                                            "service"]??"");
+                                                  },
+                                                  child: Container(
+                                                    width: 69,
+                                                    height: 32,
+                                                    decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        border: Border.all(
+                                                            color: constants
+                                                                .appMainColor,
+                                                            width: 2),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(200)),
+                                                    child: Center(
+                                                      child: Text(
+                                                        "Hire me",
+                                                        style: GoogleFonts.inter(
+                                                            color: constants
+                                                                .appMainColor,
+                                                            fontSize: 14),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                        ),
+                                      )),
                                 );
                               },
                             ),
@@ -552,14 +589,25 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                                                     CrossAxisAlignment
                                                                         .start,
                                                                 children: [
-                                                                  Text(
-                                                                    "${result![index]["first_name"] ?? ""} ${result![index]["last_name"] ?? ""}",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            14,
-                                                                        fontWeight:
-                                                                            FontWeight.bold),
-                                                                  ),
+                                                                  InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        print(result![index]
+                                                                            .toString());
+                                                                      },
+                                                                      child:
+                                                                          Row(
+                                                                        children: [
+                                                                          Text(
+                                                                            "${result![index]["first_name"] ?? ""} ${result![index]["last_name"] ?? ""}",
+                                                                            style:
+                                                                                TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                          "${result![index]["kyc"]}".toString() == "approved"
+                                                                              ? SvgPicture.asset("assets/svg/verified-badge.svg")
+                                                                              : Container(),
+                                                                        ],
+                                                                      )),
                                                                   Row(
                                                                     mainAxisAlignment:
                                                                         MainAxisAlignment
@@ -643,7 +691,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                                                         .all(
                                                                         2.0),
                                                                 child: Text(
-                                                                  "20 Recommended",
+                                                                  "0 Recommended",
                                                                   style: TextStyle(
                                                                       fontSize:
                                                                           8,
@@ -695,13 +743,19 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                                           Divider(),
                                                           InkWell(
                                                             onTap: () {
-                                                              mywidgets.showHireSheet(
-                                                                  context:
-                                                                      context,
-                                                                  sp_id: serviceProviders[
-                                                                          index]
-                                                                      [
-                                                                      "service_provider_id"]);
+                                                              mywidgets
+                                                                  .showHireSheet(
+                                                                context:
+                                                                    context,
+                                                                sp_id: result![
+                                                                        index][
+                                                                    "service_provider_id"],
+                                                                service: result![
+                                                                            index]
+                                                                        [
+                                                                        "service"] ??
+                                                                    "",
+                                                              );
                                                             },
                                                             child: Container(
                                                               // width: 69,
@@ -787,24 +841,24 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                           EdgeInsets.symmetric(horizontal: 10),
                                       child: InkWell(
                                         onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation) {
-                                                  return Recommendation();
-                                                },
-                                                transitionsBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation,
-                                                    child) {
-                                                  return FadeTransition(
-                                                    opacity: animation,
-                                                    child: child,
-                                                  );
-                                                },
-                                              ));
+                                          // Navigator.push(
+                                          //     context,
+                                          //     PageRouteBuilder(
+                                          //       pageBuilder: (context,
+                                          //           animation,
+                                          //           secondaryAnimation) {
+                                          //         return Recommendation();
+                                          //       },
+                                          //       transitionsBuilder: (context,
+                                          //           animation,
+                                          //           secondaryAnimation,
+                                          //           child) {
+                                          //         return FadeTransition(
+                                          //           opacity: animation,
+                                          //           child: child,
+                                          //         );
+                                          //       },
+                                          //     ));
                                         },
                                         child: Container(
                                           height: 48,
@@ -820,6 +874,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                               Text(
                                                 "See all",
                                                 style: TextStyle(
+                                                    fontSize: 13,
                                                     color: Colors.white),
                                               ),
                                               Container(
@@ -892,8 +947,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
 
     DataProvider dataProvider =
         Provider.of<DataProvider>(context, listen: false);
-        dataProvider.address =  "${currentAddress.streetAddress}";
-
+    dataProvider.address = "${currentAddress.streetAddress}";
 
     //   var response =
     //   await http.get(Uri.parse('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${position.latitude.toString()},${position.longitude.toString()}&radius=1000&key=${mapKey}'),

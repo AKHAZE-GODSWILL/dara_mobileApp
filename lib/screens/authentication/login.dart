@@ -13,6 +13,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:country_calling_code_picker/country.dart';
 import 'package:dara_app/screens/homepage/bottomBar.dart';
 import 'package:country_calling_code_picker/functions.dart';
+import 'package:dara_app/screens/authentication/forgetInput.dart';
 import 'package:dara_app/screens/authentication/addressInfo.dart';
 import 'package:dara_app/screens/authentication/registration.dart';
 import 'package:dara_app/screens/authentication/forgotPassword.dart';
@@ -30,8 +31,8 @@ class Login extends StatefulWidget {
 class _Login extends State<Login> {
   LocalAuthentication auth = LocalAuthentication();
   final _formKey = GlobalKey<FormState>();
-  final emailController = TextEditingController();
-  final phoneController = TextEditingController();
+  final emailController = TextEditingController(text: getX.read("email") ?? "");
+  final phoneController = TextEditingController(text: getX.read("phone") ?? "");
   final passwordController = TextEditingController();
   final bool clientRegCompleted =
       getX.read(constants.GETX_CLIENT_REG_COMPLETED) ?? false;
@@ -420,7 +421,7 @@ class _Login extends State<Login> {
                     child: InkWell(
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => ForgotPassword()));
+                            builder: (context) => forgetInput()));
                       },
                       child: Text(
                         "Forgot Password?",
@@ -472,6 +473,8 @@ class _Login extends State<Login> {
                           if ((phoneController.text.isNotEmpty ||
                                   emailController.text.isNotEmpty) &&
                               passwordController.text.isNotEmpty) {
+                            getX.write("email", emailController.text);
+                            getX.write("phone", phoneController.text);
                             // if logged in, it sends the app straight to homepage in bottom bar
 
                             if (provider.userType == "serviceProvider") {
@@ -709,7 +712,7 @@ class _Login extends State<Login> {
                               borderRadius: BorderRadius.circular(200)),
                           child: Center(
                             child: (isLoading)
-                                ? CircularProgressIndicator(
+                                ? const CircularProgressIndicator(
                                     color: Colors.white,
                                   )
                                 : Text(
@@ -720,7 +723,7 @@ class _Login extends State<Login> {
                                                     emailController
                                                         .text.isEmpty) ||
                                                 passwordController.text.isEmpty)
-                                            ? Color(0XFF6B7280)
+                                            ? const Color(0XFF6B7280)
                                             : Colors.white,
                                         fontSize: 14),
                                   ),
@@ -728,7 +731,7 @@ class _Login extends State<Login> {
                         ),
                       ),
 
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
 
@@ -739,7 +742,7 @@ class _Login extends State<Login> {
                       style:
                           GoogleFonts.inter(color: Colors.black, fontSize: 12),
                       children: <TextSpan>[
-                        TextSpan(
+                        const TextSpan(
                           text: 'Don\'t have an account? ',
                         ),
                         TextSpan(

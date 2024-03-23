@@ -7,14 +7,13 @@ import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/personalInfo.dart';
 
 class ClientAccount extends StatefulWidget {
-  const ClientAccount({Key? key, required this. backToHome}) : super(key: key);
+  const ClientAccount({Key? key, required this.backToHome}) : super(key: key);
   final Function backToHome;
   @override
   State<ClientAccount> createState() => _ClientAccountState();
 }
 
 class _ClientAccountState extends State<ClientAccount> {
-
   @override
   Widget build(BuildContext context) {
     DataProvider provider = Provider.of<DataProvider>(context, listen: true);
@@ -34,8 +33,9 @@ class _ClientAccountState extends State<ClientAccount> {
                       Container(
                           width: MediaQuery.of(context).size.width,
                           height: 210,
-                          child: Image.asset(
-                            "assets/accBg.png",
+                          child: Image.network(
+                            provider.value["user_object"]["address_information"]
+                                ["profile_image"],
                             fit: BoxFit.cover,
                           )),
                       Column(
@@ -49,15 +49,16 @@ class _ClientAccountState extends State<ClientAccount> {
                                     height: 42,
                                     width: 42,
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(100),
+                                        borderRadius:
+                                            BorderRadius.circular(100),
                                         border:
                                             Border.all(color: Colors.white38)),
                                     child: Container(
                                         child: Transform.scale(
                                             scale: 0.5,
                                             child: IconButton(
-                                              onPressed: (){
-                                                widget.backToHome(index:0);
+                                              onPressed: () {
+                                                widget.backToHome(index: 0);
                                               },
                                               icon: Icon(
                                                 Icons.arrow_back,
@@ -70,7 +71,8 @@ class _ClientAccountState extends State<ClientAccount> {
                                     height: 42,
                                     width: 42,
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(100),
+                                        borderRadius:
+                                            BorderRadius.circular(100),
                                         border:
                                             Border.all(color: Colors.white38)),
                                     child: Container(
@@ -87,7 +89,30 @@ class _ClientAccountState extends State<ClientAccount> {
                                 top: MediaQuery.of(context).size.height * 0.10),
                             child: Align(
                               alignment: Alignment.topRight,
-                              child: SvgPicture.asset("assets/svg/camera2.svg"),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation,
+                                            secondaryAnimation) {
+                                          return PersonalInfo();
+                                        },
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          return FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          );
+                                        },
+                                      ));
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SvgPicture.asset(
+                                      "assets/svg/camera2.svg"),
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -109,41 +134,45 @@ class _ClientAccountState extends State<ClientAccount> {
                               children: [
                                 CircleAvatar(
                                   radius: 40,
-                                  backgroundImage: AssetImage("assets/profile.png"),
+                                  backgroundImage: NetworkImage(provider
+                                          .value["user_object"]
+                                      ["address_information"]["profile_image"]),
                                   backgroundColor: Colors.white,
                                   foregroundColor: Colors.white,
                                 ),
                                 Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: SvgPicture.asset("assets/svg/camera.svg")),
+                                    bottom: 0,
+                                    right: 0,
+                                    child: SvgPicture.asset(
+                                        "assets/svg/camera.svg")),
                               ],
                             ),
                             InkWell(
-                              onTap: (){
-                                Navigator.push(
+                                onTap: () {
+                                  Navigator.push(
                                       context,
                                       PageRouteBuilder(
-                                        pageBuilder: (context, animation, secondaryAnimation) {
+                                        pageBuilder: (context, animation,
+                                            secondaryAnimation) {
                                           return PersonalInfo();
                                         },
-                                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
                                           return FadeTransition(
                                             opacity: animation,
                                             child: child,
                                           );
                                         },
-                                      )
-                                    );
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SvgPicture.asset("assets/svg/edit.svg"),
-                              )),
+                                      ));
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child:
+                                      SvgPicture.asset("assets/svg/edit.svg"),
+                                )),
                           ],
                         ),
                       ),
-                      
                     ],
                   )
                 ],
@@ -156,7 +185,7 @@ class _ClientAccountState extends State<ClientAccount> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "${provider.client_first_name} ${provider.client_last_name}",
+                    "${provider.value["user_object"]["personal_information"]["first_name"] ?? ""} ${provider.value["user_object"]["personal_information"]["last_name"] ?? ""}",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                 ],
@@ -168,13 +197,13 @@ class _ClientAccountState extends State<ClientAccount> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    width: MediaQuery.of(context).size.width*0.45,
+                    width: MediaQuery.of(context).size.width * 0.45,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "156",
+                          "${provider.value["user_object"]["personal_information"]["projects_completed"] ?? ""}",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
@@ -184,30 +213,30 @@ class _ClientAccountState extends State<ClientAccount> {
                       ],
                     ),
                   ),
-                  
                   Container(
-                    width: MediaQuery.of(context).size.width*0.45,
+                    width: MediaQuery.of(context).size.width * 0.45,
                     child: Row(
                       children: [
                         Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      height: 35,
-                      width: 0.5,
-                      decoration: BoxDecoration(color: Colors.black26),
-                    ),
-                  ),
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            height: 35,
+                            width: 0.5,
+                            decoration: BoxDecoration(color: Colors.black26),
+                          ),
+                        ),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "98",
+                              "0",
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Text(
                               "Recommendations",
-                              style: TextStyle(fontSize: 12, color: Colors.black54),
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.black54),
                             )
                           ],
                         ),
@@ -217,90 +246,98 @@ class _ClientAccountState extends State<ClientAccount> {
                 ],
               ),
             ),
-    
             Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top:8.0, bottom: 8),
-            child: Center(
-              child: Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 8),
+                  child: Center(
+                    child: Container(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Ranking: "),
-                          SvgPicture.asset("assets/svg/ranking.svg"),
-                          Text(" Rising Star", style: TextStyle(
-                              color: Color(0xFFf97315),
-                              fontWeight: FontWeight.bold),)
-                        ],
-                      ),
-                    ),
-                    Center(
-                      child: Stack(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width*0.88,
-                            height:8,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                color: Color(0xFFf3f4f6)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Text("Ranking: "),
+                                SvgPicture.asset("assets/svg/ranking.svg"),
+                                Text(
+                                  " Rising Star",
+                                  style: TextStyle(
+                                      color: Color(0xFFf97315),
+                                      fontWeight: FontWeight.bold),
+                                )
+                              ],
                             ),
                           ),
-                          AnimatedContainer(
-                            duration: Duration(milliseconds: 500),
-                            width: MediaQuery.of(context).size.width*0.68,
-                            height:8,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                color: Color(0xFFf97315)
+                          Center(
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.88,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      color: Color(0xFFf3f4f6)),
+                                ),
+                                AnimatedContainer(
+                                  duration: Duration(milliseconds: 500),
+                                  width: MediaQuery.of(context).size.width *
+                                      (double.parse(
+                                          "${provider.value["user_object"]["personal_information"]["rating"] ?? "0"}")),
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      color: Color(0xFFf97315)),
+                                ),
+                              ],
                             ),
                           ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "Complete ${provider.value["user_object"]["personal_information"]["projects_completed"] ?? ""} more projects to become an expert guru",
+                              style: TextStyle(
+                                  color: Colors.black26, fontSize: 12),
+                            ),
+                          )
                         ],
                       ),
+                      height: 80,
+                      width: MediaQuery.of(context).size.width * 0.93,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xFFf97315)),
+                          borderRadius: BorderRadius.circular(10)),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("Complete 20 more projects to become an expert guru", style: TextStyle(
-                          color: Colors.black26,
-                          fontSize: 12
-                      ),),
-                    )
-                  ],
+                  ),
                 ),
-                height: 80,
-                width: MediaQuery.of(context).size.width*0.93,
-                decoration: BoxDecoration(
-                    border: Border.all(color: Color(0xFFf97315)),
-                    borderRadius: BorderRadius.circular(10)
-                ),
-              ),
-            ),
-          ),
-    
-          Padding(
-            padding: const EdgeInsets.only(top:8.0, bottom: 8, left: 15, right: 15),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 8.0, top: 8),
-              child: Row(
-                children: [
-                  Icon(PhosphorIcons.map_pin,
-                    size: 19,
-                    color: Colors.black54,),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text("Lagos, Nigeria", style: TextStyle(fontSize: 12),),
-                  )
-                ],
-              ),
-            ),
-          )
-        ],
-      )
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 8.0, bottom: 8, left: 15, right: 15),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0, top: 8),
+                    child: Row(
+                      children: [
+                        Icon(
+                          PhosphorIcons.map_pin,
+                             size: 20,
+                                color: Colors.blue,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            "Lagos, Nigeria",
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            )
           ],
         ),
       ),

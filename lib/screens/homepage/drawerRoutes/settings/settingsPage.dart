@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
+import 'package:dara_app/screens/authentication/selectTier.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/wallet.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/aboutMe.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/getVerified.dart';
@@ -466,47 +467,47 @@ class _SettingsState extends State<Settings> {
                                     SizedBox(
                                       height: 5,
                                     ),
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation,
-                                                  secondaryAnimation) {
-                                                return NotificationSettings();
-                                              },
-                                              transitionsBuilder: (context,
-                                                  animation,
-                                                  secondaryAnimation,
-                                                  child) {
-                                                return FadeTransition(
-                                                  opacity: animation,
-                                                  child: child,
-                                                );
-                                              },
-                                            ));
-                                      },
-                                      child: Container(
-                                          height: 32,
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text("Notification",
-                                                  style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold)),
-                                              Icon(Icons.arrow_forward_ios)
-                                            ],
-                                          )),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Divider(),
+                                    // InkWell(
+                                    //   onTap: () {
+                                    //     Navigator.push(
+                                    //         context,
+                                    //         PageRouteBuilder(
+                                    //           pageBuilder: (context, animation,
+                                    //               secondaryAnimation) {
+                                    //             return NotificationSettings();
+                                    //           },
+                                    //           transitionsBuilder: (context,
+                                    //               animation,
+                                    //               secondaryAnimation,
+                                    //               child) {
+                                    //             return FadeTransition(
+                                    //               opacity: animation,
+                                    //               child: child,
+                                    //             );
+                                    //           },
+                                    //         ));
+                                    //   },
+                                    //   child: Container(
+                                    //       height: 32,
+                                    //       width:
+                                    //           MediaQuery.of(context).size.width,
+                                    //       child: Row(
+                                    //         mainAxisAlignment:
+                                    //             MainAxisAlignment.spaceBetween,
+                                    //         children: [
+                                    //           Text("Notification",
+                                    //               style: TextStyle(
+                                    //                   fontSize: 12,
+                                    //                   fontWeight:
+                                    //                       FontWeight.bold)),
+                                    //           Icon(Icons.arrow_forward_ios)
+                                    //         ],
+                                    //       )),
+                                    // ),
+                                    // SizedBox(
+                                    //   height: 5,
+                                    // ),
+                                    // Divider(),
                                   ],
                                 ),
                               )
@@ -568,47 +569,47 @@ class _SettingsState extends State<Settings> {
                                     SizedBox(
                                       height: 5,
                                     ),
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation,
-                                                  secondaryAnimation) {
-                                                return NotificationSettings();
-                                              },
-                                              transitionsBuilder: (context,
-                                                  animation,
-                                                  secondaryAnimation,
-                                                  child) {
-                                                return FadeTransition(
-                                                  opacity: animation,
-                                                  child: child,
-                                                );
-                                              },
-                                            ));
-                                      },
-                                      child: Container(
-                                          height: 32,
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text("Notification",
-                                                  style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold)),
-                                              Icon(Icons.arrow_forward_ios)
-                                            ],
-                                          )),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Divider(),
+                                    // InkWell(
+                                    //   onTap: () {
+                                    //     Navigator.push(
+                                    //         context,
+                                    //         PageRouteBuilder(
+                                    //           pageBuilder: (context, animation,
+                                    //               secondaryAnimation) {
+                                    //             return NotificationSettings();
+                                    //           },
+                                    //           transitionsBuilder: (context,
+                                    //               animation,
+                                    //               secondaryAnimation,
+                                    //               child) {
+                                    //             return FadeTransition(
+                                    //               opacity: animation,
+                                    //               child: child,
+                                    //             );
+                                    //           },
+                                    //         ));
+                                    //   },
+                                    //   child: Container(
+                                    //       height: 32,
+                                    //       width:
+                                    //           MediaQuery.of(context).size.width,
+                                    //       child: Row(
+                                    //         mainAxisAlignment:
+                                    //             MainAxisAlignment.spaceBetween,
+                                    //         children: [
+                                    //           Text("Notification",
+                                    //               style: TextStyle(
+                                    //                   fontSize: 12,
+                                    //                   fontWeight:
+                                    //                       FontWeight.bold)),
+                                    //           Icon(Icons.arrow_forward_ios)
+                                    //         ],
+                                    //       )),
+                                    // ),
+                                    // SizedBox(
+                                    //   height: 5,
+                                    // ),
+                                    // Divider(),
                                   ],
                                 ),
                               ),
@@ -623,7 +624,7 @@ class _SettingsState extends State<Settings> {
                           height: 5,
                         ),
                         Container(
-                          height: 180,
+                          // height: 180,
                           width: MediaQuery.of(context).size.width * 0.95,
                           // decoration: BoxDecoration(
                           //   borderRadius: BorderRadius.circular(8),
@@ -635,64 +636,65 @@ class _SettingsState extends State<Settings> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SizedBox(
-                                height: 5,
-                              ),
+                              // SizedBox(
+                              //   height: 5,
+                              // ),
+                              // InkWell(
+                              //   onTap: () {
+                              //     //  Navigator.push(
+                              //     //   context,
+                              //     //   PageRouteBuilder(
+                              //     //     pageBuilder: (context, animation, secondaryAnimation) {
+                              //     //       return Settings();
+                              //     //     },
+                              //     //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              //     //       return FadeTransition(
+                              //     //         opacity: animation,
+                              //     //         child: child,
+                              //     //       );
+                              //     //     },
+                              //     //   )
+                              //     // );
+                              //   },
+                              //   child: Container(
+                              //       height: 32,
+                              //       width: MediaQuery.of(context).size.width,
+                              //       child: Row(
+                              //         mainAxisAlignment:
+                              //             MainAxisAlignment.spaceBetween,
+                              //         children: [
+                              //           Text("Close account",
+                              //               style: TextStyle(
+                              //                   fontSize: 12,
+                              //                   fontWeight: FontWeight.bold)),
+                              //           Icon(Icons.arrow_forward_ios)
+                              //         ],
+                              //       )),
+                              // ),
+                              // SizedBox(
+                              //   height: 5,
+                              // ),
+                              // Divider(),
+                              // SizedBox(
+                              //   height: 5,
+                              // ),
                               InkWell(
                                 onTap: () {
-                                  //  Navigator.push(
-                                  //   context,
-                                  //   PageRouteBuilder(
-                                  //     pageBuilder: (context, animation, secondaryAnimation) {
-                                  //       return Settings();
-                                  //     },
-                                  //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                  //       return FadeTransition(
-                                  //         opacity: animation,
-                                  //         child: child,
-                                  //       );
-                                  //     },
-                                  //   )
-                                  // );
-                                },
-                                child: Container(
-                                    height: 32,
-                                    width: MediaQuery.of(context).size.width,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text("Close account",
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold)),
-                                        Icon(Icons.arrow_forward_ios)
-                                      ],
-                                    )),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Divider(),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  //  Navigator.push(
-                                  //   context,
-                                  //   PageRouteBuilder(
-                                  //     pageBuilder: (context, animation, secondaryAnimation) {
-                                  //       return Settings();
-                                  //     },
-                                  //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                  //       return FadeTransition(
-                                  //         opacity: animation,
-                                  //         child: child,
-                                  //       );
-                                  //     },
-                                  //   )
-                                  // );
+                                   Navigator.pushAndRemoveUntil(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation, secondaryAnimation) {
+                                        return SelectTier();
+                                      },
+                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        );
+                                      },
+                                    ),
+                                     (route) => false,
+                                  );
                                 },
                                 child: Container(
                                     height: 32,

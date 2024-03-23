@@ -10,15 +10,18 @@ import 'package:get_storage/get_storage.dart';
 import 'package:get_time_ago/get_time_ago.dart';
 import 'package:dara_app/utils/apiRequest.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:dara_app/Firebase/Utils/Provider.dart';
+import 'package:dara_app/screens/homepage/editPost.dart';
 import 'package:dara_app/screens/authentication/login.dart';
 import 'package:dara_app/screens/homepage/Notification.dart';
 import 'package:dara_app/screens/homepage/searchScreen.dart';
 import 'package:dara_app/screens/homepage/categoriesPage.dart';
 import 'package:dara_app/screens/homepage/categoryDetails.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dara_app/screens/homepage/expandableWidget.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/wallet.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
@@ -88,13 +91,46 @@ class _HomePageState extends State<HomePage> {
   }
 
   List? notification;
+  var user_object;
 
   @override
   void initState() {
-    getSkills().then((value) {
+    DataProvider provider = Provider.of<DataProvider>(context, listen: false);
+    reloadUserObject().then((value) {
+      setState(() {
+        user_object = value;
+      });
+      if ((provider.userType == "serviceProvider")) {
+        provider.set_sp_login_info(
+            value: value,
+            firstName: value["user_object"]["personal_information"]
+                ["first_name"],
+            lastName: value["user_object"]["personal_information"]["last_name"],
+            email: value["user_object"]["personal_information"]["email"],
+            id: value["user_object"]["personal_information"]["id"].toString(),
+            access_token: value["access_token"],
+            profile_image: (value["user_object"]["address_information"] != null)
+                ? value["user_object"]["address_information"]["profile_image"]
+                : "");
+      } else {
+        provider.set_client_login_info(
+            value: value,
+            firstName: value["user_object"]["personal_information"]
+                ["first_name"],
+            lastName: value["user_object"]["personal_information"]["last_name"],
+            email: value["user_object"]["personal_information"]["email"],
+            id: value["user_object"]["personal_information"]["id"].toString(),
+            access_token: value["access_token"],
+            profile_image: (value["user_object"]["address_information"] != null)
+                ? value["user_object"]["address_information"]["profile_image"]
+                : "");
+      }
+    });
+
+    getCategories().then((value) {
       setState(() {
         for (var i in value) {
-          skill.add(i["skill"]);
+          skill.add(i["name"]);
         }
       });
     });
@@ -104,6 +140,9 @@ class _HomePageState extends State<HomePage> {
     getNotifications().then((value) {
       print(value);
       if (value.toString() == "false") {
+        setState(() {
+          notification = [];
+        });
       } else {
         setState(() {
           notification = value;
@@ -213,7 +252,11 @@ class _HomePageState extends State<HomePage> {
                           style: GoogleFonts.inter(
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),
-                        SvgPicture.asset("assets/svg/verified-badge.svg")
+                        "${provider.value["user_object"]["personal_information"]["kyc"]}"
+                                    .toString() ==
+                                "approved"
+                            ? SvgPicture.asset("assets/svg/verified-badge.svg")
+                            : Container()
                       ],
                     ),
                     Container(
@@ -344,23 +387,31 @@ class _HomePageState extends State<HomePage> {
               title: Text('Support',
                   style: GoogleFonts.inter(
                       fontSize: 12, fontWeight: FontWeight.bold)),
-              onTap: () {
+              onTap: () async {
                 // Add your settings page navigation logic here
+                Future<void> _launchUrl() async {
+                  final Uri _url =
+                      Uri.parse('https://wa.me/message/MX5JENZMK2BBI1');
+                  if (!await launchUrl(_url)) {
+                    throw Exception('Could not launch $_url');
+                  }
+                }
 
-                Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) {
-                        return DaraSupport();
-                      },
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
-                      },
-                    ));
+                _launchUrl();
+                // Navigator.push(
+                //     context,
+                //     PageRouteBuilder(
+                //       pageBuilder: (context, animation, secondaryAnimation) {
+                //         return DaraSupport();
+                //       },
+                //       transitionsBuilder:
+                //           (context, animation, secondaryAnimation, child) {
+                //         return FadeTransition(
+                //           opacity: animation,
+                //           child: child,
+                //         );
+                //       },
+                //     ));
               },
             ),
             Divider(),
@@ -370,20 +421,28 @@ class _HomePageState extends State<HomePage> {
                   style: GoogleFonts.inter(
                       fontSize: 12, fontWeight: FontWeight.bold)),
               onTap: () {
-                Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) {
-                        return ShareApp();
-                      },
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
-                      },
-                    ));
+                Future<void> _launchUrl() async {
+                  final Uri _url = Uri.parse('https://usedara.com/');
+                  if (!await launchUrl(_url)) {
+                    throw Exception('Could not launch $_url');
+                  }
+                }
+
+                _launchUrl();
+                // Navigator.push(
+                //     context,
+                //     PageRouteBuilder(
+                //       pageBuilder: (context, animation, secondaryAnimation) {
+                //         return ShareApp();
+                //       },
+                //       transitionsBuilder:
+                //           (context, animation, secondaryAnimation, child) {
+                //         return FadeTransition(
+                //           opacity: animation,
+                //           child: child,
+                //         );
+                //       },
+                //     ));
               },
             ),
             ListTile(
@@ -392,8 +451,18 @@ class _HomePageState extends State<HomePage> {
                   style: GoogleFonts.inter(
                       fontSize: 12, fontWeight: FontWeight.bold)),
               onTap: () {
+                // https://usedara.com/about-us
+                Future<void> _launchUrl() async {
+                  final Uri _url = Uri.parse('https://usedara.com/about-us');
+                  if (!await launchUrl(_url)) {
+                    throw Exception('Could not launch $_url');
+                  }
+                }
+
+                _launchUrl();
+
                 // Add your settings page navigation logic here
-                Navigator.pop(context); // Close the drawer
+                // Navigator.pop(context); // Close the drawer
               },
             ),
             ListTile(
@@ -412,7 +481,11 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: notification == null
+     
+     
+     
+     
+      body: notification == null || user_object == null
           ? Center(
               child: CircularProgressIndicator(),
             )
@@ -483,8 +556,8 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Icon(
                                     PhosphorIcons.map_pin,
-                                    color: Color(0XFF374151),
-                                    size: 18,
+                                    size: 20,
+                                    color: Colors.blue,
                                   ),
                                   Text(
                                     "${provider.address}",
@@ -632,17 +705,21 @@ class _HomePageState extends State<HomePage> {
                                                         style:
                                                             GoogleFonts.inter(
                                                                 color: Colors
-                                                                    .black,
+                                                                    .white,
                                                                 fontSize: 14,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold)),
                                                   ),
                                                   decoration: BoxDecoration(
+                                                      // border: Border.all(
+                                                      //     color:
+                                                      //         Colors.black12),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               30),
-                                                      color: Color(0xFFf3f4f6)),
+                                                      color: constants
+                                                          .appMainColor),
                                                 ),
                                               ),
                                             )
@@ -660,7 +737,7 @@ class _HomePageState extends State<HomePage> {
                                                     child: Text(
                                                       "Explore",
                                                       style: GoogleFonts.inter(
-                                                          color: Colors.black,
+                                                          color: Colors.white,
                                                           fontSize: 14,
                                                           fontWeight:
                                                               FontWeight.bold),
@@ -672,10 +749,14 @@ class _HomePageState extends State<HomePage> {
                                                       0.425,
                                                   height: 50,
                                                   decoration: BoxDecoration(
+                                                      // border: Border.all(
+                                                      //     color:
+                                                      //         const Color.fromRGBO(0, 0, 0, 0.122)),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               30),
-                                                      color: Color(0xFFf3f4f6)),
+                                                      color: constants
+                                                          .appMainColor),
                                                 ),
                                               ),
                                             )
@@ -683,8 +764,9 @@ class _HomePageState extends State<HomePage> {
                                     ],
                                   ),
                                   decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(30),
-                                      color: Color(0xFFf3f4f6)),
+                                    borderRadius: BorderRadius.circular(30),
+                                    color: constants.appMainColor,
+                                  ),
                                 ),
                               ),
                               AnimatedAlign(
@@ -705,14 +787,14 @@ class _HomePageState extends State<HomePage> {
                                           ? "Conversations"
                                           : "Explore",
                                       style: GoogleFonts.inter(
-                                          color: Colors.white,
+                                          color: constants.appMainColor,
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(30),
-                                    color: constants.appMainColor,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
@@ -924,7 +1006,7 @@ class _HomePageState extends State<HomePage> {
                                                       child: Text(
                                                         'View All',
                                                         style: GoogleFonts.inter(
-                                                            fontSize: 10,
+                                                            fontSize: 13,
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                             color: Color(
@@ -979,7 +1061,7 @@ class _HomePageState extends State<HomePage> {
                                                     Text(
                                                       'See All',
                                                       style: GoogleFonts.inter(
-                                                          fontSize: 10,
+                                                          fontSize: 13,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color: Color(
@@ -1178,12 +1260,14 @@ class _HomePageState extends State<HomePage> {
                                                                     left: 10.0),
                                                             child: InkWell(
                                                               onTap: () {
-                                                                mywidgets
-                                                                    .showHireSheet(
-                                                                        context:
-                                                                            context,
-                                                                        sp_id:
-                                                                            "");
+                                                              
+                                                                mywidgets.showHireSheet(
+                                                                    context:
+                                                                        context,
+                                                                    sp_id:
+                                                                        "${provider.value["user_object"]["top_rated_service_providers"][index]["service_provider_id"]}",
+                                                                    service:
+                                                                        provider.value["user_object"]["top_rated_service_providers"][index]["service"]??"");
                                                               },
                                                               child: Container(
                                                                 width: 69,
@@ -1322,7 +1406,9 @@ class _HomePageState extends State<HomePage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        ServiceProviderAccount(user: user)));
+                                        ServiceProviderAccount(
+                                            user: posts[postIndex]
+                                                ["user_id"])));
                           },
                           child: CachedNetworkImage(
                             imageUrl: posts[postIndex]["author_image"],
@@ -1347,10 +1433,19 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          posts[postIndex]["author_name"],
-                          style: GoogleFonts.inter(
-                              fontSize: 17, fontWeight: FontWeight.bold),
+                        Row(
+                          children: [
+                            Text(
+                              posts[postIndex]["author_name"],
+                              style: GoogleFonts.inter(
+                                  fontSize: 17, fontWeight: FontWeight.bold),
+                            ),
+                            "${posts[postIndex]["kyc"]}".toString() ==
+                                    "approved"
+                                ? SvgPicture.asset(
+                                    "assets/svg/verified-badge.svg")
+                                : Container(),
+                          ],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -1403,11 +1498,12 @@ class _HomePageState extends State<HomePage> {
               // Text(posts[postIndex].toString()),
               Container(
                   // width: MediaQuery.of(context).size.width*0.72,
-                  alignment: Alignment.center,
+                  alignment: Alignment.topLeft,
                   child: ReadMoreText(
                     posts[postIndex]["body"],
                     style: GoogleFonts.inter(fontSize: 12, color: Colors.black),
                     trimCollapsedText: "See More",
+                    textAlign: TextAlign.start,
                     trimExpandedText: "See Less",
                     trimLines: 3,
                     trimMode: TrimMode.Line,
@@ -1416,57 +1512,144 @@ class _HomePageState extends State<HomePage> {
               (posts[postIndex]["media"] == "null" ||
                       posts[postIndex]["media"] == "[]")
                   ? SizedBox()
-                  : Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 290,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Builder(
-                            builder: (BuildContext context) {
-                              return CachedNetworkImage(
-                                imageUrl: json.decode(posts[postIndex]["media"]
-                                    .toString()
-                                    .replaceAll('\\', ''))[0],
-                                imageBuilder: (context, imageProvider) =>
-                                    Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: 290,
-                                  decoration: BoxDecoration(
-                                    // shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                        image: imageProvider,
-                                        fit: BoxFit.cover),
-                                  ),
-                                ),
-                                // placeholder: (context, url) => Container(
-                                //   width: 60,
-                                //   height: 60,
-                                //   child: CircularProgressIndicator()),
-                                errorWidget: (context, url, error) => Icon(
-                                    Icons.person,
-                                    size: 50,
-                                    color: Colors.grey),
-                              );
-                            },
+                  : categorizePost(posts[postIndex]["media"]) == "image"
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 290,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Builder(
+                                builder: (BuildContext context) {
+                                  return CachedNetworkImage(
+                                    imageUrl: json.decode(posts[postIndex]
+                                            ["media"]
+                                        .toString()
+                                        .replaceAll('\\', ''))[0],
+                                    imageBuilder: (context, imageProvider) =>
+                                        Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 290,
+                                      decoration: BoxDecoration(
+                                        // shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.cover),
+                                      ),
+                                    ),
+                                    // placeholder: (context, url) => Container(
+                                    //   width: 60,
+                                    //   height: 60,
+                                    //   child: CircularProgressIndicator()),
+                                    errorWidget: (context, url, error) => Icon(
+                                        Icons.person,
+                                        size: 50,
+                                        color: Colors.grey),
+                                  );
+                                },
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
+                        )
+                      : Builder(builder: (context) {
+                          Future<dynamic> generateVideoThumbnail(
+                              String videoPath) async {
+                            final thumbnail =
+                                await VideoThumbnail.thumbnailData(
+                              video: videoPath,
+                              imageFormat: ImageFormat.PNG,
+                              maxWidth: 200, // Adjust the width as needed
+                              quality:
+                                  100, // Adjust the quality (0 - 100) as needed
+                            );
+                            return thumbnail;
+                          }
+
+                          return FutureBuilder<dynamic>(
+                            future: generateVideoThumbnail(json.decode(
+                                posts[postIndex]["media"]
+                                    .toString()
+                                    .replaceAll('\\', ''))[0]),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  snapshot.hasData) {
+                                final image = Image.memory(snapshot.data!);
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => EditPost(
+                                                  mediaType: "video",
+                                                  mediaPath: json.decode(
+                                                      posts[postIndex]["media"]
+                                                          .toString()
+                                                          .replaceAll(
+                                                              '\\', ''))[0],
+                                                  type: "video",
+                                                )));
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 290,
+                                      decoration: BoxDecoration(),
+                                      child: Stack(
+                                        children: [
+                                          Container(
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              height: 290,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                image: DecorationImage(
+                                                    image: image.image,
+                                                    fit: BoxFit.cover),
+                                              )),
+                                          Center(
+                                            child: Icon(
+                                              Icons.play_circle,
+                                              size: 50,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                return Center(
+                                  child: Container(
+                                    height: 40,
+                                    width: 40,
+                                    // child: CircularProgressIndicator()
+                                  ),
+                                ); // You can display a loading indicator here.
+                              }
+                            },
+                          );
+                        }),
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, bottom: 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(onTap: () {
+                      print(posts[postIndex]["status_id"]);
                       DataProvider provider =
                           Provider.of<DataProvider>(context, listen: false);
                       GetStorage box = GetStorage();
                       var recentList = box.read("like") ?? [];
                       if (recentList.contains(
                           "${posts[postIndex]["id"]}-${(provider.userType == "serviceProvider" ? provider.sp_user_id : provider.client_user_id)}")) {
-                        unlikePost(status_id: posts[postIndex]["status_id"]);
+                        // unlikePost(status_id: posts[postIndex]["status_id"]);
                         setState(() {
                           recentList.remove(
                               "${posts[postIndex]["id"]}-${(provider.userType == "serviceProvider" ? provider.sp_user_id : provider.client_user_id)}");
@@ -1511,7 +1694,7 @@ class _HomePageState extends State<HomePage> {
                             return Padding(
                               padding: const EdgeInsets.only(left: 4.0),
                               child: Text(
-                                "${(int.parse(posts[postIndex]["likes_count"]) + int.parse(count.toString()))}",
+                                "${(int.parse(posts[postIndex]["likes"]) + int.parse(count.toString()))}",
                                 style: GoogleFonts.inter(
                                     fontSize: 13, color: Colors.black),
                               ),

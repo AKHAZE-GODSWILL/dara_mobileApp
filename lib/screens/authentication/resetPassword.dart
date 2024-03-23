@@ -1,9 +1,13 @@
 import 'package:dara_app/main.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:dara_app/utils/apiRequest.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:dara_app/widget/custom_circle.dart';
 
 class ResetPassword extends StatefulWidget {
-  ResetPassword({Key? key}) : super(key: key);
+  String email;
+  ResetPassword({required this.email});
 
   @override
   State<ResetPassword> createState() => _ResetPassword();
@@ -278,11 +282,35 @@ class _ResetPassword extends State<ResetPassword> {
           InkWell(
             onTap: () {
               /////////////////// Push to the next page after user has selected a tier
-
+              circularCustom(context);
               if (newPasswordController.text.isNotEmpty &&
                   retypePasswordController.text.isNotEmpty) {
                 ///// Navigation.push to the OTP screen
                 Navigator.pop(context);
+
+                circularCustom(context);
+                changePassword(
+                        email: widget.email,
+                        newPassword: newPasswordController.text.trim(),
+                        confirmedPassword: retypePasswordController.text)
+                    .then((value) {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+
+                  if (value["status"] == true) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            ResetPassword(email: widget.email)));
+                  } else if (value["status"] == "Network Error") {
+                    mywidgets.displayToast(
+                        msg:
+                            "Network Error. Check your Network Connection and try again");
+                  } else {
+                    mywidgets.displayToast(msg: value["message"]);
+                  }
+                });
               }
 
               //will save this parameter to state management later
@@ -333,7 +361,15 @@ class _ResetPassword extends State<ResetPassword> {
                         ..onTap = () {
                           // Handle the tap gesture for 'World!'
 
-                          Navigator.pop(context);
+                          Future<void> _launchUrl() async {
+                  final Uri _url =
+                      Uri.parse('https://wa.me/message/MX5JENZMK2BBI1');
+                  if (!await launchUrl(_url)) {
+                    throw Exception('Could not launch $_url');
+                  }
+                }
+
+                _launchUrl();
                         }),
                 ],
               ),

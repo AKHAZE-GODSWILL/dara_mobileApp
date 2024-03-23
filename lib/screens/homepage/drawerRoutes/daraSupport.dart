@@ -364,89 +364,92 @@ class _DaraSupport extends State<DaraSupport> with TickerProviderStateMixin {
     return showModalBottomSheet(
       context: context,
       builder: (context) {
-        return SizedBox(
-          height: 150,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      _pickFile();
-
-                      Navigator.pop(context);
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundColor: constants.appMainColor,
-                          child: Icon(Icons.file_copy),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          "File",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SizedBox(
+            height: 150,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        _pickFile();
+          
+                        Navigator.pop(context);
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            radius: 25,
+                            backgroundColor: constants.appMainColor,
+                            child: Icon(Icons.file_copy),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      getImageCamera();
-
-                      Navigator.pop(context);
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundColor: constants.appMainColor,
-                          child: Icon(Icons.camera),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          "Camera",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      getMediaGallery();
-                      Navigator.pop(context);
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundColor: constants.appMainColor,
-                          child: Icon(Icons.image),
-                        ),
-                        SizedBox(height: 5),
-                        Text("Gallery",
+                          SizedBox(height: 5),
+                          Text(
+                            "File",
                             style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w400)),
-                      ],
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    GestureDetector(
+                      onTap: () {
+                        getImageCamera();
+          
+                        Navigator.pop(context);
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            radius: 25,
+                            backgroundColor: constants.appMainColor,
+                            child: Icon(Icons.camera),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            "Camera",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        getMediaGallery();
+                        Navigator.pop(context);
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            radius: 25,
+                            backgroundColor: constants.appMainColor,
+                            child: Icon(Icons.image),
+                          ),
+                          SizedBox(height: 5),
+                          Text("Gallery",
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w400)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },

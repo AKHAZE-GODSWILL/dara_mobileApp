@@ -428,7 +428,7 @@ class _ProjectsState extends State<Projects> {
                                                                     children: [
                                                                   TextSpan(
                                                                     text:
-                                                                        "${ongoingProjects[index]["customer_first_name"] ?? ongoingProjects[index]["service_provider_first_name"]}",
+                                                                        "${dataProvider.userType != "client" ? ongoingProjects[index]["customer_first_name"] : ongoingProjects[index]["service_provider_first_name"]}",
                                                                     style: const TextStyle(
                                                                         fontSize:
                                                                             14,
@@ -611,11 +611,47 @@ class _ProjectsState extends State<Projects> {
                                                                     right: 8.0),
                                                             child: Stack(
                                                               children: [
-                                                                CircleAvatar(
-                                                                  radius: 22,
-                                                                  backgroundImage:
-                                                                      AssetImage(
-                                                                          "assets/profile1.png"),
+                                                                CachedNetworkImage(
+                                                                  imageUrl: confirmProjects[
+                                                                          index]
+                                                                      [
+                                                                      "profile_image"],
+                                                                  imageBuilder:
+                                                                      (context,
+                                                                              imageProvider) =>
+                                                                          Container(
+                                                                    width: 46,
+                                                                    height: 46,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                      image: DecorationImage(
+                                                                          image:
+                                                                              imageProvider,
+                                                                          fit: BoxFit
+                                                                              .cover),
+                                                                    ),
+                                                                  ),
+                                                                  placeholder: (context,
+                                                                          url) =>
+                                                                      Container(
+                                                                          width:
+                                                                              50,
+                                                                          height:
+                                                                              50,
+                                                                          child:
+                                                                              CircularProgressIndicator()),
+                                                                  errorWidget: (context,
+                                                                          url,
+                                                                          error) =>
+                                                                      const Icon(
+                                                                          Icons
+                                                                              .person,
+                                                                          size:
+                                                                              50,
+                                                                          color:
+                                                                              Colors.grey),
                                                                 ),
                                                                 Padding(
                                                                   padding: EdgeInsets
@@ -666,7 +702,7 @@ class _ProjectsState extends State<Projects> {
                                                                         children: [
                                                                       TextSpan(
                                                                         text:
-                                                                            "${confirmProjects[index]["customer_first_name"] ?? confirmProjects[index]["service_provider_first_name"]}",
+                                                                            "${dataProvider.userType != "client" ? confirmProjects[index]["customer_first_name"] : confirmProjects[index]["service_provider_first_name"]}",
                                                                         style: TextStyle(
                                                                             fontSize:
                                                                                 14,
@@ -726,9 +762,13 @@ class _ProjectsState extends State<Projects> {
                                                                         height:
                                                                             26,
                                                                         decoration: BoxDecoration(
-                                                                            color:
-                                                                                Color.fromARGB(255, 255, 209, 176),
-                                                                            borderRadius: BorderRadius.circular(200)),
+                                                                            color: Color.fromARGB(
+                                                                                255,
+                                                                                255,
+                                                                                209,
+                                                                                176),
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(200)),
                                                                         child:
                                                                             Center(
                                                                           child:
@@ -847,11 +887,47 @@ class _ProjectsState extends State<Projects> {
                                                                     right: 8.0),
                                                             child: Stack(
                                                               children: [
-                                                                CircleAvatar(
-                                                                  radius: 22,
-                                                                  backgroundImage:
-                                                                      AssetImage(
-                                                                          "assets/profile1.png"),
+                                                                CachedNetworkImage(
+                                                                  imageUrl: completedProjects[
+                                                                          index]
+                                                                      [
+                                                                      "profile_image"],
+                                                                  imageBuilder:
+                                                                      (context,
+                                                                              imageProvider) =>
+                                                                          Container(
+                                                                    width: 46,
+                                                                    height: 46,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                      image: DecorationImage(
+                                                                          image:
+                                                                              imageProvider,
+                                                                          fit: BoxFit
+                                                                              .cover),
+                                                                    ),
+                                                                  ),
+                                                                  placeholder: (context,
+                                                                          url) =>
+                                                                      Container(
+                                                                          width:
+                                                                              50,
+                                                                          height:
+                                                                              50,
+                                                                          child:
+                                                                              CircularProgressIndicator()),
+                                                                  errorWidget: (context,
+                                                                          url,
+                                                                          error) =>
+                                                                      const Icon(
+                                                                          Icons
+                                                                              .person,
+                                                                          size:
+                                                                              50,
+                                                                          color:
+                                                                              Colors.grey),
                                                                 ),
                                                                 Padding(
                                                                   padding: EdgeInsets
@@ -888,6 +964,7 @@ class _ProjectsState extends State<Projects> {
                                                                 CrossAxisAlignment
                                                                     .start,
                                                             children: [
+                                                              // Text(dataProvider.userType.toString()),
                                                               Container(
                                                                 padding: EdgeInsets
                                                                     .only(
@@ -897,20 +974,26 @@ class _ProjectsState extends State<Projects> {
                                                                         .size
                                                                         .width *
                                                                     0.78,
-                                                                child: RichText(
-                                                                    text: TextSpan(
-                                                                        children: [
-                                                                      TextSpan(
-                                                                        text:
-                                                                            "${completedProjects[index]["customer_first_name"] ?? completedProjects[index]["service_provider_first_name"]}",
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            color: Colors.black),
-                                                                      ),
-                                                                    ])),
+                                                                child: InkWell(
+                                                                  child: RichText(
+                                                                      text: TextSpan(children: [
+                                                                    TextSpan(
+                                                                      text:
+                                                                          "${dataProvider.userType != "client" ? completedProjects[index]["customer_first_name"] : completedProjects[index]["service_provider_first_name"]}",
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              14,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color:
+                                                                              Colors.black),
+                                                                    ),
+                                                                  ])),
+                                                                  onTap: () {
+                                                                    print(completedProjects[
+                                                                        index]);
+                                                                  },
+                                                                ),
                                                               ),
                                                               Padding(
                                                                 padding:

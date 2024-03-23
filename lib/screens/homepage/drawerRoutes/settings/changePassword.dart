@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:dara_app/utils/apiRequest.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:dara_app/Provider/DataProvider.dart';
+import 'package:dara_app/screens/authentication/forgetInput.dart';
 import 'package:dara_app/screens/authentication/forgotPassword.dart';
 
 class ChangePassword extends StatefulWidget {
@@ -444,7 +446,7 @@ class _ChangePassword extends State<ChangePassword> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ForgotPassword()));
+                                  builder: (context) => forgetInput()));
                         }),
                 ],
               ),
@@ -474,7 +476,16 @@ class _ChangePassword extends State<ChangePassword> {
                         ..onTap = () {
                           // Handle the tap gesture for 'World!'
 
-                          Navigator.pop(context);
+                          // Navigator.pop(context);
+                           Future<void> _launchUrl() async {
+                  final Uri _url =
+                      Uri.parse('https://wa.me/message/MX5JENZMK2BBI1');
+                  if (!await launchUrl(_url)) {
+                    throw Exception('Could not launch $_url');
+                  }
+                }
+
+                _launchUrl();
                         }),
                 ],
               ),

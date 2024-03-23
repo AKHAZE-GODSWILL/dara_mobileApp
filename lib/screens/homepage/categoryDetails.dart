@@ -135,150 +135,178 @@ class _CategoryDetailsState extends State<CategoryDetails> {
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0, bottom: 8),
-                          child: Container(
-                            height: 78,
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                  width: 2,
-                                  color: Color(0XFFE5E7EB),
-                                ),
-                                borderRadius: BorderRadius.circular(8)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(5),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: CircleAvatar(
-                                      radius: 25,
-                                      backgroundImage:
-                                          AssetImage("assets/profile1.png"),
+                          child: InkWell(
+                              onTap: () {
+                                print(result![index].toString());
+                              },
+                              child: Container(
+                                height: 78,
+                                width: MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                      width: 2,
+                                      color: Color(0XFFE5E7EB),
                                     ),
-                                  ),
-                                  Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    borderRadius: BorderRadius.circular(8)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5),
+                                  child: Row(
                                     children: [
-                                      Text(
-                                        "${result![index]["first_name"] ?? ""} ${result![index]["last_name"] ?? ""}",
-                                        style: TextStyle(
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.bold),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: CircleAvatar(
+                                          radius: 25,
+                                          backgroundImage:
+                                              AssetImage("assets/profile1.png"),
+                                        ),
                                       ),
-                                      Row(
+                                      Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.start,
+                                            MainAxisAlignment.spaceBetween,
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Icon(
-                                            PhosphorIcons.star_fill,
-                                            color: Colors.orangeAccent,
-                                            size: 13,
-                                          ),
-                                          Text(
-                                            "${result![index]["rating"]}",
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black54),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(4.0),
-                                            child: Container(
-                                              height: 4.2,
-                                              width: 4.2,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: Colors.black54,
-                                              ),
-                                              child: Text(""),
+                                          Row(children: [
+                                            Text(
+                                              "${result![index]["first_name"] ?? ""} ${result![index]["last_name"] ?? ""}",
+                                              style: TextStyle(
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.bold),
                                             ),
+                                            "${result![index]!["kyc"]}"
+                                                        .toString() ==
+                                                    "approved"
+                                                ? SvgPicture.asset(
+                                                    "assets/svg/verified-badge.svg")
+                                                : Container(),
+                                          ]),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                PhosphorIcons.star_fill,
+                                                color: Colors.orangeAccent,
+                                                size: 13,
+                                              ),
+                                              Text(
+                                                "${result![index]["rating"]}",
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black54),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(4.0),
+                                                child: Container(
+                                                  height: 4.2,
+                                                  width: 4.2,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: Colors.black54,
+                                                  ),
+                                                  child: Text(""),
+                                                ),
+                                              ),
+                                              Text(
+                                                "${result![index]["service"]} ",
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black54),
+                                              ),
+                                            ],
                                           ),
-                                          Text(
-                                            "${result![index]["service"]} ",
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black54),
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(2.0),
+                                                child: Text(
+                                                  "${result![index]["projects_completed"]} Recommended",
+                                                  style: TextStyle(
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black54),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(4.0),
+                                                child: Container(
+                                                  height: 4.2,
+                                                  width: 4.2,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: Colors.black54,
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(2.0),
+                                                child: Text(
+                                                  "${result![index]["projects_completed"]}  Completed Projects",
+                                                  style: TextStyle(
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black54),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                      Row(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(2.0),
-                                            child: Text(
-                                              "${result![index]["projects_completed"]} Recommended",
-                                              style: TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black54),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(4.0),
-                                            child: Container(
-                                              height: 4.2,
-                                              width: 4.2,
-                                              decoration: BoxDecoration(
+                                      Spacer(),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10.0),
+                                        child: InkWell(
+                                          onTap: () {
+                                            print(result![index]);
+                                            mywidgets.showHireSheet(
+                                                context: context,
+                                                sp_id: result![index]
+                                                    ["service_provider_id"],
+                                                service: result![index]
+                                                        ["service"] ??
+                                                    "");
+                                          },
+                                          child: Container(
+                                            width: 69,
+                                            height: 32,
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                border: Border.all(
+                                                    color:
+                                                        constants.appMainColor,
+                                                    width: 2),
                                                 borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: Colors.black54,
+                                                    BorderRadius.circular(200)),
+                                            child: Center(
+                                              child: Text(
+                                                "Hire me",
+                                                style: TextStyle(
+                                                    color:
+                                                        constants.appMainColor,
+                                                    fontSize: 14),
                                               ),
                                             ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(2.0),
-                                            child: Text(
-                                              "${result![index]["projects_completed"]}  Completed Projects",
-                                              style: TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black54),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Spacer(),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 10.0),
-                                    child: InkWell(
-                                      onTap: () {
-                                        mywidgets.showHireSheet(
-                                            context: context,
-                                            sp_id: result![index]
-                                                ["service_provider_id"]);
-                                      },
-                                      child: Container(
-                                        width: 69,
-                                        height: 32,
-                                        decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(
-                                                color: constants.appMainColor,
-                                                width: 2),
-                                            borderRadius:
-                                                BorderRadius.circular(200)),
-                                        child: Center(
-                                          child: Text(
-                                            "Hire me",
-                                            style: TextStyle(
-                                                color: constants.appMainColor,
-                                                fontSize: 14),
                                           ),
                                         ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
+                                ),
+                              )),
                         );
                       },
                     ),

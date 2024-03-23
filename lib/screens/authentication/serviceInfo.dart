@@ -7,10 +7,13 @@ import 'package:provider/provider.dart';
 import 'package:dara_app/utils/apiRequest.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dara_app/widget/custom_circle.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:multi_select_flutter/dialog/mult_select_dialog.dart';
 
 class Service_Info extends StatefulWidget {
   Service_Info({Key? key}) : super(key: key);
@@ -33,12 +36,14 @@ class _Service_Info extends State<Service_Info> {
 
   final bioController = TextEditingController();
   String? dropdownvalueServices;
-  String? dropdownvalueSkills;
+  String? dropdownvalueSkills = "";
   String? dropdownValueExperience;
 
   List services = [];
 
-  List skill = [];
+  List<MultiSelectItem<dynamic>> skill = [];
+
+  List servicesId = [];
 
   var experienceList = [
     "0-11months experience",
@@ -64,20 +69,21 @@ class _Service_Info extends State<Service_Info> {
     // TODO: implement initState
 
     isObscured = true;
-    getServices().then((value) {
+    getCategories().then((value) {
       setState(() {
         for (var i in value) {
           services.add(i["name"]);
+          servicesId.add(i);
         }
       });
     });
-    getSkills().then((value) {
-      setState(() {
-        for (var i in value) {
-          skill.add(i["skill"]);
-        }
-      });
-    });
+    // getSkills().then((value) {
+    //   setState(() {
+    //     for (var i in value) {
+    //       skill.add(i["skill"]);
+    //     }
+    //   });
+    // });
     super.initState();
   }
 
@@ -102,7 +108,7 @@ class _Service_Info extends State<Service_Info> {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: skill.isEmpty || services.isEmpty
+      body: services.isEmpty
           ? Center(
               child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -249,7 +255,7 @@ class _Service_Info extends State<Service_Info> {
                                               getImageGallery();
                                             },
                                             child: Text(
-                                              "Upload Image",
+                                              "Upload Passport Photo",
                                               style: GoogleFonts.inter(
                                                   fontSize: 14,
                                                   color:
@@ -397,9 +403,33 @@ class _Service_Info extends State<Service_Info> {
                                               .toList(),
                                           value: dropdownvalueServices,
                                           onChanged: (value) {
+                                            circularCustom(context);
                                             setState(() {
                                               dropdownvalueServices =
                                                   value as String;
+                                              getSpecificSkills(servicesId
+                                                      .singleWhere((element) =>
+                                                          element["name"]
+                                                              .toString()
+                                                              .toLowerCase() ==
+                                                          value
+                                                              .toString()
+                                                              .toLowerCase())["id"])
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                setState(() {
+                                                  skill = [];
+                                                  // if (!skill.contains(
+                                                  //     dropdownvalueSkills)) {
+                                                  //   skill.add(
+                                                  //       dropdownvalueSkills);
+                                                  // }
+                                                  for (var i in value) {
+                                                    skill.add(
+                                                        MultiSelectItem(i, i));
+                                                  }
+                                                });
+                                              });
                                             });
                                           },
                                           buttonHeight: 40,
@@ -433,53 +463,74 @@ class _Service_Info extends State<Service_Info> {
                                   SizedBox(
                                     height: 5,
                                   ),
-                                  Container(
-                                    height: 48,
-                                    width: MediaQuery.of(context).size.width *
-                                        0.95,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                            width: 1,
-                                            color: Color(0XFFE5E7EB))),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton2(
-                                          icon: Icon(
-                                            Icons.arrow_drop_down,
-                                            color: Colors.black38,
+                                  InkWell(
+                                      onTap: () {
+                                        void _showMultiSelect(
+                                            BuildContext context) async {
+                                          await showDialog(
+                                            context: context,
+                                            builder: (ctx) {
+                                              return MultiSelectDialog(
+                                                items: skill,
+                                                initialValue: [
+                                                  MultiSelectItem("", "")
+                                                ],
+                                                onConfirm: (values) {
+                                                  setState(() {
+                                                    dropdownvalueSkills = values
+                                                        .sublist(1,
+                                                            (values.length))
+                                                        .toString()
+                                                        .replaceAll("[", "")
+                                                        .replaceAll("]", "");
+                                                  });
+                                                },
+                                              );
+                                            },
+                                          );
+                                        }
+
+                                        _showMultiSelect(context);
+                                      },
+                                      child: Container(
+                                        height: 48,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.95,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                                width: 1,
+                                                color: Color(0XFFE5E7EB))),
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 8.0),
+                                          child: Row(
+                                            children: [
+                                              Align(
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  child: Text(
+                                                    dropdownvalueSkills == "" ||
+                                                            dropdownvalueSkills ==
+                                                                null
+                                                        ? "Choose your kind of skills"
+                                                        : dropdownvalueSkills
+                                                            .toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.black54),
+                                                  )),
+                                              Spacer(),
+                                              Icon(
+                                                Icons.arrow_drop_down,
+                                                color: Colors.black38,
+                                              )
+                                            ],
                                           ),
-                                          hint: Text('Select Your skills',
-                                              style: GoogleFonts.inter(
-                                                  fontSize: 14,
-                                                  color: Color(0XFF6B7280))),
-                                          items: skill
-                                              .map((item) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: item,
-                                                    child: Text(item,
-                                                        style:
-                                                            GoogleFonts.inter(
-                                                                fontSize: 14,
-                                                                color: Colors
-                                                                    .black)),
-                                                  ))
-                                              .toList(),
-                                          value: dropdownvalueSkills,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              dropdownvalueSkills =
-                                                  value as String;
-                                            });
-                                          },
-                                          buttonHeight: 40,
-                                          buttonWidth: 140,
-                                          itemHeight: 40,
+                                     
                                         ),
-                                      ),
-                                    ),
-                                  ),
+                                      )),
                                 ],
                               ),
                             ),
@@ -594,13 +645,7 @@ class _Service_Info extends State<Service_Info> {
                                       experience: dropdownValueExperience,
                                       user_id: provider.sp_user_id)
                                   .then((value) {
-                                mywidgets.displayToast(
-                                    msg:
-                                        "End point worked and this is the error");
                                 if (value["status"] == true) {
-                                  mywidgets.displayToast(
-                                      msg:
-                                          "Got to the place before fire store");
                                   FirebaseFirestore.instance
                                       .collection("users")
                                       .doc("${provider.sp_user_id}")

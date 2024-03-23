@@ -1,18 +1,18 @@
-// import 'package:fixme/Services/network_service.dart';
-import 'package:dara_app/Provider/DataProvider.dart';
-import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
-// import 'package:goldenpay/Firebase/Utils/utils.dart';
-import 'package:path/path.dart' as Path;
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:provider/provider.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
 import 'dart:io';
-import 'Model/Message.dart';
+import 'dart:async';
 import 'Model/User.dart';
 import 'Utils/utils.dart';
+import 'Model/Message.dart';
+import 'package:flutter/material.dart';
+import 'package:path/path.dart' as Path;
+import 'package:provider/provider.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:dara_app/Provider/DataProvider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+// import 'package:fixme/Services/network_service.dart';
+// import 'package:goldenpay/Firebase/Utils/utils.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class FirebaseApi {
   static GetStorage box = GetStorage();
@@ -215,7 +215,6 @@ class FirebaseApi {
   }
 
   static Future addUserChat({
-    // required DeliveryMainModel shipment,
     idUser,
     name,
     urlAvatar,
@@ -265,67 +264,10 @@ class FirebaseApi {
     });
   }
 
-  static Future addUserBidChat({
-    token,
-    token2,
-    bidData,
-    idUser,
-    name,
-    urlAvatar,
-    docid,
-    recieveruserId2,
-    recieveruserId,
-    serviceId,
-    serviceId2,
-    idArtisan,
-    name2,
-    urlAvatar2,
-    userMobile,
-    artisanMobile,
-  }) async {
-    final refUsers =
-        FirebaseFirestore.instance.collection('UserChat/$idArtisan/individual');
-    final refAritisan =
-        FirebaseFirestore.instance.collection('UserChat/$idUser/individual');
-    await refUsers.doc(idUser).set({
-      'bid_id': bidData.bid_id ?? '',
-      'project_id': bidData.job_id ?? '',
-      'project_owner_user_id': bidData.project_owner_user_id ?? '',
-      'service_id': bidData.service_id ?? '',
-      'chatid': idArtisan,
-      'read': false,
-      'idUser': idUser,
-      'name': name,
-      'serviceId': serviceId ?? '',
-      'token': token,
-      'recieveruserId': recieveruserId,
-      'block': false,
-      'userMobile': userMobile,
-      'lastMessage': '',
-      'urlAvatar': urlAvatar,
-      'lastMessageTime': DateTime.now(),
-    });
-    await refAritisan.doc(idArtisan).set({
-      'bid_id': bidData.bid_id ?? '',
-      'project_id': bidData.job_id ?? '',
-      'project_owner_user_id': bidData.project_owner_user_id ?? '',
-      'service_id': bidData.service_id ?? '',
-      'chatid': idUser,
-      'read': false,
-      'token': token2,
-      'recieveruserId': recieveruserId2,
-      'block': false,
-      'serviceId': serviceId ?? '',
-      'idUser': idArtisan,
-      'lastMessage': '',
-      'name': name2,
-      'userMobile': artisanMobile,
-      'urlAvatar': urlAvatar2,
-      'lastMessageTime': DateTime.now(),
-    });
-  }
 
-  static Stream<QuerySnapshot> userChatStream(chatid) {
+
+
+ static Stream<QuerySnapshot> userChatStream(chatid) {
    
     var data = FirebaseFirestore.instance
         .collection('UserChat/$chatid/individual');

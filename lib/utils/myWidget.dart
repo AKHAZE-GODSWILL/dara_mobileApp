@@ -311,8 +311,9 @@ class Mywidget {
     );
   }
 
-  showHireSheet({context, required sp_id}) {
-    String? dropdownvalueProject;
+  showHireSheet({context, required sp_id, required service}) {
+    print(service);
+    String? dropdownvalueProject = service;
     String message = "";
     String skillRequired = "";
     String price = "";
@@ -331,7 +332,7 @@ class Mywidget {
         return StatefulBuilder(builder: (context, setState) {
           bool isLoading = false;
           return Container(
-              height: 400,
+              height: 500,
               padding: EdgeInsets.only(
                   bottom: MediaQuery.of(context).viewInsets.bottom),
               child: SingleChildScrollView(
@@ -382,7 +383,7 @@ class Mywidget {
                               padding:
                                   const EdgeInsets.only(left: 10, right: 10),
                               child: Text(
-                                "Skill Required",
+                                "Service Required",
                                 style: GoogleFonts.inter(
                                     fontSize: 12, color: Color(0XFF6B7280)),
                               ),
@@ -400,39 +401,49 @@ class Mywidget {
                                       width: 1, color: Color(0XFFE5E7EB))),
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton2(
-                                    icon: Icon(
-                                      Icons.arrow_drop_down,
-                                      color: Colors.black38,
-                                    ),
-                                    hint: Text('Select Skill',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Color(0XFF6B7280))),
-                                    items: skill
-                                        .map((item) => DropdownMenuItem<String>(
-                                              value: item,
-                                              child: Text(
-                                                item.toString(),
-                                                style: TextStyle(
+                                child: service == "" || service == null
+                                    ? DropdownButtonHideUnderline(
+                                        child: DropdownButton2(
+                                          icon: Icon(
+                                            Icons.arrow_drop_down,
+                                            color: Colors.black38,
+                                          ),
+                                          hint: Text('Select Skill',
+                                              style: GoogleFonts.inter(
                                                   fontSize: 14,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                            ))
-                                        .toList(),
-                                    value: dropdownvalueProject,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        dropdownvalueProject = value;
-                                      });
-                                    },
-                                    buttonHeight: 40,
-                                    buttonWidth: 140,
-                                    itemHeight: 40,
-                                  ),
-                                ),
+                                                  color: Color(0XFF6B7280))),
+                                          items: skill
+                                              .map((item) =>
+                                                  DropdownMenuItem<String>(
+                                                    value: item,
+                                                    child: Text(
+                                                      item.toString(),
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ))
+                                              .toList(),
+                                          value: dropdownvalueProject,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              dropdownvalueProject = value;
+                                            });
+                                          },
+                                          buttonHeight: 40,
+                                          buttonWidth: 140,
+                                          itemHeight: 40,
+                                        ),
+                                      )
+                                    : Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          service,
+                                          style:
+                                              TextStyle(color: Colors.black45),
+                                        ),
+                                      ),
                               ),
                             ),
 
@@ -453,7 +464,7 @@ class Mywidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Message (Optional)",
+                              "Message ",
                               style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -507,9 +518,11 @@ class Mywidget {
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: InkWell(
                         onTap: () {
-                        print(message.isNotEmpty && dropdownvalueProject==null);
+                          print(message.isNotEmpty &&
+                              dropdownvalueProject == null);
 
-                          if (message.isNotEmpty && dropdownvalueProject!=null) {
+                          if (message.isNotEmpty &&
+                              dropdownvalueProject != null) {
                             circularCustom(context);
 
                             setState(() {

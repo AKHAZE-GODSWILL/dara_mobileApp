@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:dara_app/utils/apiRequest.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dara_app/screens/chat/Chat.dart';
+import 'package:dara_app/widget/call_dialog.dart';
 import 'package:dara_app/Firebase/Model/User.dart';
 import 'package:dara_app/widget/custom_circle.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
@@ -37,12 +38,6 @@ class _ViewProjectState extends State<ViewProject> {
     isSelected = widget.selected;
     super.initState();
   }
-
-// @override
-// void dispose() {
-// super.dispose();
-// _controller.dispose();
-// }
 
   @override
   Widget build(BuildContext context) {
@@ -279,124 +274,122 @@ class _ViewProjectState extends State<ViewProject> {
                       ],
                     ),
                     Spacer(),
-                    InkWell(
-                      onTap: () {
-                        ///////////// The list is not necessary
-                        List<User> users = [
-                          User(
-                              lastMessage: '',
-                              urlAvatar:  widget.projectDetail["profile_image"],
-                              userMobile: "",
-                              lastMessageTime: DateTime.now(),
-                              idUser: (provider.userType == "serviceProvider")
-                                  ? widget.projectDetail["customer"]
-                                  : widget.projectDetail["service_provider"],
-                              name: (provider.userType == "serviceProvider")
-                                  ? '${widget.projectDetail["customer_first_name"]}'
-                                  : '${widget.projectDetail["service_provider_first_name"]}',
-                              read: true,
-                              id: (provider.userType == "serviceProvider")
-                                  ? widget.projectDetail["service_provider"]
-                                  : widget.projectDetail["customer"],
-                              status: true,
-                              docid: (provider.userType == "serviceProvider")
-                                  ? widget.projectDetail["service_provider"]
-                                  : widget.projectDetail["customer"])
-                        ];
+                    Container(
+                      child: InkWell(
+                        onTap: () {
+                          List<User> users = [
+                            User(
+                                lastMessage: '',
+                                urlAvatar:
+                                    widget.projectDetail["profile_image"],
+                                userMobile:
+                                    widget.projectDetail["phone"].toString(),
+                                lastMessageTime: DateTime.now(),
+                                idUser: (provider.userType == "client")
+                                    ? widget.projectDetail["service_provider"]
+                                    : widget.projectDetail["customer"],
+                                name: (provider.userType == "client")
+                                    ? '${widget.projectDetail["service_provider_first_name"]}'
+                                    : '${widget.projectDetail["customer_first_name"]}',
+                                fcmToken: (provider.userType == "client")
+                                    ? '${widget.projectDetail["fcm_token"].toString()}'
+                                    : '${widget.projectDetail["fcm_token"].toString()}',
+                                read: true,
+                                id: (provider.userType == "client")
+                                    ? widget.projectDetail["service_provider"]
+                                    : widget.projectDetail["customer"],
+                                status: true,
+                                docid: (provider.userType == "client")
+                                    ? widget.projectDetail["service_provider"]
+                                    : widget.projectDetail["customer"])
+                          ];
 
-                        //----------------------//
-                        FirebaseApi.addUserChat(
-                          // shipment: e.value,
-                          token2: 'data.fcmToken',
-                          token: 'snapshot.data[index].fcmToken',
-                          urlAvatar2: provider.client_profile_image,
-                          name2: provider.client_first_name,
-                          recieveruserId2:
-                              provider.sp_user_id.toString() == null
-                                  ? provider.client_user_id.toString()
-                                  : provider.sp_user_id.toString(),
-                          recieveruserId: users[0].idUser,
-                          idArtisan: provider.sp_user_id.toString() == null
-                              ? provider.client_user_id.toString()
-                              : provider.sp_user_id.toString(),
-                          artisanMobile: provider.client_phone,
-                          userMobile: users[0].userMobile,
-                          idUser: users[0].idUser.toString(),
-                          urlAvatar: users[0].urlAvatar,
-                          name: users[0].name,
-                        );
+                          FirebaseApi.addUserChat(
+                            token2: device_token,
+                            token: users[0].fcmToken,
+                            urlAvatar2: provider.userType.toString() == "client"
+                                ? provider.client_profile_image
+                                : provider.sp_profile_image,
+                            name2: provider.userType.toString() == "client"
+                                ? provider.client_first_name.toString()
+                                : provider.sp_first_name.toString(),
+                            recieveruserId2:
+                                provider.userType.toString() == "client"
+                                    ? provider.client_user_id.toString()
+                                    : provider.sp_user_id.toString(),
+                            recieveruserId: users[0].idUser,
+                            idArtisan: provider.userType.toString() == "client"
+                                ? provider.client_user_id.toString()
+                                : provider.sp_user_id.toString(),
+                            artisanMobile:
+                                provider.userType.toString() == "client"
+                                    ? provider.value["user_object"]
+                                            ["personal_information"]["phone"]
+                                        .toString()
+                                    : provider.value["user_object"]
+                                            ["personal_information"]["phone"]
+                                        .toString(),
+                            userMobile: users[0].userMobile,
+                            idUser: users[0].idUser.toString(),
+                            urlAvatar: users[0].urlAvatar,
+                            name: users[0].name,
+                          );
 
-                        Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) {
-                                return ChatPage(
-                                    newchat: true,
-                                    support: true,
-                                    user: users[0]);
-                              },
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: child,
-                                );
-                              },
-                            ));
-                      },
-                      child: Container(
-                          height: 40,
-                          width: 40,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                  color: constants.appMainColor, width: 2),
-                              borderRadius: BorderRadius.circular(6)),
-                          child: SvgPicture.asset("assets/svg/message.svg")),
+                          Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) {
+                                  return ChatPage(
+                                      newchat: true,
+                                      productSend: true,
+                                      support: true,
+                                      user: users[0]);
+                                },
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  );
+                                },
+                              ));
+                        },
+                        child: Container(
+                            height: 40,
+                            width: 40,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                    color: constants.appMainColor, width: 2),
+                                borderRadius: BorderRadius.circular(6)),
+                            child: SvgPicture.asset("assets/svg/message.svg")),
+                      ),
                     ),
                     SizedBox(
                       width: 10,
                     ),
                     InkWell(
                       onTap: () {
-                        /////////
-                        Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) {
-                                return CallsScreen(
-                                  target_id: (provider.userType ==
-                                          "serviceProvider")
-                                      ? widget.projectDetail["customer"]
-                                      : widget
-                                          .projectDetail["service_provider"],
-                                  target_name: (provider.userType ==
-                                          "serviceProvider")
-                                      ? widget
-                                          .projectDetail["customer_first_name"]
-                                      : widget.projectDetail[
-                                          "service_provider_first_name"],
-                                  target_img:
-                                      widget.projectDetail["profile_image"],
-                                );
-                                // MainOnboard();
-                                // HomePageWidget();
-                              },
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: child,
-                                );
-                              },
-                            ));
+                        callDialog(
+                          context: context,
+                          phone: widget.projectDetail["phone"],
+                          target_id: (provider.userType == "serviceProvider")
+                              ? widget.projectDetail["customer"]
+                              : widget.projectDetail["service_provider"],
+                          target_name: (provider.userType == "serviceProvider")
+                              ? widget.projectDetail["customer_first_name"]
+                              : widget
+                                  .projectDetail["service_provider_first_name"],
+                          target_img: widget.projectDetail["profile_image"],
+                        );
+
                       },
                       child: Container(
                         height: 40,
                         width: 40,
+                        margin: EdgeInsets.only(right: 10),
                         decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(
@@ -415,7 +408,7 @@ class _ViewProjectState extends State<ViewProject> {
             ),
             Spacer(),
             (provider.userType == "client")
-                ? (isSelected == "ongoing" || isSelected == "confirm")
+                ? (isSelected == "confirm")
                     ? Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: InkWell(
@@ -438,26 +431,16 @@ class _ViewProjectState extends State<ViewProject> {
                           ),
                         ),
                       )
-                    : Padding(
+                    : isSelected == "completed"? Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: InkWell(
                           onTap: () {
-                            Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation, secondaryAnimation) {
-                                    return ReviewService(
-                                        projectDetail: widget.projectDetail);
-                                  },
-                                  transitionsBuilder: (context, animation,
-                                      secondaryAnimation, child) {
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    );
-                                  },
-                                ));
+                            print(widget.projectDetail);
+                            mywidgets.showHireSheet(
+                                context: context,
+                                sp_id: widget.projectDetail["service_provider"],
+                                service: widget.projectDetail["skill_needed"]);
+                            
                           },
                           child: Container(
                             width: MediaQuery.of(context).size.width,
@@ -467,39 +450,42 @@ class _ViewProjectState extends State<ViewProject> {
                                 borderRadius: BorderRadius.circular(200)),
                             child: Center(
                               child: Text(
-                                "Write a review",
+                                "Rehire",
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 14),
                               ),
                             ),
                           ),
                         ),
-                      )
+                      ):Container()
                 // runs when the tier type selected is service provider
                 : (isSelected == "ongoing" || isSelected == "confirm")
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: InkWell(
-                          onTap: () {
-                            showSubmitSheet(
-                                widget.projectDetail["customer_first_name"]);
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 48,
-                            decoration: BoxDecoration(
-                                color: constants.appMainColor,
-                                borderRadius: BorderRadius.circular(200)),
-                            child: Center(
-                              child: Text(
-                                "Complete Project",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 14),
+                    ? isSelected == "confirm" && provider.userType != "client"
+                        ? Container()
+                        : Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: InkWell(
+                              onTap: () {
+                                showSubmitSheet(widget
+                                    .projectDetail["customer_first_name"]);
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                    color: constants.appMainColor,
+                                    borderRadius: BorderRadius.circular(200)),
+                                child: Center(
+                                  child: Text(
+                                    "Complete Project",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 14),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      )
+                          )
                     : SizedBox(),
             SizedBox(height: 40)
           ],
@@ -520,147 +506,151 @@ class _ViewProjectState extends State<ViewProject> {
       isScrollControlled: true,
       builder: (BuildContext ctx) {
         return SingleChildScrollView(
-          child: Container(
-              height: 450,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 40,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "End Project",
-                            style: GoogleFonts.inter(
-                                fontSize: 14,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                              "Feel free to leave a note for your client in the box provided, if you have any message",
-                              style: GoogleFonts.inter(
-                                  fontSize: 12, color: Color(0XFF374151))),
-                        ],
-                      ),
+          child: Padding(
+             padding: EdgeInsets.only(
+         bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+                height: 450,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 40,
                     ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Message (Optional)",
-                            style: GoogleFonts.inter(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0XFF6B7280)),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            height: 209,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                    width: 1, color: Color(0XFFE5E7EB))),
-                            child: TextFormField(
-                              // focusNode: textNode,
-                              onChanged: (value) {
-                                setState(() {});
-                              },
-                              keyboardType: TextInputType.multiline,
-                              textAlignVertical: TextAlignVertical.top,
-                              maxLines: null,
-                              expands: true,
-                              minLines: null,
-                              // controller: bioController,
-                              decoration: InputDecoration(
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide
-                                      .none, // Remove the border when focused
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide
-                                      .none, // Remove the border when enabled
-                                ),
-                                hintText:
-                                    "Describe what you want the client to know",
-                                hintStyle: GoogleFonts.inter(
-                                    fontSize: 12, color: Color(0XFF6B7280)),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                        circularCustom(context);
-                        completeProject(
-                                projectId: widget.projectDetail["project_id"])
-                            .then((value) {
-                          // mywidgets.displayToast(msg: "making the request");
-
-                          if (value["status"].toString() == "true") {
-                            Navigator.of(context, rootNavigator: true).pop();
-                            setState(() {
-                              isSelected = "confirm";
-                            });
-                            showDoneSheet(name);
-                            // showProjectCompletionDialog();
-                            widget.refreshProjectPage(
-                                projectIndex: widget.projectIndex);
-                            // project!.removeAt(index);
-                          } else if (value["status"] == "Network Error") {
-                            Navigator.pop(context);
-                            mywidgets.displayToast(
-                                msg:
-                                    "Network Error. Check your Network Connection and try again");
-                          } else {
-                            Navigator.pop(context);
-                            mywidgets.displayToast(msg: value["message"]);
-                          }
-                        });
-                      },
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 48,
-                        decoration: BoxDecoration(
-                            color: constants.appMainColor,
-                            borderRadius: BorderRadius.circular(200)),
-                        child: Center(
-                          child: Text(
-                            "Submit",
-                            style: GoogleFonts.inter(
-                                color: Colors.white, fontSize: 14),
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "End Project",
+                              style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                                "Feel free to leave a note for your client in the box provided, if you have any message",
+                                style: GoogleFonts.inter(
+                                    fontSize: 12, color: Color(0XFF374151))),
+                          ],
                         ),
                       ),
                     ),
-                  )
-                ],
-              )),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Message",
+                              style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0XFF6B7280)),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              height: 209,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                      width: 1, color: Color(0XFFE5E7EB))),
+                              child: TextFormField(
+                                // focusNode: textNode,
+                                onChanged: (value) {
+                                  setState(() {});
+                                },
+                                keyboardType: TextInputType.multiline,
+                                textAlignVertical: TextAlignVertical.top,
+                                maxLines: null,
+                                expands: true,
+                                minLines: null,
+                                // controller: bioController,
+                                decoration: InputDecoration(
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide
+                                        .none, // Remove the border when focused
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide
+                                        .none, // Remove the border when enabled
+                                  ),
+                                  hintText:
+                                      "Describe what you want the client to know",
+                                  hintStyle: GoogleFonts.inter(
+                                      fontSize: 12, color: Color(0XFF6B7280)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          circularCustom(context);
+                          completeProject(
+                                  projectId: widget.projectDetail["project_id"])
+                              .then((value) {
+                            // mywidgets.displayToast(msg: "making the request");
+            
+                            if (value["status"].toString() == "true") {
+                              Navigator.of(context, rootNavigator: true).pop();
+                              setState(() {
+                                isSelected = "confirm";
+                              });
+                              showDoneSheet(name);
+                              // showProjectCompletionDialog();
+                              widget.refreshProjectPage(
+                                  projectIndex: widget.projectIndex);
+                              // project!.removeAt(index);
+                            } else if (value["status"] == "Network Error") {
+                              Navigator.pop(context);
+                              mywidgets.displayToast(
+                                  msg:
+                                      "Network Error. Check your Network Connection and try again");
+                            } else {
+                              Navigator.pop(context);
+                              mywidgets.displayToast(msg: value["message"]);
+                            }
+                          });
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 48,
+                          decoration: BoxDecoration(
+                              color: constants.appMainColor,
+                              borderRadius: BorderRadius.circular(200)),
+                          child: Center(
+                            child: Text(
+                              "Submit",
+                              style: GoogleFonts.inter(
+                                  color: Colors.white, fontSize: 14),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                )),
+          ),
         );
       },
     );
@@ -736,6 +726,7 @@ class _ViewProjectState extends State<ViewProject> {
                       child: GestureDetector(
                         onTap: () {
                           Navigator.pop(context);
+                          Navigator.pop(context);
                         },
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.85,
@@ -773,7 +764,8 @@ class _ViewProjectState extends State<ViewProject> {
         context: context,
         builder: (ctx) {
           return StatefulBuilder(builder: (ctx, setState) {
-            return Container(
+            return Material(
+              color: Colors.transparent,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -793,14 +785,13 @@ class _ViewProjectState extends State<ViewProject> {
                           child: Text(
                             "You are confirming that your project was successfully completed",
                             style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black,
-                                decoration: TextDecoration.none),
+                              fontSize: 14,
+                            ),
                             // textAlign: TextAlign.left,
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
@@ -811,9 +802,7 @@ class _ViewProjectState extends State<ViewProject> {
                                 child: Text(
                                   "Cancel",
                                   style: TextStyle(
-                                      fontSize: 14,
-                                      color: Color(0XFF6B7280),
-                                      decoration: TextDecoration.none),
+                                      fontSize: 14, color: Color(0XFF6B7280)),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -857,8 +846,7 @@ class _ViewProjectState extends State<ViewProject> {
                                   "Continue",
                                   style: TextStyle(
                                       fontSize: 14,
-                                      color: constants.appMainColor,
-                                      decoration: TextDecoration.none),
+                                      color: constants.appMainColor),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -877,6 +865,7 @@ class _ViewProjectState extends State<ViewProject> {
 
   showProjectCompletionDialog() {
     return showDialog(
+        barrierDismissible: false,
         barrierColor: Color(0XFF121212).withOpacity(0.7),
         context: context,
         builder: (context) {
@@ -918,11 +907,8 @@ class _ViewProjectState extends State<ViewProject> {
                           textAlign: TextAlign.center,
                         ),
                         Text(
-                          "Your project was successfully completed",
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              decoration: TextDecoration.none),
+                          "Your project was successfully completed. write a review",
+                          style: TextStyle(fontSize: 14, color: Colors.black),
                           textAlign: TextAlign.center,
                         ),
                         Container(
@@ -930,6 +916,22 @@ class _ViewProjectState extends State<ViewProject> {
                             onTap: () {
                               Navigator.pop(context);
                               Navigator.pop(context);
+                              Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                        secondaryAnimation) {
+                                      return ReviewService(
+                                          projectDetail: widget.projectDetail);
+                                    },
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                                  ));
                             },
                             child: Container(
                               width: MediaQuery.of(context).size.width * 0.85,

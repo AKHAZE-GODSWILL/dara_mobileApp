@@ -26,12 +26,45 @@ class _WalletPageState extends State<WalletPage> {
     "Last month",
   ];
 
+  var user_object;
   Map? banks;
   List? history;
 
   @override
   initState() {
     super.initState();
+    DataProvider provider = Provider.of<DataProvider>(context, listen: false);
+    reloadUserObject().then((value) {
+      setState(() {
+        user_object = value;
+      });
+      if ((provider.userType == "serviceProvider")) {
+        provider.set_sp_login_info(
+            value: value,
+            firstName: value["user_object"]["personal_information"]
+                ["first_name"],
+            lastName: value["user_object"]["personal_information"]["last_name"],
+            email: value["user_object"]["personal_information"]["email"],
+            id: value["user_object"]["personal_information"]["id"].toString(),
+            access_token: value["access_token"],
+            profile_image: (value["user_object"]["address_information"] != null)
+                ? value["user_object"]["address_information"]["profile_image"]
+                : "");
+      } else {
+        provider.set_client_login_info(
+            value: value,
+            firstName: value["user_object"]["personal_information"]
+                ["first_name"],
+            lastName: value["user_object"]["personal_information"]["last_name"],
+            email: value["user_object"]["personal_information"]["email"],
+            id: value["user_object"]["personal_information"]["id"].toString(),
+            access_token: value["access_token"],
+            profile_image: (value["user_object"]["address_information"] != null)
+                ? value["user_object"]["address_information"]["profile_image"]
+                : "");
+      }
+    });
+
     fetchBanks().then((value) {
       setState(() {
         banks = value;
@@ -117,10 +150,16 @@ class _WalletPageState extends State<WalletPage> {
                                   child: child,
                                 );
                               },
-                            ));
+                            )).then((value) {
+                          fetchBanks().then((value) {
+                            setState(() {
+                              banks = value;
+                            });
+                          });
+                        });
                       },
                       child: Container(
-                        width:80,
+                        width: 80,
                         height: 50,
                         decoration: BoxDecoration(
                             border: Border.all(
@@ -143,293 +182,307 @@ class _WalletPageState extends State<WalletPage> {
           backgroundColor: Colors.white,
           elevation: 0,
         ),
-        body: Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: Stack(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+        body: user_object == null
+            ? Center(child: CircularProgressIndicator())
+            : Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: Stack(
                   children: [
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        height: 124,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: constants.appMainColor,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 20,
                         ),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5),
-                                child: Container(
-                                  width: 74.68,
-                                  height: 104,
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: AssetImage(
-                                            "assets/daraLogoGrey.png"),
-                                        fit: BoxFit.cover),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                // color: Colors.red,
-                                height: 84,
-                                width: MediaQuery.of(context).size.width * 0.47,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Available Balance",
-                                      style: TextStyle(
-                                          fontSize: 12, color: Colors.white),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      "NGN ${provider.value["user_object"]["personal_information"]["wallet"]}",
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
-                                    ),
-                                    Spacer(),
-                                    RichText(
-                                      text: TextSpan(
-                                        style: TextStyle(
-                                            color: Colors.black, fontSize: 12),
-                                        children: <TextSpan>[
-                                          TextSpan(
-                                            text: 'Total Wallet Balance: ',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.white),
-                                          ),
-                                          TextSpan(
-                                            text:
-                                                'NGN ${provider.value["user_object"]["personal_information"]["wallet"]}',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white),
-                                          ),
-                                        ],
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Container(
+                            height: 124,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: constants.appMainColor,
+                            ),
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5),
+                                    child: Container(
+                                      width: 74.68,
+                                      height: 104,
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: AssetImage(
+                                                "assets/daraLogoGrey.png"),
+                                            fit: BoxFit.cover),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5),
-                                child: Container(
-                                  width: 74.68,
-                                  height: 104,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: AssetImage(
-                                            "assets/daraLogoGrey.png"),
-                                        fit: BoxFit.cover),
                                   ),
-                                ),
-                              )
-                            ]),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        height: 24,
-                        // color: Colors.red,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Transaction History",
-                              style: TextStyle(fontSize: 14),
-                            ),
-                            Container(
-                              padding: EdgeInsets.only(left: 5),
-                              height: 24,
-                              width: 104,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                      width: 1, color: Color(0XFFE5E7EB))),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton2(
-                                  icon: Icon(
-                                    Icons.arrow_drop_down,
-                                    color: Colors.black38,
-                                  ),
-                                  hint: Text(
-                                    '',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                  items: period
-                                      .map((item) => DropdownMenuItem<String>(
-                                            value: item,
-                                            child: Text(
-                                              item,
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 14),
-                                            ),
-                                          ))
-                                      .toList(),
-                                  value: transactionPeriod,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      transactionPeriod = value as String;
-                                    });
-                                  },
-                                  buttonHeight: 40,
-                                  buttonWidth: 140,
-                                  itemHeight: 40,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                          height: MediaQuery.of(context).size.height * 0.52,
-                          // color: Colors.red,
-                          child: history == null
-                              ? Center(child: CircularProgressIndicator())
-                              : history!.length == 0
-                                  ? Column(
+                                  Container(
+                                    // color: Colors.red,
+                                    height: 84,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.47,
+                                    child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          CrossAxisAlignment.center,
                                       children: [
-                                        Center(
-                                          child: Text(
-                                            "No History Found",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                                        Text(
+                                          "Available Balance",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white),
                                         ),
                                         SizedBox(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.1,
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          "NGN ${provider.value["user_object"]["personal_information"]["wallet"]}",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white),
+                                        ),
+                                        Spacer(),
+                                        RichText(
+                                          text: TextSpan(
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 12),
+                                            children: <TextSpan>[
+                                              TextSpan(
+                                                text: 'Total Wallet Balance: ',
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.white),
+                                              ),
+                                              TextSpan(
+                                                text:
+                                                    'NGN ${provider.value["user_object"]["personal_information"]["wallet"]}',
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
-                                    )
-                                  : ListView.builder(
-                                      itemCount:
-                                          history == null ? 0 : history!.length,
-                                      itemBuilder: (context, index) {
-                                        return incomeCard(index);
-                                        // : withdrawalCard();
-                                      })),
-                    ),
-                  ],
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 84,
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey,
-                          offset: Offset(4, 0),
-                          blurRadius: 8,
-                          spreadRadius: 0,
-                        )
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5),
+                                    child: Container(
+                                      width: 74.68,
+                                      height: 104,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: AssetImage(
+                                                "assets/daraLogoGrey.png"),
+                                            fit: BoxFit.cover),
+                                      ),
+                                    ),
+                                  )
+                                ]),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Container(
+                            height: 24,
+                            // color: Colors.red,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Transaction History",
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(left: 5),
+                                  height: 24,
+                                  width: 104,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                          width: 1, color: Color(0XFFE5E7EB))),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton2(
+                                      icon: Icon(
+                                        Icons.arrow_drop_down,
+                                        color: Colors.black38,
+                                      ),
+                                      hint: Text(
+                                        '',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                      items: period
+                                          .map((item) =>
+                                              DropdownMenuItem<String>(
+                                                value: item,
+                                                child: Text(
+                                                  item,
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 14),
+                                                ),
+                                              ))
+                                          .toList(),
+                                      value: transactionPeriod,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          transactionPeriod = value as String;
+                                        });
+                                      },
+                                      buttonHeight: 40,
+                                      buttonWidth: 140,
+                                      itemHeight: 40,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Container(
+                              height: MediaQuery.of(context).size.height * 0.52,
+                              // color: Colors.red,
+                              child: history == null
+                                  ? Center(child: CircularProgressIndicator())
+                                  : history!.length == 0
+                                      ? Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Center(
+                                              child: Text(
+                                                "No History Found",
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.1,
+                                            ),
+                                          ],
+                                        )
+                                      : ListView.builder(
+                                          itemCount: history == null
+                                              ? 0
+                                              : history!.length,
+                                          itemBuilder: (context, index) {
+                                            return incomeCard(index);
+                                            // : withdrawalCard();
+                                          })),
+                        ),
                       ],
-                      color: Colors.white,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 15),
-                      child: InkWell(
-                        onTap: () {
-                          if (banks!.isEmpty) {
-                            Fluttertoast.showToast(
-                                msg:
-                                    "Update bank details, before you can proceed.");
-                          } else {
-                            Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation, secondaryAnimation) {
-                                    return WithdrawFunds();
-                                  },
-                                  transitionsBuilder: (context, animation,
-                                      secondaryAnimation, child) {
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    );
-                                  },
-                                )).then((value) {
-                              setState(() {
-                                fetchHistory().then((value) {
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 84,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey,
+                              offset: Offset(4, 0),
+                              blurRadius: 8,
+                              spreadRadius: 0,
+                            )
+                          ],
+                          color: Colors.white,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 15),
+                          child: InkWell(
+                            onTap: () {
+                              print(banks);
+                              if (banks == {}) {
+                                Fluttertoast.showToast(
+                                    msg:
+                                        "Update bank details, before you can proceed.");
+                              } else {
+                                Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                          secondaryAnimation) {
+                                        return WithdrawFunds();
+                                      },
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        );
+                                      },
+                                    )).then((value) {
                                   setState(() {
-                                    history = null;
-                                    history = value;
+                                    fetchHistory().then((value) {
+                                      setState(() {
+                                        history = null;
+                                        history = value;
+                                      });
+                                    });
                                   });
                                 });
-                              });
-                            });
-                          }
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.85,
-                          height: 50,
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 2, color: constants.appMainColor),
-                              borderRadius: BorderRadius.circular(200)),
-                          child: Center(
-                            child: Text(
-                              "Withdraw",
-                              style: TextStyle(
-                                  color: constants.appMainColor, fontSize: 14),
+                              }
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.85,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 2, color: constants.appMainColor),
+                                  borderRadius: BorderRadius.circular(200)),
+                              child: Center(
+                                child: Text(
+                                  "Withdraw",
+                                  style: TextStyle(
+                                      color: constants.appMainColor,
+                                      fontSize: 14),
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                )
-              ],
-            )));
+                    )
+                  ],
+                )));
   }
 
   incomeCard(index) {

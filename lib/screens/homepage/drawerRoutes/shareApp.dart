@@ -1,10 +1,10 @@
-
-
-import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-
 import '../../../../main.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
+import 'package:dotted_border/dotted_border.dart';
+
+
+
 
 class ShareApp extends StatefulWidget {
   const ShareApp({Key? key}) : super(key: key);
@@ -138,25 +138,25 @@ super.initState();
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children:[
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                  child: Container(
-                                    // color: Colors.red,
-                                    // height: 72,
-                                    width: MediaQuery.of(context).size.width*0.6,
-                                    child: Text("ABC1234",
-                                     style: TextStyle(fontSize: 14,color: Colors.black54),),
-                                  ),
-                                ),
+                                // Padding(
+                                //   padding: const EdgeInsets.symmetric(horizontal: 10),
+                                //   child: Container(
+                                //     // color: Colors.red,
+                                //     // height: 72,
+                                //     width: MediaQuery.of(context).size.width*0.6,
+                                //     child: Text("ABC1234",
+                                //      style: TextStyle(fontSize: 14,color: Colors.black54),),
+                                //   ),
+                                // ),
         
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                  child: Text("Tap to copy",
-                                         style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: constants.appMainColor),),
-                                )
+                                // Padding(
+                                //   padding: const EdgeInsets.symmetric(horizontal: 10),
+                                //   child: Text("Tap to copy",
+                                //          style: TextStyle(
+                                //           fontSize: 14,
+                                //           fontWeight: FontWeight.bold,
+                                //           color: constants.appMainColor),),
+                                // )
                               ]
                             ),
                           ),
@@ -166,7 +166,7 @@ super.initState();
                     ),
                   ),
         
-                  SizedBox(height: 20,),
+                  // SizedBox(height: 20,),
         
         
                   Text("OR",

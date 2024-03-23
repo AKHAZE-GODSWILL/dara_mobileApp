@@ -26,8 +26,6 @@ class _Address_Info extends State<Address_Info> {
   String? dropdownvalueState;
   String? dropdownvalueLGA;
 
-  
-
   final textNode = FocusNode();
   final passwordFocusNode = FocusNode();
 
@@ -357,59 +355,85 @@ class _Address_Info extends State<Address_Info> {
                       SizedBox(
                         height: 5,
                       ),
-                      Container(
-                        height: 48,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border:
-                                Border.all(width: 1, color: Color(0XFFE5E7EB))),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.8,
-                              child: TextFormField(
-                                // focusNode: textNode,
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
-                                keyboardType: TextInputType.emailAddress,
-                                controller: specificAddressController,
-                                decoration: InputDecoration(
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide
-                                        .none, // Remove the border when focused
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return SearchPlace(title: "Address");
+                              },
+                            ),
+                          ).then((place) {
+                            setState(() {
+                              specificAddressController.text =
+                                  place["mainText"];
+                            });
+                          });
+                        },
+                        child: Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                  width: 1, color: Color(0XFFE5E7EB))),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.8,
+                                child: TextFormField(
+                                  // focusNode: textNode,
+                                  onChanged: (value) {
+                                    setState(() {});
+                                  },
+                                  keyboardType: TextInputType.emailAddress,
+                                  enabled: false,
+                                  controller: specificAddressController,
+                                  decoration: InputDecoration(
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide
+                                          .none, // Remove the border when focused
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide
+                                          .none, // Remove the border when enabled
+                                    ),
+                                    disabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide
+                                          .none, // Remove the border when enabled
+                                    ),
+                                    hintText:
+                                        "Enter your specific location address",
                                   ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide
-                                        .none, // Remove the border when enabled
-                                  ),
-                                  hintText:
-                                      "Enter your specific location address",
                                 ),
                               ),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return SearchPlace(title: "Address");
-                                    },
-                                  ),
-                                ).then((place) {
-                                  setState(() {
-                                    specificAddressController.text =
-                                        place["mainText"];
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return SearchPlace(title: "Address");
+                                      },
+                                    ),
+                                  ).then((place) {
+                                    setState(() {
+                                      specificAddressController.text =
+                                          place["mainText"];
+                                    });
                                   });
-                                });
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                child: Icon(PhosphorIcons.map_pin),
-                              ),
-                            )
-                          ],
+                                },
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  child: Icon(
+                                    PhosphorIcons.map_pin,
+                                    size: 20,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ],

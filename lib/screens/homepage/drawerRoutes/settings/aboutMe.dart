@@ -1,5 +1,8 @@
 import '../../../../main.dart';
 import 'package:flutter/material.dart';
+import 'package:dara_app/utils/apiRequest.dart';
+import 'package:dara_app/widget/custom_circle.dart';
+
 
 class AboutMe extends StatefulWidget {
   const AboutMe({Key? key}) : super(key: key);
@@ -13,12 +16,7 @@ class _AboutMeState extends State<AboutMe> {
 
   @override
   void initState() {
-    aboutMeController.text =
-        '''Hey there! I'm Michael, your friendly neighborhood laundry attendant and the proud owner of Sparkleen. I’m passionate about everything laundry-related, and I can't wait to share my expertise and love for clean, fresh-smelling clothes with you!
-
-As a lifelong enthusiast of all things clean and tidy, I decided to turn my passion into a full-fledged laundry venture. With years of experience in the industry, I've honed my skills in the art of laundry, from battling stubborn stains to creating laundry masterpieces that leave my customers in awe. I believe that laundry is not just a chore; it's a chance to bring joy and comfort to people's lives, one freshly laundered garment at a time.
-
-My mission is simple: to redefine the way you experience laundry services. I aim to transform the mundane chore of washing clothes into an enjoyable and hassle-free experience. My laundry is not just a place to get your clothes cleaned; it's a place to connect, relax, and be part of a vibrant laundry-loving community. I take great pride in offering top-notch service, meticulous attention to detail, and a commitment to exceeding your expectations''';
+    aboutMeController.text = '';
     super.initState();
   }
 
@@ -110,7 +108,7 @@ My mission is simple: to redefine the way you experience laundry services. I aim
                         height: 5,
                       ),
                       Container(
-                        height: MediaQuery.of(context).size.height * 0.7,
+                        height: MediaQuery.of(context).size.height * 0.65,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             border:
@@ -150,7 +148,24 @@ My mission is simple: to redefine the way you experience laundry services. I aim
 
               InkWell(
                 onTap: () {
-                  Navigator.pop(context);
+                  // makes the request here
+                  circularCustom(context);
+                 
+                  setAbout(
+                    about: aboutMeController.text,
+                  ).then((value) {
+                    if (value["status"] == true) {
+                      ///// Navigation.push to the OTP screen
+                       Navigator.pop(context);
+                      mywidgets.displayToast(msg: "Updated Successfully");
+                    } else if (value["status"] == "Network Error") {
+                      mywidgets.displayToast(
+                          msg:
+                              "Network Error. Check your Network Connection and try again");
+                    } else {
+                      mywidgets.displayToast(msg: value["message"]);
+                    }
+                  });
 
                   //will save this parameter to state management later
                 },

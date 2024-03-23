@@ -21,6 +21,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:get_time_ago/get_time_ago.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:dara_app/widget/call_dialog.dart';
 import 'package:path_provider/path_provider.dart';
 import '../homepage/drawerRoutes/callsScreen.dart';
 import 'package:dara_app/widget/custom_circle.dart';
@@ -59,10 +60,6 @@ class ChatPage extends StatefulWidget {
     this.itemid,
     required this.newchat,
     required this.support,
-    // this.shipments,
-    // this.pickup,
-    // this.dropoff,
-
     localFileSystem,
     @required this.user,
   }) : this.localFileSystem = localFileSystem ?? LocalFileSystem();
@@ -693,26 +690,32 @@ class _ChatPageState extends State<ChatPage> {
                                 children: [
                                   InkWell(
                                     onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation,
-                                                secondaryAnimation) {
-                                              return CallsScreen(
-                                                  target_id: widget.user.idUser,
-                                                  target_name: widget.user.name,
-                                                  target_img: widget.user.name);
-                                            },
-                                            transitionsBuilder: (context,
-                                                animation,
-                                                secondaryAnimation,
-                                                child) {
-                                              return FadeTransition(
-                                                opacity: animation,
-                                                child: child,
-                                              );
-                                            },
-                                          ));
+                                      callDialog(
+                                          context: context,
+                                          target_id: widget.user.idUser,
+                                          target_name: widget.user.name,
+                                             phone: widget.user.userMobile,
+                                          target_img: widget.user.name);
+                                      // Navigator.push(
+                                      //     context,
+                                      //     PageRouteBuilder(
+                                      //       pageBuilder: (context, animation,
+                                      //           secondaryAnimation) {
+                                      //         return CallsScreen(
+                                      //             target_id: widget.user.idUser,
+                                      //             target_name: widget.user.name,
+                                      //             target_img: widget.user.name);
+                                      //       },
+                                      //       transitionsBuilder: (context,
+                                      //           animation,
+                                      //           secondaryAnimation,
+                                      //           child) {
+                                      //         return FadeTransition(
+                                      //           opacity: animation,
+                                      //           child: child,
+                                      //         );
+                                      //       },
+                                      //     ));
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
@@ -890,7 +893,12 @@ class _ChatPageState extends State<ChatPage> {
                                   child: IconButton(
                                       onPressed: () async {
                                         if (datas.isWriting) {
+                                          // print(device_token);
                                           sendMessage();
+                                          sendNotification(
+                                              title: "Dara message",
+                                              body: message,
+                                              token: widget.user.fcmToken);
                                         } else {
                                           // var tempDir = await getTemporaryDirectory();
                                           // var path = "${tempDir.path}/flutter_sound.aac";
@@ -908,6 +916,10 @@ class _ChatPageState extends State<ChatPage> {
                                                 record: recordingPath,
                                                 context: context);
                                             initRecordingPath();
+                                            sendNotification(
+                                                title: "Dara message",
+                                                body: "recording...",
+                                                token: widget.user.fcmToken);
                                             // Navigator.push(context, MaterialPageRoute(builder: (context)=>  CustomAudioPlayer(audioPath: path)));
                                           } else {
                                             await _soundRecorder!.startRecorder(
@@ -961,318 +973,324 @@ class _ChatPageState extends State<ChatPage> {
       builder: (BuildContext context) {
         return StatefulBuilder(builder: (context, setState) {
           bool isLoading = false;
-          return Container(
-              height: 400,
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 40,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Create Invoice",
-                              style: GoogleFonts.inter(
-                                  fontSize: 14, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Text(
-                                "Feel free to leave a note for the client in the provided box.Provide a brief description of the price break down.",
-                                style: GoogleFonts.inter(
-                                    fontSize: 12, color: Color(0XFF374151))),
-                          ],
-                        ),
+          return Padding(
+         padding: EdgeInsets.only(
+         bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+                height: 400,
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 40,
                       ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10, right: 10),
-                      child: Text(
-                        "Project",
-                        style: GoogleFonts.inter(
-                            fontSize: 12, color: Color(0XFF6B7280)),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Container(
-                      height: 48,
-                      width: MediaQuery.of(context).size.width * 0.95,
-                      margin: EdgeInsets.only(left: 10, right: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          border:
-                              Border.all(width: 1, color: Color(0XFFE5E7EB))),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton2(
-                            icon: Icon(
-                              Icons.arrow_drop_down,
-                              color: Colors.black38,
-                            ),
-                            hint: Text('Select Project',
-                                style: GoogleFonts.inter(
-                                    fontSize: 14, color: Color(0XFF6B7280))),
-                            items: projects!
-                                .map((ongoingProjects) =>
-                                    DropdownMenuItem<dynamic>(
-                                      value: ongoingProjects,
-                                      child: Row(
-                                        children: [
-                                          CachedNetworkImage(
-                                            imageUrl: ongoingProjects[
-                                                "profile_image"],
-                                            imageBuilder:
-                                                (context, imageProvider) =>
-                                                    Container(
-                                              width: 25,
-                                              height: 25,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: DecorationImage(
-                                                    image: imageProvider,
-                                                    fit: BoxFit.cover),
-                                              ),
-                                            ),
-                                            placeholder: (context, url) =>
-                                                Container(
-                                                    width: 25,
-                                                    height: 25,
-                                                    child:
-                                                        CircularProgressIndicator()),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Icon(Icons.person,
-                                                        size: 30,
-                                                        color: Colors.grey),
-                                          ),
-                                          Text(
-                                            "  ${ongoingProjects["customer_first_name"] ?? ongoingProjects["service_provider_first_name"]}",
-                                            style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
-                                          ),
-                                        ],
-                                      ),
-                                    ))
-                                .toList(),
-                            value: dropdownvalueProject,
-                            onChanged: (ongoingProjects) {
-                              setState(() {
-                                print(ongoingProjects);
-                                dropdownvalueProject = ongoingProjects;
-                                dropdownvalueProjectID = ongoingProjects["project_id"];
-                              });
-                            },
-                            buttonHeight: 40,
-                            buttonWidth: 140,
-                            itemHeight: 40,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    /////// The Demacation //////////
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Price",
-                              style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0XFF6B7280)),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                      width: 1, color: Color(0XFFE5E7EB))),
-                              child: TextFormField(
-                                // focusNode: textNode,
-                                onChanged: (value) {
-                                  price = value;
-                                },
-                                keyboardType: TextInputType.number,
-                                textAlignVertical: TextAlignVertical.top,
-
-                                // controller: bioController,
-                                decoration: InputDecoration(
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide
-                                        .none, // Remove the border when focused
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide
-                                        .none, // Remove the border when enabled
-                                  ),
-                                  hintText: "Total price of work",
-                                  hintStyle: GoogleFonts.inter(
-                                      fontSize: 12, color: Color(0XFF6B7280)),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    /////// The Demacation //////////
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Message (Optional)",
-                              style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0XFF6B7280)),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              height: 140,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                      width: 1, color: Color(0XFFE5E7EB))),
-                              child: TextFormField(
-                                // focusNode: textNode,
-                                onChanged: (value) {
-                                  message = value;
-                                },
-                                keyboardType: TextInputType.multiline,
-                                textAlignVertical: TextAlignVertical.top,
-                                maxLines: null,
-                                expands: true,
-                                minLines: null,
-                                // controller: bioController,
-                                decoration: InputDecoration(
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide
-                                        .none, // Remove the border when focused
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide
-                                        .none, // Remove the border when enabled
-                                  ),
-                                  hintText: "Describe the price break down",
-                                  hintStyle: GoogleFonts.inter(
-                                      fontSize: 12, color: Color(0XFF6B7280)),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: InkWell(
-                        onTap: () {
-                          if (message.isNotEmpty &&
-                              dropdownvalueProjectID != null &&
-                              price.isNotEmpty) {
-                            circularCustom(context);
-
-                            setState(() {
-                              isLoading = true;
-                            });
-
-                            setProjectAmount(
-                                    amount: price,
-                                    project_id: dropdownvalueProjectID)
-                                .then((value) {
-                                  print(value);
-                              if (value["status"] == true &&
-                                  value["message"] ==
-                                      "You have set the final amount for the selected project.") {
-                                mywidgets.displayToast(
-                                    msg: "Invoice sent successfully");
-                                setState(() {});
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                                this.message =
-                                    "Invoice for project has been sent. Please check your mail to make payment";
-                                sendMessage();
-                              } else if (value["status"] == "Network Error") {
-                                Navigator.pop(context);
-                                mywidgets.displayToast(
-                                    msg:
-                                        "Network Error. Check your Network Connection and try again");
-                              } else {
-                                Navigator.pop(context);
-                                mywidgets.displayToast(msg: value["message"]);
-                              }
-
-                              setState(() {
-                                isLoading = false;
-                              });
-                            });
-                          } else {}
-                        },
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
                         child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 48,
-                          decoration: BoxDecoration(
-                              color: constants.appMainColor,
-                              borderRadius: BorderRadius.circular(200)),
-                          child: Center(
-                            child: (isLoading == true)
-                                ? CircularProgressIndicator()
-                                : Text(
-                                    "Submit",
-                                    style: GoogleFonts.inter(
-                                        color: Colors.white, fontSize: 14),
-                                  ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Create Invoice",
+                                style: GoogleFonts.inter(
+                                    fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Text(
+                                  "Feel free to leave a note for the client in the provided box.Provide a brief description of the price break down.",
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12, color: Color(0XFF374151))),
+                            ],
                           ),
                         ),
                       ),
-                    ),
-
-                    SizedBox(
-                      height: 20,
-                    )
-                  ],
-                ),
-              ));
+                      SizedBox(
+                        height: 20,
+                      ),
+            
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10, right: 10),
+                        child: Text(
+                          "Project",
+                          style: GoogleFonts.inter(
+                              fontSize: 12, color: Color(0XFF6B7280)),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Container(
+                        height: 48,
+                        width: MediaQuery.of(context).size.width * 0.95,
+                        margin: EdgeInsets.only(left: 10, right: 10),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border:
+                                Border.all(width: 1, color: Color(0XFFE5E7EB))),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton2(
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.black38,
+                              ),
+                              hint: Text('Select Project',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 14, color: Color(0XFF6B7280))),
+                              items: projects!
+                                  .map((ongoingProjects) =>
+                                      DropdownMenuItem<dynamic>(
+                                        value: ongoingProjects,
+                                        child: Row(
+                                          children: [
+                                            CachedNetworkImage(
+                                              imageUrl: ongoingProjects[
+                                                  "profile_image"],
+                                              imageBuilder:
+                                                  (context, imageProvider) =>
+                                                      Container(
+                                                width: 25,
+                                                height: 25,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: DecorationImage(
+                                                      image: imageProvider,
+                                                      fit: BoxFit.cover),
+                                                ),
+                                              ),
+                                              placeholder: (context, url) =>
+                                                  Container(
+                                                      width: 25,
+                                                      height: 25,
+                                                      child:
+                                                          CircularProgressIndicator()),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      const Icon(Icons.person,
+                                                          size: 30,
+                                                          color: Colors.grey),
+                                            ),
+                                            Text(
+                                              "  ${ongoingProjects["customer_first_name"] ?? ongoingProjects["service_provider_first_name"]}",
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                      ))
+                                  .toList(),
+                              value: dropdownvalueProject,
+                              onChanged: (ongoingProjects) {
+                                setState(() {
+                                  print(ongoingProjects);
+                                  dropdownvalueProject = ongoingProjects;
+                                  dropdownvalueProjectID =
+                                      ongoingProjects["project_id"];
+                                });
+                              },
+                              buttonHeight: 40,
+                              buttonWidth: 140,
+                              itemHeight: 40,
+                            ),
+                          ),
+                        ),
+                      ),
+            
+                      /////// The Demacation //////////
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Workmanship fee",
+                                style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0XFF6B7280)),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                height: 48,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        width: 1, color: Color(0XFFE5E7EB))),
+                                child: TextFormField(
+                                  // focusNode: textNode,
+                                  onChanged: (value) {
+                                    price = value;
+                                  },
+                                  keyboardType: TextInputType.number,
+                                  textAlignVertical: TextAlignVertical.top,
+            
+                                  // controller: bioController,
+                                  decoration: InputDecoration(
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide
+                                          .none, // Remove the border when focused
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide
+                                          .none, // Remove the border when enabled
+                                    ),
+                                    hintText:
+                                        "describe what needs to be purchased and price",
+                                    hintStyle: GoogleFonts.inter(
+                                        fontSize: 12, color: Color(0XFF6B7280)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+            
+                      /////// The Demacation //////////
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Message ",
+                                style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0XFF6B7280)),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                height: 140,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        width: 1, color: Color(0XFFE5E7EB))),
+                                child: TextFormField(
+                                  // focusNode: textNode,
+                                  onChanged: (value) {
+                                    message = value;
+                                  },
+                                  keyboardType: TextInputType.multiline,
+                                  textAlignVertical: TextAlignVertical.top,
+                                  maxLines: null,
+                                  expands: true,
+                                  minLines: null,
+                                  // controller: bioController,
+                                  decoration: InputDecoration(
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide
+                                          .none, // Remove the border when focused
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide
+                                          .none, // Remove the border when enabled
+                                    ),
+                                    hintText: "Describe the price break down",
+                                    hintStyle: GoogleFonts.inter(
+                                        fontSize: 12, color: Color(0XFF6B7280)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+            
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: InkWell(
+                          onTap: () {
+                            if (message.isNotEmpty &&
+                                dropdownvalueProjectID != null &&
+                                price.isNotEmpty) {
+                              circularCustom(context);
+            
+                              setState(() {
+                                isLoading = true;
+                              });
+            
+                              setProjectAmount(
+                                      amount: price,
+                                      project_id: dropdownvalueProjectID)
+                                  .then((value) {
+                                print(value);
+                                if (value["status"] == true &&
+                                    value["message"] ==
+                                        "You have set the final amount for the selected project.") {
+                                  mywidgets.displayToast(
+                                      msg: "Invoice sent successfully");
+                                  setState(() {});
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  this.message =
+                                      "Invoice for project has been sent. Please check your mail to make payment";
+                                  sendMessage();
+                                } else if (value["status"] == "Network Error") {
+                                  Navigator.pop(context);
+                                  mywidgets.displayToast(
+                                      msg:
+                                          "Network Error. Check your Network Connection and try again");
+                                } else {
+                                  Navigator.pop(context);
+                                  mywidgets.displayToast(msg: value["message"]);
+                                }
+            
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              });
+                            } else {}
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 48,
+                            decoration: BoxDecoration(
+                                color: constants.appMainColor,
+                                borderRadius: BorderRadius.circular(200)),
+                            child: Center(
+                              child: (isLoading == true)
+                                  ? CircularProgressIndicator()
+                                  : Text(
+                                      "Submit",
+                                      style: GoogleFonts.inter(
+                                          color: Colors.white, fontSize: 14),
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ),
+            
+                      SizedBox(
+                        height: 20,
+                      )
+                    ],
+                  ),
+                )),
+          );
         });
       },
     );

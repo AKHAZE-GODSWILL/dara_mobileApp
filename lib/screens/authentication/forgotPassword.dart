@@ -4,13 +4,17 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:dara_app/utils/apiRequest.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:dara_app/widget/custom_circle.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:pin_code_text_field/pin_code_text_field.dart';
 import 'package:dara_app/screens/authentication/personal_info.dart';
 import 'package:dara_app/screens/authentication/resetPassword.dart';
 
 class ForgotPassword extends StatefulWidget {
-  ForgotPassword({Key? key}) : super(key: key);
+  String? email;
+  ForgotPassword({required this.email});
 
   @override
   State<ForgotPassword> createState() => _ForgotPasswordState();
@@ -134,7 +138,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0, right: 10),
                     child: Text(
-                      "A 4-digit code has been sent to +234 800000000 by SMS. Please enter the code that was sent to you.",
+                      "A 4-digit code has been sent to ${widget.email}. Please enter the code that was sent to you.",
                       style: TextStyle(fontSize: 12),
                       textAlign: TextAlign.center,
                     ),
@@ -216,8 +220,24 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
                 if (isMaxPin) {
                   ///// Navigation.push to the OTP screen
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => ResetPassword()));
+
+                  circularCustom(context);
+                  verifyServiceProvider(
+                          otp: pinController.text.trim(),
+                          phoneNumber: widget.email)
+                      .then((value) {
+                    Navigator.pop(context);
+                    if (value["status"] == true) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ResetPassword(email:  widget.email.toString())));
+                    } else if (value["status"] == "Network Error") {
+                      mywidgets.displayToast(
+                          msg:
+                              "Network Error. Check your Network Connection and try again");
+                    } else {
+                      mywidgets.displayToast(msg: value["message"]);
+                    }
+                  });
                 }
 
                 //will save this parameter to state management later
@@ -247,86 +267,24 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 ? Center(
                     child: InkWell(
                       onTap: () {
-                        // FirebaseAuth.instance
-                        //     .verifyPhoneNumber(
-                        //   phoneNumber: widget.number,
-                        //   verificationCompleted: (credential) async {
-                        //     await auth
-                        //         .signInWithCredential(credential)
-                        //         .then((value)async {
+                        resendEmail(email: widget.email).then((value) {
+                          if (value["status"] == true) {
+                            setState(() {
+                              _start = 100;
+                              startTimer();
+                            });
+                          } else if (value == "Network Error") {
+                            mywidgets.displayToast(
+                                msg:
+                                    "Network Error. Check your Network Connection and try again");
+                          } else {
+                            mywidgets.displayToast(msg: value["message"]);
+                          }
 
-                        //       SharedPreferences prefs = await SharedPreferences.getInstance();
-                        //       prefs.setString("token", "1");
-
-                        //       // make a request here. If you get the user data then you move to home page
-                        //       // if not, you move to signup
-                        //       // DatabaseReference newUserRef = FirebaseDatabase.instance.reference().child('users/${provider.userid}');
-
-                        //       widget.page == "signup"
-                        //           ? Navigator.pushReplacement(
-                        //               context,
-                        //               PageRouteBuilder(
-                        //                 pageBuilder: (context, animation,
-                        //                     secondaryAnimation) {
-                        //                   return Email();
-                        //                 },
-                        //                 transitionsBuilder: (context,
-                        //                     animation,
-                        //                     secondaryAnimation,
-                        //                     child) {
-                        //                   return FadeTransition(
-                        //                     opacity: animation,
-                        //                     child: child,
-                        //                   );
-                        //                 },
-                        //               ),
-                        //             )
-                        //           : Navigator.pushReplacement(
-
-                        //         context,
-                        //         PageRouteBuilder(
-                        //           pageBuilder: (context, animation, secondaryAnimation) {
-                        //             return MainPage();
-                        //           },
-                        //           transitionsBuilder:
-                        //               (context, animation, secondaryAnimation, child) {
-                        //             return FadeTransition(
-                        //               opacity: animation,
-                        //               child: child,
-                        //             );
-                        //           },
-                        //         ),
-                        //       );
-                        //       // network.login(context: context, scaffoldKey: scaffoldKey);
-                        //     });
-                        //   },
-                        //   verificationFailed:
-                        //       (FirebaseAuthException e) async {
-                        //     Navigator.pop(context);
-                        //     await showTextToast(
-                        //       text: e.toString(),
-                        //       context: context,
-                        //     );
-                        //   },
-                        //   timeout: Duration(seconds: 120),
-                        //   codeSent: (String verificationId,
-                        //       int ?resendToken) async {
-                        //     Navigator.pop(context);
-                        //     widget.verificationID = verificationId;
-                        //     await showTextToast(
-                        //       text: 'Code Sent',
-                        //       context: context,
-                        //     );
-                        //   },
-                        //   codeAutoRetrievalTimeout:
-                        //       (String verificationId) {},
-                        // )
-                        //     .then((value) {
-                        //   setState(() {
-                        //     _start = 100;
-                        //     startTimer();
-                        //   });
-                        // });
+                          // setState(() {
+                          //   isLoading = false;
+                          // });
+                        });
                       },
                       child: Container(
                           width: 100,
@@ -361,7 +319,15 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           ..onTap = () {
                             // Handle the tap gesture for 'World!'
 
-                            Navigator.pop(context);
+                          Future<void> _launchUrl() async {
+                  final Uri _url =
+                      Uri.parse('https://wa.me/message/MX5JENZMK2BBI1');
+                  if (!await launchUrl(_url)) {
+                    throw Exception('Could not launch $_url');
+                  }
+                }
+
+                _launchUrl();
                           }),
                   ],
                 ),

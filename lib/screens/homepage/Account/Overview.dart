@@ -20,68 +20,69 @@ class _OverviewState extends State<Overview> {
     DataProvider provider = Provider.of<DataProvider>(context, listen: true);
     return Column(
       children: [
-        // Padding(
-        //   padding: const EdgeInsets.only(top:8.0, bottom: 8),
-        //   child: Center(
-        //     child: Container(
-        //       child: Column(
-        //         mainAxisAlignment: MainAxisAlignment.start,
-        //         crossAxisAlignment: CrossAxisAlignment.start,
-        //         children: [
-        //           Padding(
-        //             padding: const EdgeInsets.all(8.0),
-        //             child: Row(
-        //               children: [
-        //                 Text("Ranking: "),
-        //                 SvgPicture.asset("assets/svg/ranking.svg"),
-        //                 Text(" Rising Star", style: TextStyle(
-        //                     color: Color(0xFFf97315),
-        //                     fontWeight: FontWeight.bold),)
-        //               ],
-        //             ),
-        //           ),
-        //           Center(
-        //             child: Stack(
-        //               children: [
-        //                 Container(
-        //                   width: MediaQuery.of(context).size.width*0.88,
-        //                   height:8,
-        //                   decoration: BoxDecoration(
-        //                       borderRadius: BorderRadius.circular(15),
-        //                       color: Color(0xFFf3f4f6)
-        //                   ),
-        //                 ),
-        //                 AnimatedContainer(
-        //                   duration: Duration(milliseconds: 500),
-        //                   width: MediaQuery.of(context).size.width*0.68,
-        //                   height:8,
-        //                   decoration: BoxDecoration(
-        //                       borderRadius: BorderRadius.circular(15),
-        //                       color: Color(0xFFf97315)
-        //                   ),
-        //                 ),
-        //               ],
-        //             ),
-        //           ),
-        //           Padding(
-        //             padding: const EdgeInsets.all(8.0),
-        //             child: Text("Complete 20 more projects to become an expert guru", style: TextStyle(
-        //                 color: Colors.black26,
-        //                 fontSize: 12
-        //             ),),
-        //           )
-        //         ],
-        //       ),
-        //       height: 80,
-        //       width: MediaQuery.of(context).size.width*0.93,
-        //       decoration: BoxDecoration(
-        //           border: Border.all(color: Color(0xFFf97315)),
-        //           borderRadius: BorderRadius.circular(10)
-        //       ),
-        //     ),
-        //   ),
-        // ),
-
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8),
+          child: Center(
+            child: Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Text("Ranking: "),
+                        SvgPicture.asset("assets/svg/ranking.svg"),
+                        Text(
+                          " Rising Star",
+                          style: TextStyle(
+                              color: Color(0xFFf97315),
+                              fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
+                  Center(
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.88,
+                          height: 8,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: Color(0xFFf3f4f6)),
+                        ),
+                        AnimatedContainer(
+                          duration: Duration(milliseconds: 500),
+                          width: MediaQuery.of(context).size.width *
+                              (int.parse(
+                                  "${provider.value["user_object"]["personal_information"]["rating"]}")),
+                          height: 8,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: Color(0xFFf97315)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Complete ${provider.value["user_object"]["personal_information"]["projects_completed"]} more projects to become an expert guru",
+                      style: TextStyle(color: Colors.black26, fontSize: 12),
+                    ),
+                  )
+                ],
+              ),
+              height: 80,
+              width: MediaQuery.of(context).size.width * 0.93,
+              decoration: BoxDecoration(
+                  border: Border.all(color: Color(0xFFf97315)),
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+        ),
         Padding(
           padding:
               const EdgeInsets.only(top: 8.0, bottom: 8, left: 15, right: 15),
@@ -110,7 +111,9 @@ class _OverviewState extends State<Overview> {
                                   child: child,
                                 );
                               },
-                            ));
+                            )).then((value) {
+                          setState(() {});
+                        });
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -124,8 +127,8 @@ class _OverviewState extends State<Overview> {
                   children: [
                     Icon(
                       PhosphorIcons.map_pin,
-                      size: 19,
-                      color: Colors.black54,
+                         size: 20,
+                                color: Colors.blue,
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),
@@ -174,38 +177,42 @@ class _OverviewState extends State<Overview> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            ...provider.value["user_object"]["service_information"]
-                                .map((e) {
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: InkWell(
-                                  onTap: () {},
-                                  child: Container(
-                                    // width:90,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                        color: Color(0xFFbcd2ff),
-                                        borderRadius:
-                                            BorderRadius.circular(200)),
-                                    child: Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 5),
-                                        child: Text(
-                                          "${e["service"]}",
-                                          style: TextStyle(
-                                              color: constants.appMainColor,
-                                              fontSize: 11),
+                        Container(
+                          width: MediaQuery.of(context).size.width*0.8,
+                          child: Wrap(
+                            children: [
+                              ...provider.value["user_object"]
+                                      ["service_information"]
+                                  .map((e) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: InkWell(
+                                    onTap: () {},
+                                    child: Container(
+                                      width:90,
+                                      height: 20,
+                                      decoration: BoxDecoration(
+                                          color: Color(0xFFbcd2ff),
+                                          borderRadius:
+                                              BorderRadius.circular(200)),
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 5),
+                                          child: Text(
+                                            "${e["service"]}",
+                                            style: TextStyle(
+                                                color: constants.appMainColor,
+                                                fontSize: 11),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              );
-                            })
-                          ],
+                                );
+                              })
+                            ],
+                          ),
                         )
                       ],
                     ),
@@ -224,7 +231,7 @@ class _OverviewState extends State<Overview> {
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Text(
-                       "${provider.value["user_object"]["service_information"][0]["experience"]}",
+                        "${provider.value["user_object"]["service_information"][0]["experience"]}",
                         style: TextStyle(fontSize: 12),
                       ),
                     )
@@ -234,7 +241,6 @@ class _OverviewState extends State<Overview> {
             ],
           ),
         ),
-
         Padding(
           padding:
               const EdgeInsets.only(top: 8.0, bottom: 8, left: 15, right: 15),
@@ -263,7 +269,9 @@ class _OverviewState extends State<Overview> {
                                   child: child,
                                 );
                               },
-                            ));
+                            )).then((value) {
+                          setState(() {});
+                        });
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -276,7 +284,7 @@ class _OverviewState extends State<Overview> {
                 child: Align(
                     alignment: Alignment.topLeft,
                     child: Text(
-                        "${provider.value["user_object"]["service_information"][0]["bio"]}",
+                      "${provider.value["user_object"]["service_information"][0]["bio"]}",
                       style: TextStyle(fontSize: 13),
                     )),
               )

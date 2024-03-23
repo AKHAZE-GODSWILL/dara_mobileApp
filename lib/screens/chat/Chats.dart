@@ -1,20 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-
-
+import 'Chat.dart';
+import '../../utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get_storage/get_storage.dart';
-
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../Firebase/Firebase_service.dart';
-import '../../Firebase/Model/UserChat.dart';
-import '../../Firebase/Utils/Provider.dart';
 import '../../Firebase/Utils/utils.dart';
 import '../../Provider/DataProvider.dart';
-import '../../utils/constants.dart';
-import 'Chat.dart';
+import '../../Firebase/Model/UserChat.dart';
+import '../../Firebase/Utils/Provider.dart';
+import 'package:get_storage/get_storage.dart';
+import '../../Firebase/Firebase_service.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ListenIncoming extends StatefulWidget {
   @override
@@ -35,19 +32,20 @@ class _ListenIncomingState extends State<ListenIncoming> {
   @override
   Widget build(BuildContext context) {
     var data = Provider.of<Utils>(context, listen: false);
-     String? userId =  Provider.of<DataProvider>(context, listen: false).client_user_id==""?
-     Provider.of<DataProvider>(context, listen: false).sp_user_id:
-     Provider.of<DataProvider>(context, listen: false).client_user_id;
+    String? userId =
+        Provider.of<DataProvider>(context, listen: false).client_user_id == ""
+            ? Provider.of<DataProvider>(context, listen: false).sp_user_id
+            : Provider.of<DataProvider>(context, listen: false).client_user_id;
     // GetStorage box = GetStorage();
     // String userId = box.read("userId");
 
     Widget buildText(String text) => Center(
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 18, color: Colors.black38),
-        textAlign: TextAlign.center,
-      ),
-    );
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 18, color: Colors.black38),
+            textAlign: TextAlign.center,
+          ),
+        );
     List<UserChat>? user;
     Widget widget = Scaffold(
       appBar: AppBar(
@@ -81,10 +79,10 @@ class _ListenIncomingState extends State<ListenIncoming> {
                 return Center(
                   child: Theme(
                       data: Theme.of(context)
-                          .copyWith(hintColor:Constants().appMainColor),
+                          .copyWith(hintColor: Constants().appMainColor),
                       child: CircularProgressIndicator(
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(Constants().appMainColor),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            Constants().appMainColor),
                         strokeWidth: 2,
                         backgroundColor: Colors.white,
                       )),
@@ -134,30 +132,32 @@ class _ListenIncomingState extends State<ListenIncoming> {
                                     );
                                   }
 
-
                                   Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) {
                                       return ChatPage(
                                           support: true,
                                           newchat: true,
-                                          // shipments: shipment,
-                                          // pickup: shipment.pickup,
-                                          // dropoff:shipment.dropoff,
+                                         
                                           productSend: true,
                                           user: users[index]);
                                     },
                                   ));
                                 },
-                                leading: CircleAvatar(
-                                  foregroundColor: Colors.white,
-                                  backgroundColor: Colors.white,
-                                  radius: 30,
-                                  backgroundImage:
-                                      users[index].urlAvatar.toString() == ""
-                                          ? AssetImage("image/user.png")
-                                          : NetworkImage(
-                                                  users[index].urlAvatar.toString())
-                                              as ImageProvider,
+                                leading: InkWell(
+                                  onTap: () {
+                                    print(users[index].urlAvatar.toString());
+                                  },
+                                  child: CircleAvatar(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: Colors.white,
+                                    radius: 30,
+                                    backgroundImage:
+                                        users[index].urlAvatar.toString() == ""
+                                            ? AssetImage("image/user.png")
+                                            : NetworkImage(users[index]
+                                                .urlAvatar
+                                                .toString()) as ImageProvider,
+                                  ),
                                 ),
                                 title: Text(
                                   users[index].name.toString().capitalize(),
@@ -165,9 +165,12 @@ class _ListenIncomingState extends State<ListenIncoming> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 subtitle: Padding(
-                                  padding: const EdgeInsets.only(top:10.0),
+                                  padding: const EdgeInsets.only(top: 10.0),
                                   child: Text(
-                                    users[index].lastMessage.toString().isEmpty ||
+                                    users[index]
+                                                .lastMessage
+                                                .toString()
+                                                .isEmpty ||
                                             users[index].lastMessage == null
                                         ? 'No Message Yet'
                                         : users[index].lastMessage.toString(),
@@ -183,10 +186,10 @@ class _ListenIncomingState extends State<ListenIncoming> {
                                   ),
                                 ),
                                 trailing: Padding(
-                                  padding: const EdgeInsets.only(top:42.0),
-                                  child: Text(date, style: TextStyle(fontSize: 12,
-                                  color: Colors.black54
-                                  )),
+                                  padding: const EdgeInsets.only(top: 42.0),
+                                  child: Text(date,
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.black54)),
                                 ),
                                 //  subtitle:  Text(users[index].lastMessageTime),
                               ),

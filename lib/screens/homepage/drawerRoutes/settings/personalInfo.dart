@@ -3,12 +3,16 @@ import '../../../../main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:dara_app/utils/states.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:dara_app/utils/apiRequest.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dara_app/widget/custom_circle.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:dara_app/screens/homepage/searchPlace.dart';
+import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 
 class PersonalInfo extends StatefulWidget {
   const PersonalInfo({Key? key}) : super(key: key);
@@ -32,37 +36,26 @@ class _PersonalInfoState extends State<PersonalInfo> {
   TextEditingController? phoneController;
   TextEditingController? emailAddressController;
   TextEditingController? bioController;
-  TextEditingController? specificAddressController;
 
   String? dropdownvalueCountry;
   String? dropdownvalueState;
   String? dropdownvalueLGA;
-  var country = [
-    'Nigeria',
-    "Ghana",
-    "South Africa",
-    "USA",
-    "Other Countries would be gotten from Api",
-  ];
+  List? country = ['Nigeria'];
 
-  var state = [
-    'Lagos',
-    "Cairo",
-    "Kampala",
-    "Texas",
-    "Other States would be gotten from Api",
-  ];
+  List? state = [];
 
-  var localGovernmentArea = [
-    'Egor',
-    "Surulere",
-    "Uselu",
-    "Mushin",
-    "Other Local Government Areas would be gotten from Api",
-  ];
+  List? localGovernmentArea = [];
+
+  TextEditingController specificAddressController = TextEditingController();
 
   @override
   void initState() {
+    states.forEach((e) {
+      setState(() {
+        state!.add(e["state"]);
+      });
+    });
+
     DataProvider provider = Provider.of<DataProvider>(context, listen: false);
     super.initState();
     firstNameController = TextEditingController(
@@ -77,19 +70,33 @@ class _PersonalInfoState extends State<PersonalInfo> {
     emailAddressController = TextEditingController(
         text:
             "${provider.value["user_object"]["personal_information"]["email"]}");
-    bioController = TextEditingController(
-        text:
-            "${provider.value["user_object"]["service_information"][0]["bio"]}");
+    bioController = TextEditingController(text: "");
+
     specificAddressController = TextEditingController(
         text:
             "${provider.value["user_object"]["address_information"]["address"]}");
+
+    super.initState();
   }
 
-// @override
-// void dispose() {
-// super.dispose();
-// _controller.dispose();
-// }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+
+    specificAddressController.dispose();
+    super.dispose();
+  }
+
+  filterLga() {
+    setState(() {
+      List new_localGovernmentArea = states.singleWhere((element) =>
+          element["state"].toString().toLowerCase() ==
+          dropdownvalueState.toString().toLowerCase())["lga"];
+      new_localGovernmentArea.forEach((element) {
+        localGovernmentArea!.add(element["name"]);
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +210,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
                                     getImageGallery();
                                   },
                                   child: Text(
-                                    "Upload Image",
+                                    "Upload Passport Photo",
                                     style: TextStyle(
                                         fontSize: 14,
                                         color: constants.appMainColor),
@@ -505,228 +512,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
                             height: 20,
                           ),
 
-                          // Country
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Container(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Country",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Container(
-                                    height: 48,
-                                    width: MediaQuery.of(context).size.width *
-                                        0.95,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                            width: 1,
-                                            color: Color(0XFFE5E7EB))),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton2(
-                                          icon: Icon(
-                                            Icons.arrow_drop_down,
-                                            color: Colors.black38,
-                                          ),
-                                          hint: Text(
-                                            'Select Your Country',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black54,
-                                            ),
-                                          ),
-                                          items: country
-                                              .map((item) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: item,
-                                                    child: Text(
-                                                      item,
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                  ))
-                                              .toList(),
-                                          value: dropdownvalueCountry,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              dropdownvalueCountry =
-                                                  value as String;
-                                            });
-                                          },
-                                          buttonHeight: 40,
-                                          buttonWidth: 140,
-                                          itemHeight: 40,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          SizedBox(
-                            height: 20,
-                          ),
-
-                          // State
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Container(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "State",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Container(
-                                    height: 48,
-                                    width: MediaQuery.of(context).size.width *
-                                        0.95,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                            width: 1,
-                                            color: Color(0XFFE5E7EB))),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton2(
-                                          icon: Icon(
-                                            Icons.arrow_drop_down,
-                                            color: Colors.black38,
-                                          ),
-                                          hint: Text(
-                                            'Select Your State',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black54,
-                                            ),
-                                          ),
-                                          items: state
-                                              .map((item) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: item,
-                                                    child: Text(
-                                                      item,
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                  ))
-                                              .toList(),
-                                          value: dropdownvalueState,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              dropdownvalueState =
-                                                  value as String;
-                                            });
-                                          },
-                                          buttonHeight: 40,
-                                          buttonWidth: 140,
-                                          itemHeight: 40,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          SizedBox(
-                            height: 20,
-                          ),
-
-                          //Area
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Container(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Area(L.G.A)",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Container(
-                                    height: 48,
-                                    width: MediaQuery.of(context).size.width *
-                                        0.95,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                            width: 1,
-                                            color: Color(0XFFE5E7EB))),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton2(
-                                          icon: Icon(
-                                            Icons.arrow_drop_down,
-                                            color: Colors.black38,
-                                          ),
-                                          hint: Text(
-                                            'Select Your Local Government Area',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black54,
-                                            ),
-                                          ),
-                                          items: state
-                                              .map((item) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: item,
-                                                    child: Text(
-                                                      item,
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                  ))
-                                              .toList(),
-                                          value: dropdownvalueLGA,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              dropdownvalueLGA =
-                                                  value as String;
-                                            });
-                                          },
-                                          buttonHeight: 40,
-                                          buttonWidth: 140,
-                                          itemHeight: 40,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          SizedBox(
-                            height: 20,
-                          ),
-
                           //Specific Address
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 10),
@@ -748,25 +533,38 @@ class _PersonalInfoState extends State<PersonalInfo> {
                                         border: Border.all(
                                             width: 1,
                                             color: Color(0XFFE5E7EB))),
-                                    child: TextFormField(
-                                      // focusNode: textNode,
-                                      onChanged: (value) {
-                                        setState(() {});
-                                      },
-                                      keyboardType: TextInputType.emailAddress,
-                                      controller: specificAddressController,
-                                      decoration: InputDecoration(
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide
-                                              .none, // Remove the border when focused
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.8,
+                                          child: TextFormField(
+                                            enabled: false,
+                                            // focusNode: textNode,
+                                            onChanged: (value) {
+                                              setState(() {});
+                                            },
+                                            keyboardType:
+                                                TextInputType.emailAddress,
+                                            controller:
+                                                specificAddressController,
+                                            decoration: InputDecoration(
+                                              focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide
+                                                    .none, // Remove the border when focused
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide
+                                                    .none, // Remove the border when enabled
+                                              ),
+                                              hintText:
+                                                  "Specific location address",
+                                            ),
+                                          ),
                                         ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide
-                                              .none, // Remove the border when enabled
-                                        ),
-                                        hintText:
-                                            "Enter your specific location address",
-                                      ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -783,7 +581,10 @@ class _PersonalInfoState extends State<PersonalInfo> {
 
                 InkWell(
                   onTap: () {
-                     circularCustom(context);
+                    // if (readyUploadImage == null) {
+                    //  mywidgets.displayToast(msg:"Select Image to Update");
+                    // }else{
+                    circularCustom(context);
                     updatePersonalInfo(
                         imageFile: readyUploadImage,
                         first_name: firstNameController!.text,
@@ -793,12 +594,52 @@ class _PersonalInfoState extends State<PersonalInfo> {
                         bio: bioController!.text)
                       ..then((value) {
                         print(value);
-                       
+
                         if (value["status"] == true) {
-                           mywidgets.displayToast(
-                              msg:
-                                  "Profile Updated");
-                          
+                          mywidgets.displayToast(msg: "Profile Updated");
+                          reloadUserObject().then((value) {
+                            if ((provider.userType == "serviceProvider")) {
+                              provider.set_sp_login_info(
+                                  value: value,
+                                  firstName: value["user_object"]
+                                      ["personal_information"]["first_name"],
+                                  lastName: value["user_object"]
+                                      ["personal_information"]["last_name"],
+                                  email: value["user_object"]
+                                      ["personal_information"]["email"],
+                                  id: value["user_object"]
+                                          ["personal_information"]["id"]
+                                      .toString(),
+                                  access_token: value["access_token"],
+                                  profile_image: (value["user_object"]
+                                              ["address_information"] !=
+                                          null)
+                                      ? value["user_object"]
+                                              ["address_information"]
+                                          ["profile_image"]
+                                      : "");
+                            } else {
+                              provider.set_client_login_info(
+                                  value: value,
+                                  firstName: value["user_object"]
+                                      ["personal_information"]["first_name"],
+                                  lastName: value["user_object"]
+                                      ["personal_information"]["last_name"],
+                                  email: value["user_object"]
+                                      ["personal_information"]["email"],
+                                  id: value["user_object"]
+                                          ["personal_information"]["id"]
+                                      .toString(),
+                                  access_token: value["access_token"],
+                                  profile_image: (value["user_object"]
+                                              ["address_information"] !=
+                                          null)
+                                      ? value["user_object"]
+                                              ["address_information"]
+                                          ["profile_image"]
+                                      : "");
+                            }
+                          });
                         } else if (value["status"] == "Network Error") {
                           mywidgets.displayToast(
                               msg:
@@ -809,6 +650,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
 
                         Navigator.pop(context);
                       });
+                    // }
 
                     //will save this parasmeter to state management later
                   },

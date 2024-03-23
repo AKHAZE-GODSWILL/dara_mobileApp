@@ -1,6 +1,7 @@
 import '../../../../main.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
@@ -202,7 +203,16 @@ class _AccountConfirmState extends State<AccountConfirm> {
                             ..onTap = () {
                               // Handle the tap gesture for 'World!'
 
-                              Navigator.pop(context);
+                              // Navigator.pop(context);
+                              Future<void> _launchUrl() async {
+                                final Uri _url = Uri.parse(
+                                    'https://wa.me/message/MX5JENZMK2BBI1');
+                                if (!await launchUrl(_url)) {
+                                  throw Exception('Could not launch $_url');
+                                }
+                              }
+
+                              _launchUrl();
                             }),
                     ],
                   ),
@@ -230,233 +240,239 @@ class _AccountConfirmState extends State<AccountConfirm> {
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
           return SingleChildScrollView(
-            child: Container(
-                height: 450,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 40,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        "Update Account Details",
-                        style: GoogleFonts.inter(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+            child: Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Container(
+                  height: 450,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 40,
                       ),
-                    ),
-
-                    SizedBox(
-                      height: 20,
-                    ),
-                    //Account Number
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Account Number",
-                              style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0XFF6B7280)),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                      width: 1, color: Color(0XFFE5E7EB))),
-                              child: TextFormField(
-                                // focusNode: textNode,
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
-                                keyboardType: TextInputType.number,
-                                controller: accountNumberController,
-                                decoration: InputDecoration(
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide
-                                          .none, // Remove the border when focused
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide
-                                          .none, // Remove the border when enabled
-                                    ),
-                                    hintText: "Enter your account number",
-                                    hintStyle: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        color: Color(0XFF6B7280))),
-                              ),
-                            ),
-                          ],
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          "Update Account Details",
+                          style: GoogleFonts.inter(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
-                    ),
 
-                    SizedBox(
-                      height: 20,
-                    ),
-
-                    //Specific Address
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Account Name",
-                              style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0XFF6B7280)),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                      width: 1, color: Color(0XFFE5E7EB))),
-                              child: TextFormField(
-                                // focusNode: textNode,
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
-                                keyboardType: TextInputType.text,
-                                controller: accountNameController,
-                                decoration: InputDecoration(
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide
-                                          .none, // Remove the border when focused
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide
-                                          .none, // Remove the border when enabled
-                                    ),
-                                    hintText: "Enter your account name",
-                                    helperStyle: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        color: Color(0XFF6B7280))),
-                              ),
-                            ),
-                          ],
-                        ),
+                      SizedBox(
+                        height: 20,
                       ),
-                    ),
-
-                    SizedBox(
-                      height: 20,
-                    ),
-
-                    // Country
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Bank",
+                      //Account Number
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Account Number",
                                 style: GoogleFonts.inter(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0XFF6B7280))),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              height: 48,
-                              width: MediaQuery.of(context).size.width * 0.95,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                      width: 1, color: Color(0XFFE5E7EB))),
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton2(
-                                    icon: Icon(
-                                      Icons.arrow_drop_down,
-                                      color: Colors.black38,
-                                    ),
-                                    hint: Text('Select Bank',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Color(0XFF6B7280))),
-                                    items: bankName
-                                        .map((item) => DropdownMenuItem<String>(
-                                              value: item,
-                                              child: Text(
-                                                item,
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                            ))
-                                        .toList(),
-                                    value: dropdownvalueBankName,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        dropdownvalueBankName = value as String;
-                                      });
-                                    },
-                                    buttonHeight: 40,
-                                    buttonWidth: 140,
-                                    itemHeight: 40,
-                                  ),
+                                    color: Color(0XFF6B7280)),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Container(
+                                height: 48,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        width: 1, color: Color(0XFFE5E7EB))),
+                                child: TextFormField(
+                                  // focusNode: textNode,
+                                  onChanged: (value) {
+                                    setState(() {});
+                                  },
+                                  keyboardType: TextInputType.number,
+                                  controller: accountNumberController,
+                                  decoration: InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide
+                                            .none, // Remove the border when focused
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide
+                                            .none, // Remove the border when enabled
+                                      ),
+                                      hintText: "Enter your account number",
+                                      hintStyle: GoogleFonts.inter(
+                                          fontSize: 14,
+                                          color: Color(0XFF6B7280))),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: 20,
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: InkWell(
-                        onTap: () {
-                          // setState(() {
-                          //   isSelected = false;
-                          // });
-                          // Navigator.pop(context);
-                          // showDoneSheet();
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 48,
-                          decoration: BoxDecoration(
-                              color: constants.appMainColor,
-                              borderRadius: BorderRadius.circular(200)),
-                          child: Center(
-                            child: Text(
-                              "Submit",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 14),
-                            ),
+                            ],
                           ),
                         ),
                       ),
-                    )
-                  ],
-                )),
+
+                      SizedBox(
+                        height: 20,
+                      ),
+
+                      //Specific Address
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Account Name",
+                                style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0XFF6B7280)),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Container(
+                                height: 48,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        width: 1, color: Color(0XFFE5E7EB))),
+                                child: TextFormField(
+                                  // focusNode: textNode,
+                                  onChanged: (value) {
+                                    setState(() {});
+                                  },
+                                  keyboardType: TextInputType.text,
+                                  controller: accountNameController,
+                                  decoration: InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide
+                                            .none, // Remove the border when focused
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide
+                                            .none, // Remove the border when enabled
+                                      ),
+                                      hintText: "Enter your account name",
+                                      helperStyle: GoogleFonts.inter(
+                                          fontSize: 14,
+                                          color: Color(0XFF6B7280))),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(
+                        height: 20,
+                      ),
+
+                      // Country
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Bank",
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0XFF6B7280))),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Container(
+                                height: 48,
+                                width: MediaQuery.of(context).size.width * 0.95,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        width: 1, color: Color(0XFFE5E7EB))),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton2(
+                                      icon: Icon(
+                                        Icons.arrow_drop_down,
+                                        color: Colors.black38,
+                                      ),
+                                      hint: Text('Select Bank',
+                                          style: GoogleFonts.inter(
+                                              fontSize: 14,
+                                              color: Color(0XFF6B7280))),
+                                      items: bankName
+                                          .map((item) =>
+                                              DropdownMenuItem<String>(
+                                                value: item,
+                                                child: Text(
+                                                  item,
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ))
+                                          .toList(),
+                                      value: dropdownvalueBankName,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          dropdownvalueBankName =
+                                              value as String;
+                                        });
+                                      },
+                                      buttonHeight: 40,
+                                      buttonWidth: 140,
+                                      itemHeight: 40,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(
+                        height: 20,
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: InkWell(
+                          onTap: () {
+                            // setState(() {
+                            //   isSelected = false;
+                            // });
+                            // Navigator.pop(context);
+                            // showDoneSheet();
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 48,
+                            decoration: BoxDecoration(
+                                color: constants.appMainColor,
+                                borderRadius: BorderRadius.circular(200)),
+                            child: Center(
+                              child: Text(
+                                "Submit",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  )),
+            ),
           );
         });
       },

@@ -141,7 +141,7 @@ class _RecommendationState extends State<Recommendation> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: Text(
-                                "20 Recommended",
+                                "0 Recommended",
                                 style: TextStyle(
                                     fontSize: 8,
                                     fontWeight: FontWeight.bold,
@@ -178,7 +178,8 @@ class _RecommendationState extends State<Recommendation> {
                       padding: const EdgeInsets.only(left: 10.0),
                       child: InkWell(
                         onTap: () {
-                          mywidgets.showHireSheet(context: context, sp_id: "");
+                          mywidgets.showHireSheet(
+                              context: context, sp_id: "", service: "ffff");
                         },
                         child: Container(
                           width: 69,

@@ -1,9 +1,9 @@
-import 'dart:async';
 import 'dart:math';
+import 'dart:async';
+import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 // import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 // import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 
 class DataProviders extends ChangeNotifier {
 
@@ -301,4 +301,63 @@ bool overlay = false;
       return 'link';
     }
   }
+}
+
+
+
+  String ?categorizePost(String s) {
+      var pos = s.lastIndexOf('.');
+      String result = s.substring(pos + 1, s.length).toString().toLowerCase();
+      if (result.contains('jpg') ||
+          result.contains('jpeg') ||
+          result.contains('png') ||
+          result.contains('gif') || 
+          result.contains('bmp') ||
+          result.contains('tif') ||
+          result.contains('tiff') ||
+          result.contains('webp') ||
+          result.contains('svg') ||
+          result.contains('heic') ||
+          result.contains('heif') ) {
+        return 'image';
+      } else if (result.contains('pdf') ||
+          result.contains('doc') ||
+          result.contains('docx') ||
+          result.contains('xls') ||
+          result.contains('xlsx') ||
+          result.contains('ods') ||
+          result.contains('txt') ||
+          result.contains('csv') ||
+          result.contains('html') ||
+          result.contains('ppt') ||
+          result.contains('pptx') ||
+          result.contains('rtf') ||
+          result.contains('htm') ||
+          result.contains('xml') ||
+          result.contains('json') ||
+          result.contains('md') ||
+          result.contains('markdown') ||
+          result.contains('tex') ||
+          result.contains('odt') ||
+          result.contains('odp')) {
+        return 'doc';
+      } else if (result.contains('wav') || result.contains('mp3') || result.contains("aac")) {
+        return 'audio';
+      }
+      else if(
+        result.contains('mp4') ||
+        result.contains('avi') ||
+        result.contains('mov') ||
+        result.contains('mkv') ||
+        result.contains('wmv') ||
+        result.contains('flv') ||
+        result.contains('webm') ||
+        result.contains('3gp') ||
+        result.contains('mpeg') ||
+        result.contains('mpg') ||
+        result.contains('ogg')
+      ){
+        return 'video';
+      }
+
 }

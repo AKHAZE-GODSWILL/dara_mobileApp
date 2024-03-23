@@ -59,38 +59,33 @@ class _CreatePostState extends State<CreatePost> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Text("")),
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Container(
+              height: 42,
+              width: 42,
+              alignment: Alignment.center,
+              // decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.circular(100),
+              //     border:
+              //     Border.all(color: Colors.black12)),
+              child: IconButton(
+                onPressed: () {
+                  widget.backToHome(index: 0);
+                },
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.black,
+                  size: 24,
+                ),
+              )),
+        ),
         centerTitle: false,
         titleSpacing: 0,
         title: Transform(
           transform: Matrix4.translationValues(0, 0, 0),
           child: Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Container(
-                    height: 42,
-                    width: 42,
-                    alignment: Alignment.center,
-                    // decoration: BoxDecoration(
-                    //     borderRadius: BorderRadius.circular(100),
-                    //     border:
-                    //     Border.all(color: Colors.black12)),
-                    child: IconButton(
-                      onPressed: () {
-                        widget.backToHome(index: 0);
-                      },
-                      icon: Icon(
-                        Icons.close,
-                        color: Colors.black,
-                        size: 24,
-                      ),
-                    )),
-              ),
               Padding(
                 padding: const EdgeInsets.only(left: 12.0),
                 child: Text(
@@ -115,13 +110,10 @@ class _CreatePostState extends State<CreatePost> {
                 });
 
                 createPost(
-                        imageFiles: mediaFiles,
-                        body: _captionController.text.trim(),
-                        token: provider.sp_token!)
-                    .then((value) {
+                  imageFiles: mediaFiles,
+                  body: _captionController.text.trim(),
+                ).then((value) {
                   if (value["status"] == true) {
-                    ///// Navigation.push to the OTP screen
-                    // Navigator.pop(context);
                     mywidgets.displayToast(msg: "Successful");
                     widget.backToHome(index: 0);
                   } else if (value["status"] == "Network Error") {
@@ -131,7 +123,6 @@ class _CreatePostState extends State<CreatePost> {
                   } else {
                     mywidgets.displayToast(msg: value["message"]);
                   }
-
                   setState(() {
                     isLoading = false;
                   });
@@ -141,19 +132,28 @@ class _CreatePostState extends State<CreatePost> {
                 width: 50,
                 height: 30,
                 decoration: BoxDecoration(
-                    color: Color(0XFFF3F4F6),
+                    color: _captionController.text.isEmpty
+                        ? Color(0XFFF3F4F6)
+                        : Color.fromARGB(255, 42, 92, 231),
                     borderRadius: BorderRadius.circular(200)),
                 child: Center(
                   child: (isLoading)
                       ? Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.grey,
+                          child: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.grey,
+                            ),
                           ),
                         )
                       : Text(
                           "Post",
-                          style:
-                              TextStyle(color: Color(0XFF6B7280), fontSize: 14),
+                          style: TextStyle(
+                              color: _captionController.text.isEmpty
+                                  ? Color(0XFF6B7280)
+                                  : Colors.white,
+                              fontSize: 14),
                         ),
                 ),
               ),
@@ -193,61 +193,6 @@ class _CreatePostState extends State<CreatePost> {
                         errorWidget: (context, url, error) =>
                             Icon(Icons.person, size: 100, color: Colors.white),
                       )),
-                  // Container(
-                  //   height: 48,
-                  //   width: 80,
-                  //   // decoration: BoxDecoration(
-                  //   //   borderRadius: BorderRadius.circular(8),
-                  //   //   border: Border.all(
-                  //   //     width: 1,
-                  //   //     color: Color(0XFFE5E7EB)
-                  //   //   )
-                  //   // ),
-                  // child: DropdownButtonHideUnderline(
-                  //   child: DropdownButton2(
-                  //     icon: Icon(
-                  //       Icons.arrow_drop_down,
-                  //       color: Colors.black38,
-                  //     ),
-                  //     hint: Text(
-                  //       '',
-                  //       style: TextStyle(
-                  //         fontSize: 14,
-                  //         color: Colors.black54,
-                  //       ),
-                  //     ),
-                  //     items: viewList
-                  //         .map((item) =>
-                  //             DropdownMenuItem<String>(
-                  //               value: item,
-                  //               child: Text(
-                  //                 item,
-                  //                 style: TextStyle(
-                  //                   color: Colors.black,
-                  //                   fontSize: 14),
-                  //               ),
-                  //             ))
-                  //         .toList(),
-                  //     value: whoCanSeePost,
-                  //     onChanged: (value) {
-                  //       setState(() {
-                  //         whoCanSeePost = value as String;
-                  //       });
-                  //     },
-                  //     buttonHeight: 40,
-                  //     buttonWidth: 140,
-                  //     itemHeight: 40,
-                  //   ),
-                  // ),
-                  // ),
-
-                  // Row(
-                  //   children: [
-                  //     Text("total media: ${mediaFiles.length}"),
-                  //     // Text("total videos: ${videoCount}"),
-                  //     Text("total photos: ${photoCount}"),
-                  //   ],
-                  // ),
                 ],
               ),
             ),
@@ -257,18 +202,10 @@ class _CreatePostState extends State<CreatePost> {
             child: Container(
               child: Container(
                 height: 100,
-                // decoration: BoxDecoration(
-                //   borderRadius: BorderRadius.circular(8),
-                //   border: Border.all(
-                //     width: 1,
-                //     color: Color(0XFFE5E7EB)
-                //   )
-                // ),
                 child: TextFormField(
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                  // focusNode: textNode,
+                  // onChanged: (value) {
+                  //   setState(() {});
+                  // },
                   keyboardType: TextInputType.multiline,
                   textAlignVertical: TextAlignVertical.top,
                   controller: _captionController,
@@ -291,23 +228,25 @@ class _CreatePostState extends State<CreatePost> {
               ),
             ),
           ),
-          (imgPath.isNotEmpty)
-              ? Container(
-                  height: 360,
-                  width: MediaQuery.of(context).size.width,
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount:
-                          3, // Adjust the number of columns as needed
-                    ),
-                    itemCount: mediaFiles
-                        .length, // Replace with the length of your data
-                    itemBuilder: (BuildContext context, int index) {
-                      return customMediaWidget(
-                          filePath: mediaFiles[index].path, index: index);
-                    },
-                  ))
-              : SizedBox(),
+          StatefulBuilder(builder: (context, setState) {
+            return (imgPath.isNotEmpty)
+                ? Container(
+                    height: 360,
+                    width: MediaQuery.of(context).size.width,
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount:
+                            3, // Adjust the number of columns as needed
+                      ),
+                      itemCount: mediaFiles
+                          .length, // Replace with the length of your data
+                      itemBuilder: (BuildContext context, int index) {
+                        return customMediaWidget(
+                            filePath: mediaFiles[index].path, index: index);
+                      },
+                    ))
+                : SizedBox();
+          }),
           Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
@@ -545,43 +484,48 @@ class _CreatePostState extends State<CreatePost> {
       if (selectedImage == null) return;
 
       readyUploadImage = File(selectedImage[0].path);
+      // int  value = await (pickedVideo.length());
+      double value = (readyUploadImage!.lengthSync() / (1048576));
+      double size = value / (1048576);
+      if (size >= 5.0) {
+        mywidgets.displayToast(msg: "Maximum upload size is 5mb");
+      } else {
+        setState(() {
+          if (selectedImage.isNotEmpty) {
+            (photoCount < 30)
+                ? selectedImage.forEach((image) {
+                    (photoCount < 30) ? mediaFiles.add(image) : ();
+                    (photoCount < 30) ? photoCount++ : ();
+                  })
+                : ();
+          }
 
-      setState(() {
-        imgPath = readyUploadImage!.path;
-        imgExt = imgPath.split(".").last;
-        hasImg = true;
-
-        if (selectedImage.isNotEmpty) {
-          (photoCount < 30)
-              ? selectedImage.forEach((image) {
-                  (photoCount < 30) ? mediaFiles.add(image) : ();
-                  (photoCount < 30) ? photoCount++ : ();
-                })
-              : ();
-
-          /////////
-          ///
-          /// if photocount is more than 30, the Toast should be triggered
-        }
-      });
+          imgPath = readyUploadImage!.path;
+          imgExt = imgPath.split(".").last;
+          hasImg = true;
+        });
+      }
     });
   }
 
   Future<void> getVideoGallery() async {
     final pickedVideo =
         await ImagePicker().pickVideo(source: ImageSource.gallery);
-
     if (pickedVideo == null) return;
-
     final videoPath = File(pickedVideo.path);
-
-    setState(() {
-      imgPath = videoPath.path;
-      imgExt = imgPath.split(".").last;
-      hasImg = true;
-      (videoCount < 20) ? mediaFiles.add(pickedVideo) : ();
-      (videoCount < 20) ? videoCount++ : ();
-    });
+    int value = await (pickedVideo.length());
+    double size = value / (1048576);
+    if (size >= 5.0) {
+      mywidgets.displayToast(msg: "Maximum upload size is 5mb");
+    } else {
+      setState(() {
+        imgPath = videoPath.path;
+        imgExt = imgPath.split(".").last;
+        hasImg = true;
+        (videoCount < 20) ? mediaFiles.add(pickedVideo) : ();
+        (videoCount < 20) ? videoCount++ : ();
+      });
+    }
   }
 
   Future<dynamic> generateVideoThumbnail(String videoPath) async {
@@ -591,7 +535,6 @@ class _CreatePostState extends State<CreatePost> {
       maxWidth: 200, // Adjust the width as needed
       quality: 25, // Adjust the quality (0 - 100) as needed
     );
-
     return thumbnail;
   }
 }

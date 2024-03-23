@@ -11,7 +11,6 @@ import '../../../Firebase/Firebase_service.dart';
 import 'package:dara_app/Firebase/Model/User.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// import 'package:dara_app/screens/homepage/drawerRoutes/chat/chatPage.dart';
 
 class ChatHistory extends StatefulWidget {
   const ChatHistory({Key? key}) : super(key: key);
@@ -316,6 +315,7 @@ class _ChatHistoryState extends State<ChatHistory> {
     // mywidgets.displayToast(msg: "${user.lastMessage}");
     return InkWell(
       onTap: () {
+        print(user.urlAvatar.toString());
         var utils = Provider.of<DataProvider>(context, listen: false);
         FirebaseApi.updateUsertoRead(
             idUser: user.idUser,
@@ -337,17 +337,11 @@ class _ChatHistoryState extends State<ChatHistory> {
             return ChatPage(
                 support: true,
                 newchat: true,
-
-                // shipments: shipment,
-                // pickup: shipment.pickup,
-                // dropoff:shipment.dropoff,
                 productSend: true,
                 user: user);
           },
         ));
-        // Navigator.push(context, MaterialPageRoute(
-        //   builder: (context) => ChatPage()
-        // ));
+     
       },
       child: ListTile(
           leading: Container(

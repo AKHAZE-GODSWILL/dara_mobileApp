@@ -2,11 +2,16 @@ import 'dart:io';
 import '../../../../main.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:file_picker/file_picker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:dara_app/utils/apiRequest.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:dara_app/widget/custom_circle.dart';
+import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
 class GetVerified extends StatefulWidget {
@@ -30,9 +35,10 @@ class _GetVerifiedState extends State<GetVerified> {
 
   var id_type = [
     "National ID Card",
-    "International passport",
+    // "International passport",
     "Voter's card",
     "Driver's License",
+    // "Certificate of cooperation",
   ];
 
   final idNumberController = TextEditingController();
@@ -51,6 +57,8 @@ class _GetVerifiedState extends State<GetVerified> {
 
   @override
   Widget build(BuildContext context) {
+    DataProvider provider = Provider.of<DataProvider>(context, listen: true);
+
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -103,681 +111,657 @@ class _GetVerifiedState extends State<GetVerified> {
           backgroundColor: Colors.white,
           elevation: 0,
         ),
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 20,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Container(
-                    child: Text(
-                      "To verify your Dara service provider account, please complete the form below with essential information.",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black54,
-                      ),
-                    ),
+        body: "${provider.value["user_object"]["personal_information"]["kyc"]}"
+                    .toString() == "submitted"
+              
+            ? Center(
+                child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.pending,
+                    color: Colors.orange,
+                    size: 100,
                   ),
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Text(
-                          "1. Proof of ID - Front",
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
+                  Text(
+                    "Kyc is under review",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              )):
+"${provider.value["user_object"]["personal_information"]["kyc"]}"
+                    .toString() == "approved"?
+              Center(
+                child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.gpp_good,
+                    color: Colors.green,
+                    size: 100,
+                  ),
+                  Text(
+                    "Account Verified",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ))
+            : Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Container(
+                          child: Text(
+                            "To verify your Dara service provider account, please complete the form below with essential information.",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.black54,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-
-                    SizedBox(
-                      height: 20,
-                    ),
-
-                    // ID Type
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "ID Type",
-                              style: TextStyle(
-                                  fontSize: 12, color: Colors.black54),
+                      SizedBox(
+                        height: 40,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Container(
+                              child: Text(
+                                "1. Identity Verification",
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              height: 48,
-                              width: MediaQuery.of(context).size.width * 0.95,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                      width: 1, color: Color(0XFFE5E7EB))),
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton2(
-                                    icon: Icon(
-                                      Icons.arrow_drop_down,
-                                      color: Colors.black38,
-                                    ),
-                                    hint: Text(
-                                      'Select ID Type',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black54,
+                          ),
+
+                          SizedBox(
+                            height: 20,
+                          ),
+
+                          // ID Type
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Container(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "ID Type",
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.black54),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Container(
+                                    height: 48,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.95,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                            width: 1,
+                                            color: Color(0XFFE5E7EB))),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton2(
+                                          icon: Icon(
+                                            Icons.arrow_drop_down,
+                                            color: Colors.black38,
+                                          ),
+                                          hint: Text(
+                                            'Select ID Type',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.black54,
+                                            ),
+                                          ),
+                                          items: id_type
+                                              .map((item) =>
+                                                  DropdownMenuItem<String>(
+                                                    value: item,
+                                                    child: Text(
+                                                      item,
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ))
+                                              .toList(),
+                                          value: dropdownvalueIDType,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              dropdownvalueIDType =
+                                                  value as String;
+                                            });
+                                          },
+                                          buttonHeight: 40,
+                                          buttonWidth: 140,
+                                          itemHeight: 40,
+                                        ),
                                       ),
                                     ),
-                                    items: id_type
-                                        .map((item) => DropdownMenuItem<String>(
-                                              value: item,
-                                              child: Text(
-                                                item,
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(
+                            height: 20,
+                          ),
+
+                          Column(children: [
+                            // Bio
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: Container(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Upload Photo of ID (front)",
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.black54),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    DottedBorder(
+                                      borderType: BorderType.RRect,
+                                      radius: Radius.circular(8),
+                                      dashPattern: [10, 10],
+                                      color: Color(0XFFE5E7EB),
+                                      strokeWidth: 2,
+                                      child: Container(
+                                        height: 96,
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                child: Container(
+                                                  // color: Colors.red,
+                                                  height: 72,
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.6,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "Upload ID",
+                                                        style: TextStyle(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Text(
+                                                        "Please ensure that this image corresponds with the ID Type you selected above",
+                                                        style: TextStyle(
+                                                            fontSize: 12,
+                                                            color:
+                                                                Colors.black54),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
-                                            ))
-                                        .toList(),
-                                    value: dropdownvalueIDType,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        dropdownvalueIDType = value as String;
-                                      });
-                                    },
-                                    buttonHeight: 40,
-                                    buttonWidth: 140,
-                                    itemHeight: 40,
-                                  ),
+                                              (filesInfo[0]["path"]!.isEmpty)
+                                                  ? PopupMenuButton<String>(
+                                                      onSelected: (value) {
+                                                        // Handle the selected option here
+
+                                                        if (value ==
+                                                            "Option 1") {
+                                                          getImageCamera(
+                                                              index: 0);
+                                                        } else if (value ==
+                                                            "Option 2") {
+                                                          getImageGallery(
+                                                              index: 0);
+                                                        } else {
+                                                          _pickFile(index: 0);
+                                                        }
+                                                      },
+                                                      itemBuilder: (BuildContext
+                                                          context) {
+                                                        return <PopupMenuEntry<
+                                                            String>>[
+                                                          PopupMenuItem<String>(
+                                                            value: 'Option 1',
+                                                            child: Text(
+                                                                'Take photo from Camera'),
+                                                          ),
+                                                          PopupMenuItem<String>(
+                                                            value: 'Option 2',
+                                                            child: Text(
+                                                                'Choose photo from Gallery'),
+                                                          ),
+                                                          PopupMenuItem<String>(
+                                                            value: 'Option 3',
+                                                            child: Text(
+                                                                'Attach File'),
+                                                          ),
+                                                        ];
+                                                      },
+                                                      child: SvgPicture.asset(
+                                                          "assets/svg/camera@2x.svg"), // Icon for the dropdown menu
+                                                    )
+                                                  : (filesInfo[0]["type"] ==
+                                                          "photo")
+                                                      ? customImageWidget(
+                                                          index: 0)
+                                                      : customFileWidget(
+                                                          index: 0)
+                                            ]),
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
 
-                    SizedBox(
-                      height: 20,
-                    ),
-                    // Bio
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Upload Photo of ID (front)",
-                              style: TextStyle(
-                                  fontSize: 12, color: Colors.black54),
-                            ),
                             SizedBox(
-                              height: 5,
+                              height: 20,
                             ),
-                            DottedBorder(
-                              borderType: BorderType.RRect,
-                              radius: Radius.circular(8),
-                              dashPattern: [10, 10],
-                              color: Color(0XFFE5E7EB),
-                              strokeWidth: 2,
+                            // Bio
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
                               child: Container(
-                                height: 96,
-                                child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        child: Container(
-                                          // color: Colors.red,
-                                          height: 72,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.6,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Upload Photo of ID (back)",
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.black54),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    DottedBorder(
+                                      borderType: BorderType.RRect,
+                                      radius: Radius.circular(8),
+                                      dashPattern: [10, 10],
+                                      color: Color(0XFFE5E7EB),
+                                      strokeWidth: 2,
+                                      child: Container(
+                                        height: 96,
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(
-                                                "Upload ID",
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                child: Container(
+                                                  // color: Colors.red,
+                                                  height: 72,
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.6,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "Upload ID",
+                                                        style: TextStyle(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Text(
+                                                        "Please ensure that this image corresponds with the ID Type you selected above",
+                                                        style: TextStyle(
+                                                            fontSize: 12,
+                                                            color:
+                                                                Colors.black54),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
                                               ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Text(
-                                                "Please ensure that this image corresponds with the ID Type you selected above",
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.black54),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                              (filesInfo[1]["path"]!.isEmpty)
+                                                  ? PopupMenuButton<String>(
+                                                      onSelected: (value) {
+                                                        // Handle the selected option here
+
+                                                        if (value ==
+                                                            "Option 1") {
+                                                          getImageCamera(
+                                                              index: 1);
+                                                        } else if (value ==
+                                                            "Option 2") {
+                                                          getImageGallery(
+                                                              index: 1);
+                                                        } else {
+                                                          _pickFile(index: 1);
+                                                        }
+                                                      },
+                                                      itemBuilder: (BuildContext
+                                                          context) {
+                                                        return <PopupMenuEntry<
+                                                            String>>[
+                                                          PopupMenuItem<String>(
+                                                            value: 'Option 1',
+                                                            child: Text(
+                                                                'Take photo from Camera'),
+                                                          ),
+                                                          PopupMenuItem<String>(
+                                                            value: 'Option 2',
+                                                            child: Text(
+                                                                'Choose photo from Gallery'),
+                                                          ),
+                                                          PopupMenuItem<String>(
+                                                            value: 'Option 3',
+                                                            child: Text(
+                                                                'Attach File'),
+                                                          ),
+                                                        ];
+                                                      },
+                                                      child: SvgPicture.asset(
+                                                          "assets/svg/camera@2x.svg"), // Icon for the dropdown menu
+                                                    )
+                                                  : (filesInfo[1]["type"] ==
+                                                          "photo")
+                                                      ? customImageWidget(
+                                                          index: 1)
+                                                      : customFileWidget(
+                                                          index: 1)
+                                            ]),
                                       ),
-                                      (filesInfo[0]["path"]!.isEmpty)
-                                          ? PopupMenuButton<String>(
-                                              onSelected: (value) {
-                                                // Handle the selected option here
-
-                                                if (value == "Option 1") {
-                                                  getImageCamera(index: 0);
-                                                } else if (value ==
-                                                    "Option 2") {
-                                                  getImageGallery(index: 0);
-                                                } else {
-                                                  _pickFile(index: 0);
-                                                }
-                                              },
-                                              itemBuilder:
-                                                  (BuildContext context) {
-                                                return <PopupMenuEntry<String>>[
-                                                  PopupMenuItem<String>(
-                                                    value: 'Option 1',
-                                                    child: Text(
-                                                        'Take photo from Camera'),
-                                                  ),
-                                                  PopupMenuItem<String>(
-                                                    value: 'Option 2',
-                                                    child: Text(
-                                                        'Choose photo from Gallery'),
-                                                  ),
-                                                  PopupMenuItem<String>(
-                                                    value: 'Option 3',
-                                                    child: Text('Attach File'),
-                                                  ),
-                                                ];
-                                              },
-                                              child: SvgPicture.asset(
-                                                  "assets/svg/camera@2x.svg"), // Icon for the dropdown menu
-                                            )
-                                          : (filesInfo[0]["type"] == "photo")
-                                              ? customImageWidget(index: 0)
-                                              : customFileWidget(index: 0)
-                                    ]),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: 20,
-                    ),
-                    // Bio
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Upload Photo of ID (back)",
-                              style: TextStyle(
-                                  fontSize: 12, color: Colors.black54),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            DottedBorder(
-                              borderType: BorderType.RRect,
-                              radius: Radius.circular(8),
-                              dashPattern: [10, 10],
-                              color: Color(0XFFE5E7EB),
-                              strokeWidth: 2,
-                              child: Container(
-                                height: 96,
-                                child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        child: Container(
-                                          // color: Colors.red,
-                                          height: 72,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.6,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Upload ID",
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Text(
-                                                "Please ensure that this image corresponds with the ID Type you selected above",
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.black54),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      (filesInfo[1]["path"]!.isEmpty)
-                                          ? PopupMenuButton<String>(
-                                              onSelected: (value) {
-                                                // Handle the selected option here
-
-                                                if (value == "Option 1") {
-                                                  getImageCamera(index: 1);
-                                                } else if (value ==
-                                                    "Option 2") {
-                                                  getImageGallery(index: 1);
-                                                } else {
-                                                  _pickFile(index: 1);
-                                                }
-                                              },
-                                              itemBuilder:
-                                                  (BuildContext context) {
-                                                return <PopupMenuEntry<String>>[
-                                                  PopupMenuItem<String>(
-                                                    value: 'Option 1',
-                                                    child: Text(
-                                                        'Take photo from Camera'),
-                                                  ),
-                                                  PopupMenuItem<String>(
-                                                    value: 'Option 2',
-                                                    child: Text(
-                                                        'Choose photo from Gallery'),
-                                                  ),
-                                                  PopupMenuItem<String>(
-                                                    value: 'Option 3',
-                                                    child: Text('Attach File'),
-                                                  ),
-                                                ];
-                                              },
-                                              child: SvgPicture.asset(
-                                                  "assets/svg/camera@2x.svg"), // Icon for the dropdown menu
-                                            )
-                                          : (filesInfo[1]["type"] == "photo")
-                                              ? customImageWidget(index: 1)
-                                              : customFileWidget(index: 1)
-                                    ]),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Text(
-                          "2. Bank Verification Number (BVN)",
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: 20,
-                    ),
-
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "ID Number",
-                              style: TextStyle(
-                                  fontSize: 12, color: Colors.black54),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                      width: 1, color: Color(0XFFE5E7EB))),
-                              child: TextFormField(
-                                // focusNode: textNode,
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
-                                keyboardType: TextInputType.emailAddress,
-                                controller: idNumberController,
-                                decoration: InputDecoration(
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide
-                                          .none, // Remove the border when focused
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide
-                                          .none, // Remove the border when enabled
-                                    ),
-                                    hintText: "Enter ID Number",
-                                    hintStyle: TextStyle(
-                                      color: Colors.black54,
-                                    )),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                          ],
-                        ),
+                          ]),
+                        ],
                       ),
-                    ),
-
-                    SizedBox(
-                      height: 10,
-                    ),
-                    // Bio
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        "Kindly note that your BVN details is safe with us and will not be shared with a third party",
-                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                      SizedBox(
+                        height: 30,
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Text(
-                          "3. Certification (optional)",
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: 20,
-                    ),
-
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Certificate Name",
-                              style: TextStyle(
-                                  fontSize: 12, color: Colors.black54),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                      width: 1, color: Color(0XFFE5E7EB))),
-                              child: TextFormField(
-                                // focusNode: textNode,
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
-                                keyboardType: TextInputType.emailAddress,
-                                controller: idNumberController,
-                                decoration: InputDecoration(
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide
-                                          .none, // Remove the border when focused
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide
-                                          .none, // Remove the border when enabled
-                                    ),
-                                    hintText: "Enter ID Number",
-                                    hintStyle: TextStyle(
-                                      color: Colors.black54,
-                                    )),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Container(
+                              child: Text(
+                                "2. Business Verification (CAC)",
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.bold),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Container(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    "Upload Photo of Certificate",
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.black54),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  DottedBorder(
+                                    borderType: BorderType.RRect,
+                                    radius: Radius.circular(8),
+                                    dashPattern: [10, 10],
+                                    color: Color(0XFFE5E7EB),
+                                    strokeWidth: 2,
+                                    child: Container(
+                                      height: 96,
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Container(
+                                                // color: Colors.red,
+                                                height: 80,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.6,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Upload Document",
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Text(
+                                                      "Please ensure to upload a document that aligns well with your skills and showcase your expertise.",
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          color:
+                                                              Colors.black54),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            (filesInfo[2]["path"]!.isEmpty)
+                                                ? PopupMenuButton<String>(
+                                                    onSelected: (value) {
+                                                      // Handle the selected option here
 
-                    SizedBox(
-                      height: 20,
-                    ),
-
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Certificate Number",
-                              style: TextStyle(
-                                  fontSize: 12, color: Colors.black54),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                      width: 1, color: Color(0XFFE5E7EB))),
-                              child: TextFormField(
-                                // focusNode: textNode,
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
-                                keyboardType: TextInputType.emailAddress,
-                                controller: idNumberController,
-                                decoration: InputDecoration(
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide
-                                          .none, // Remove the border when focused
+                                                      if (value == "Option 1") {
+                                                        getImageCamera(
+                                                            index: 2);
+                                                      } else if (value ==
+                                                          "Option 2") {
+                                                        getImageGallery(
+                                                            index: 2);
+                                                      } else {
+                                                        _pickFile(index: 2);
+                                                      }
+                                                    },
+                                                    itemBuilder:
+                                                        (BuildContext context) {
+                                                      return <PopupMenuEntry<
+                                                          String>>[
+                                                        PopupMenuItem<String>(
+                                                          value: 'Option 1',
+                                                          child: Text(
+                                                              'Take photo from Camera'),
+                                                        ),
+                                                        PopupMenuItem<String>(
+                                                          value: 'Option 2',
+                                                          child: Text(
+                                                              'Choose photo from Gallery'),
+                                                        ),
+                                                        PopupMenuItem<String>(
+                                                          value: 'Option 3',
+                                                          child: Text(
+                                                              'Attach File'),
+                                                        ),
+                                                      ];
+                                                    },
+                                                    child: SvgPicture.asset(
+                                                        "assets/svg/camera@2x.svg"), // Icon for the dropdown menu
+                                                  )
+                                                : (filesInfo[2]["type"] ==
+                                                        "photo")
+                                                    ? customImageWidget(
+                                                        index: 2)
+                                                    : customFileWidget(index: 2)
+                                          ]),
                                     ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide
-                                          .none, // Remove the border when enabled
-                                    ),
-                                    hintText: "Enter ID Number",
-                                    hintStyle: TextStyle(
-                                      color: Colors.black54,
-                                    )),
+                                  )
+                                ],
                               ),
                             ),
-                          ],
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 40,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          // print(filesInfo[0]["path"].toString().isEmpty);
+                          // print(filesInfo[1]["path"].toString().isEmpty);
+
+                          print(filesInfo[2]["path"].toString().isEmpty);
+                          print("ppp");
+
+                          if (filesInfo[0]["path"].toString().isNotEmpty ||
+                              filesInfo[1]["path"].toString().isNotEmpty ||
+                              filesInfo[2]["path"].toString().isNotEmpty) {
+                            DataProvider provider = Provider.of<DataProvider>(
+                                context,
+                                listen: false);
+
+                            circularCustom(context);
+
+                            updateKyc(
+                              id_image_front:
+                                  filesInfo[0]["path"].toString().isEmpty
+                                      ? File(filesInfo[2]["path"].toString())
+                                      : File(filesInfo[0]["path"].toString()),
+                              id_image_back:
+                                  filesInfo[1]["path"].toString().isEmpty
+                                      ? File(filesInfo[2]["path"].toString())
+                                      : File(filesInfo[1]["path"].toString()),
+                              cac: filesInfo[2]["path"].toString().isEmpty
+                                  ? File(filesInfo[0]["path"].toString())
+                                  : File(filesInfo[2]["path"].toString()),
+                              id_number: idNumberController.text,
+                              id_type: dropdownvalueIDType,
+                            ).then((value) {
+                              print("eee");
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              Fluttertoast.showToast(
+                                  msg: "Updated Successfully");
+                              reloadUserObject().then((value) {
+                                if ((provider.userType == "serviceProvider")) {
+                                  provider.set_sp_login_info(
+                                      value: value,
+                                      firstName: value["user_object"]
+                                              ["personal_information"]
+                                          ["first_name"],
+                                      lastName: value["user_object"]
+                                          ["personal_information"]["last_name"],
+                                      email: value["user_object"]
+                                          ["personal_information"]["email"],
+                                      id: value["user_object"]
+                                              ["personal_information"]["id"]
+                                          .toString(),
+                                      access_token: value["access_token"],
+                                      profile_image: (value["user_object"]
+                                                  ["address_information"] !=
+                                              null)
+                                          ? value["user_object"]
+                                                  ["address_information"]
+                                              ["profile_image"]
+                                          : "");
+                                } else {
+                                  provider.set_client_login_info(
+                                      value: value,
+                                      firstName: value["user_object"]
+                                              ["personal_information"]
+                                          ["first_name"],
+                                      lastName: value["user_object"]
+                                          ["personal_information"]["last_name"],
+                                      email: value["user_object"]
+                                          ["personal_information"]["email"],
+                                      id: value["user_object"]
+                                              ["personal_information"]["id"]
+                                          .toString(),
+                                      access_token: value["access_token"],
+                                      profile_image: (value["user_object"]
+                                                  ["address_information"] !=
+                                              null)
+                                          ? value["user_object"]
+                                                  ["address_information"]
+                                              ["profile_image"]
+                                          : "");
+                                }
+                              });
+                            });
+                          } else {
+                            Fluttertoast.showToast(
+                                msg:
+                                    "Choose Image front/back and Upload CAC document");
+                          }
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: constants.appMainColor,
+                              borderRadius: BorderRadius.circular(200)),
+                          child: Center(
+                            child: Text(
+                              "Submit",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 14),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-
-                    SizedBox(
-                      height: 20,
-                    ),
-                    // Bio
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Upload Photo of Certificate",
-                              style: TextStyle(
-                                  fontSize: 12, color: Colors.black54),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            DottedBorder(
-                              borderType: BorderType.RRect,
-                              radius: Radius.circular(8),
-                              dashPattern: [10, 10],
-                              color: Color(0XFFE5E7EB),
-                              strokeWidth: 2,
-                              child: Container(
-                                height: 96,
-                                child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        child: Container(
-                                          // color: Colors.red,
-                                          height: 72,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.6,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Upload Certificate",
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Text(
-                                                "Please ensure to upload a certificate that aligns well with your skills and showcase your expertise.",
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.black54),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      (filesInfo[2]["path"]!.isEmpty)
-                                          ? PopupMenuButton<String>(
-                                              onSelected: (value) {
-                                                // Handle the selected option here
-
-                                                if (value == "Option 1") {
-                                                  getImageCamera(index: 2);
-                                                } else if (value ==
-                                                    "Option 2") {
-                                                  getImageGallery(index: 2);
-                                                } else {
-                                                  _pickFile(index: 2);
-                                                }
-                                              },
-                                              itemBuilder:
-                                                  (BuildContext context) {
-                                                return <PopupMenuEntry<String>>[
-                                                  PopupMenuItem<String>(
-                                                    value: 'Option 1',
-                                                    child: Text(
-                                                        'Take photo from Camera'),
-                                                  ),
-                                                  PopupMenuItem<String>(
-                                                    value: 'Option 2',
-                                                    child: Text(
-                                                        'Choose photo from Gallery'),
-                                                  ),
-                                                  PopupMenuItem<String>(
-                                                    value: 'Option 3',
-                                                    child: Text('Attach File'),
-                                                  ),
-                                                ];
-                                              },
-                                              child: SvgPicture.asset(
-                                                  "assets/svg/camera@2x.svg"), // Icon for the dropdown menu
-                                            )
-                                          : (filesInfo[2]["type"] == "photo")
-                                              ? customImageWidget(index: 2)
-                                              : customFileWidget(index: 2)
-                                    ]),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-
-                    //will save this parameter to state management later
-                  },
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.85,
-                    height: 50,
-                    decoration: BoxDecoration(
-                        color: constants.appMainColor,
-                        borderRadius: BorderRadius.circular(200)),
-                    child: Center(
-                      child: Text(
-                        "Submit",
-                        style: TextStyle(color: Colors.white, fontSize: 14),
-                      ),
-                    ),
+                      SizedBox(
+                        height: 30,
+                      )
+                    ],
                   ),
                 ),
-                SizedBox(
-                  height: 30,
-                )
-              ],
-            ),
-          ),
-        ));
+              ));
   }
 
   customImageWidget({required index}) {

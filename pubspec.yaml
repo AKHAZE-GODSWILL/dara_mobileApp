@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   agora_rtc_engine: ^5.2.0
   easy_audio_player: ^0.0.1
-  firebase_messaging:
+  firebase_messaging: ^14.7.17
   print_remover: ^1.0.1
   dio:
   bubble:
@@ -75,22 +75,24 @@ dependencies:
   http: ^1.1.0
   image_picker: ^0.8.5+3
   firebase_core: ^2.24.2
+  multi_select_flutter:
   flutter_svg:
   flutter_phosphor_icons: ^0.0.1+5
   flutter_sound: ^9.2.13
   local_auth: ^2.1.5
   open_file: ^3.3.2
   path: ^1.8.3
+  flutter_local_notifications: ^16.3.2
   path_provider: ^2.1.0
   pin_code_text_field: ^1.8.0
   percent_indicator: ^4.2.3
   permission_handler: ^11.0.1
   provider: ^6.0.2
   readmore: ^2.2.0
+  video_player:
   shared_preferences: ^2.2.2
   smooth_page_indicator: ^1.0.0+2
   simple_waveform_progressbar: ^0.0.3
-  video_player: ^2.7.2
   video_thumbnail: ^0.5.3
 
 

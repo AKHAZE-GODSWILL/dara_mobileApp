@@ -2,6 +2,7 @@ import '../../main.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:dara_app/utils/apiRequest.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dara_app/widget/custom_circle.dart';
@@ -38,31 +39,29 @@ class _OffersState extends State<Offers> {
       isLoading = true;
     });
     DataProvider dataProvider = Provider.of(context, listen: false);
-   
+
     // (widget.userType == "serviceProvider")
-        // ?
-         getOffers(context).then((value) {
-            // mywidgets.displayToast(msg: "making the request");
+    // ?
+    getOffers(context).then((value) {
+    
 
-            if (value["status"] == true &&
-                value["message"] == "Data fetched successfully") {
-              setState(() {
-                offers = value["data"];
-              });
-            } else if (value["status"] == "Network Error") {
-              mywidgets.displayToast(
-                  msg:
-                      "Network Error. Check your Network Connection and try again");
-            } else {
-              offers = [];
-              mywidgets.displayToast(msg: value["message"]);
-            }
+      if (value["status"] == true) {
+        setState(() {
+          offers = value["data"];
+        });
+      } else if (value["status"] == "Network Error") {
+        mywidgets.displayToast(
+            msg: "Network Error. Check your Network Connection and try again");
+      } else {
+        offers = [];
+        mywidgets.displayToast(msg: value["message"]);
+      }
 
-            setState(() {
-              isLoading = false;
-            });
-          });
-        // : ();
+      setState(() {
+        isLoading = false;
+      });
+    });
+    // : ();
   }
 
   void refreshOfferPage({required offerIndex}) {
@@ -96,28 +95,41 @@ class _OffersState extends State<Offers> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundImage: AssetImage("assets/profile.png"),
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.white,
+                    CachedNetworkImage(
+                      imageUrl: (provider.userType == "serviceProvider")
+                          ? provider.sp_profile_image!
+                          : provider.client_profile_image!,
+                      imageBuilder: (context, imageProvider) => Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              image: imageProvider, fit: BoxFit.cover),
+                        ),
+                      ),
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          Icon(Icons.person, size: 50, color: Colors.grey),
                     ),
                     Row(
                       children: [
                         Text(
-                          "Michael Traore",
+                          (provider.userType == "serviceProvider")
+                              ? "${provider.sp_first_name} ${provider.sp_last_name}"
+                              : "${provider.client_first_name} ${provider.client_last_name}",
                           style: GoogleFonts.inter(
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),
-                        SvgPicture.asset("assets/svg/verified-badge.svg")
+                        "${provider.value["user_object"]["personal_information"]["kyc"]}"
+                                    .toString() ==
+                                "approved"
+                            ? SvgPicture.asset("assets/svg/verified-badge.svg")
+                            : Container()
                       ],
                     ),
                     Container(
-                      height: 24,
-                      width: 85,
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xFFf97315)),
-                          borderRadius: BorderRadius.circular(10)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -131,6 +143,11 @@ class _OffersState extends State<Offers> {
                           )
                         ],
                       ),
+                      height: 24,
+                      width: 85,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xFFf97315)),
+                          borderRadius: BorderRadius.circular(10)),
                     ),
                     SizedBox(
                       height: 5,
@@ -164,24 +181,30 @@ class _OffersState extends State<Offers> {
                 )),
             ListTile(
               leading: SvgPicture.asset("assets/svg/wallet.svg"),
-              title: Text('Wallet (Available Soon)',
+              title: Text(
+                  (provider.userType == "serviceProvider")
+                      ? 'Wallet'
+                      : 'Wallet (Available Soon)',
                   style: GoogleFonts.inter(
                       fontSize: 12, fontWeight: FontWeight.bold)),
               onTap: () {
-                Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) {
-                        return WalletPage();
-                      },
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
-                      },
-                    ));
+                (provider.userType == "serviceProvider")
+                    ? Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) {
+                            return WalletPage();
+                          },
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                        ))
+                    : ();
               },
             ),
             ListTile(
@@ -234,23 +257,31 @@ class _OffersState extends State<Offers> {
               title: Text('Support',
                   style: GoogleFonts.inter(
                       fontSize: 12, fontWeight: FontWeight.bold)),
-              onTap: () {
+              onTap: () async {
                 // Add your settings page navigation logic here
+                Future<void> _launchUrl() async {
+                  final Uri _url =
+                      Uri.parse('https://wa.me/message/MX5JENZMK2BBI1');
+                  if (!await launchUrl(_url)) {
+                    throw Exception('Could not launch $_url');
+                  }
+                }
 
-                Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) {
-                        return DaraSupport();
-                      },
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
-                      },
-                    ));
+                _launchUrl();
+                // Navigator.push(
+                //     context,
+                //     PageRouteBuilder(
+                //       pageBuilder: (context, animation, secondaryAnimation) {
+                //         return DaraSupport();
+                //       },
+                //       transitionsBuilder:
+                //           (context, animation, secondaryAnimation, child) {
+                //         return FadeTransition(
+                //           opacity: animation,
+                //           child: child,
+                //         );
+                //       },
+                //     ));
               },
             ),
             Divider(),
@@ -260,20 +291,28 @@ class _OffersState extends State<Offers> {
                   style: GoogleFonts.inter(
                       fontSize: 12, fontWeight: FontWeight.bold)),
               onTap: () {
-                Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) {
-                        return ShareApp();
-                      },
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
-                      },
-                    ));
+                Future<void> _launchUrl() async {
+                  final Uri _url = Uri.parse('https://usedara.com/');
+                  if (!await launchUrl(_url)) {
+                    throw Exception('Could not launch $_url');
+                  }
+                }
+
+                _launchUrl();
+                // Navigator.push(
+                //     context,
+                //     PageRouteBuilder(
+                //       pageBuilder: (context, animation, secondaryAnimation) {
+                //         return ShareApp();
+                //       },
+                //       transitionsBuilder:
+                //           (context, animation, secondaryAnimation, child) {
+                //         return FadeTransition(
+                //           opacity: animation,
+                //           child: child,
+                //         );
+                //       },
+                //     ));
               },
             ),
             ListTile(
@@ -282,8 +321,18 @@ class _OffersState extends State<Offers> {
                   style: GoogleFonts.inter(
                       fontSize: 12, fontWeight: FontWeight.bold)),
               onTap: () {
+                // https://usedara.com/about-us
+                Future<void> _launchUrl() async {
+                  final Uri _url = Uri.parse('https://usedara.com/about-us');
+                  if (!await launchUrl(_url)) {
+                    throw Exception('Could not launch $_url');
+                  }
+                }
+
+                _launchUrl();
+
                 // Add your settings page navigation logic here
-                Navigator.pop(context); // Close the drawer
+                // Navigator.pop(context); // Close the drawer
               },
             ),
             ListTile(
@@ -916,7 +965,7 @@ class _OffersState extends State<Offers> {
                           height: 20,
                         ),
                         Text(
-                          "Project hire from Daniel Smith Accepted",
+                          "Project hire has been Accepted",
                           style: GoogleFonts.notoSans(
                               fontSize: 14,
                               color: Color(0XFF374151),
@@ -1007,7 +1056,7 @@ class _OffersState extends State<Offers> {
                           height: 20,
                         ),
                         Text(
-                          "Project hire from Daniel Smith declined",
+                          "Project hire has been declined",
                           style: GoogleFonts.notoSans(
                               fontSize: 14,
                               color: Color(0XFF374151),

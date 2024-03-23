@@ -14,13 +14,43 @@ String url = 'base.usedara.com'; // Replace with your API endpoint
 
 Future<dynamic> registerServiceProvider(
     {required countryCallCode, required phoneNumber}) async {
+  print("${countryCallCode}${phoneNumber}");
+  print("${countryCallCode}${phoneNumber}");
   try {
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
     };
 
     final Map<String, dynamic> requestBody = {
-      "phone": "${countryCallCode}${phoneNumber}"
+      "phone": "$countryCallCode$phoneNumber"
+    }; // Replace with your request data
+
+    http.Client client = http.Client();
+    final response = await client.post(
+      Uri.https(url, "/api/v1/signup/otp"),
+      headers: headers,
+      body: jsonEncode(requestBody),
+    );
+
+    final utf8Response = utf8.decode(response.bodyBytes);
+    final jsonData = json.decode(utf8Response) as Map;
+
+    return jsonData;
+  } on SocketException catch (e) {
+    return {"status": "Network Error"};
+  } on Error catch (e) {
+    return "Some error occured";
+  }
+}
+
+Future<dynamic> resendEmail({required email}) async {
+  try {
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+
+    final Map<String, dynamic> requestBody = {
+      "phone": "$email"
     }; // Replace with your request data
 
     http.Client client = http.Client();
@@ -74,9 +104,8 @@ Future<dynamic> saveBankAccount(
 
 Future<dynamic> loginServiceProvider(
     {required phoneNumber, required password}) async {
-  print(phoneNumber);
-  print(phoneNumber);
-  print(phoneNumber);
+  print("${phoneNumber}");
+  print("${phoneNumber}");
   try {
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -84,7 +113,8 @@ Future<dynamic> loginServiceProvider(
 
     final Map<String, dynamic> requestBody = {
       "phone": phoneNumber,
-      "password": password
+      "password": password,
+      "fcm_token": device_token
     }; // Replace with your request data
 
     http.Client client = http.Client();
@@ -133,6 +163,37 @@ Future<dynamic> verifyServiceProvider(
     return "Some error occured";
   }
 }
+
+// Future<dynamic> resetPassword(
+//     {required confirmPassword, required password}) async {
+//   try {
+//     final Map<String, String> headers = {
+//       'Content-Type': 'application/json',
+//     };
+
+//     final Map<String, dynamic> requestBody = {
+//       // "phone": value,
+//       "confirmed_password": confirmPassword,
+//       "password": password
+//     }; // Replace with your request data
+
+//     http.Client client = http.Client();
+//     final response = await client.post(
+//       Uri.https(url, "/api/v1/reset-password"),
+//       headers: headers,
+//       body: jsonEncode(requestBody),
+//     );
+
+//     final utf8Response = utf8.decode(response.bodyBytes);
+//     final jsonData = json.decode(utf8Response) as Map;
+
+//     return jsonData;
+//   } on SocketException catch (e) {
+//     return {"status": "Network Error"};
+//   } on Error catch (e) {
+//     return "Some error occured";
+//   }
+// }
 
 Future<dynamic> userServiceInformation(
     {File? imageFile,
@@ -227,12 +288,39 @@ Future<dynamic> getNotifications() async {
 
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response);
+    print(jsonData);
+    print(jsonData);
 
     return jsonData["data"] == "0" ||
             jsonData["data"] == 0 ||
             jsonData["data"] == null
         ? []
-        : jsonData["data"] == "0";
+        : jsonData["data"];
+  } on SocketException catch (e) {
+    return {"status": "Network Error"};
+  } on Error catch (e) {
+    return "Some error occured";
+  }
+}
+
+Future<dynamic> getServiceProvider(String id) async {
+  try {
+    String token = getX.read(constants.GETX_TOKEN);
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
+    };
+    http.Client client = http.Client();
+    final response = await client.get(
+      Uri.https(url, "/api/v1/sp/$id/details"),
+      headers: headers,
+    );
+    final utf8Response = utf8.decode(response.bodyBytes);
+    final jsonData = json.decode(utf8Response);
+    print(jsonData);
+    print(jsonData);
+    print(jsonData);
+    return jsonData["data"][0];
   } on SocketException catch (e) {
     return {"status": "Network Error"};
   } on Error catch (e) {
@@ -243,6 +331,7 @@ Future<dynamic> getNotifications() async {
 Future<dynamic> ServiceProviderMap() async {
   try {
     String token = getX.read(constants.GETX_TOKEN);
+    print(token);
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
@@ -479,6 +568,33 @@ Future<dynamic> getSkills() async {
   }
 }
 
+Future<dynamic> getSpecificSkills(id) async {
+  String token = getX.read(constants.GETX_TOKEN);
+  print(token);
+  print("/api/v1/categories/${id}/skills");
+  try {
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
+    };
+
+    http.Client client = http.Client();
+    final response = await client.get(
+      Uri.https(url, "/api/v1/categories/${id}/skills"),
+      headers: headers,
+    );
+
+    final utf8Response = utf8.decode(response.bodyBytes);
+    final jsonData = json.decode(utf8Response);
+
+    return jsonData["data"];
+  } on SocketException catch (e) {
+    return {"status": "Network Error"};
+  } on Error catch (e) {
+    return "Some error occured";
+  }
+}
+
 Future<dynamic> getServices() async {
   try {
     String token = getX.read(constants.GETX_TOKEN);
@@ -543,6 +659,9 @@ Future<dynamic> serviceProviderPersonalInfo(
 
 Future<dynamic> getOffers(context) async {
   DataProvider dataProvider = Provider.of(context, listen: false);
+  print(dataProvider.userType == "client"
+      ? "/api/v1/customer/offers"
+      : "/api/v1/offers");
 
   try {
     String token = getX.read(constants.GETX_TOKEN);
@@ -560,10 +679,11 @@ Future<dynamic> getOffers(context) async {
                 ? "/api/v1/customer/offers"
                 : "/api/v1/offers"),
         headers: headers);
+      
     // mywidgets.displayToast(msg: "after making the get request");
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response) as Map;
-
+      print(jsonData);
     return jsonData;
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -641,6 +761,7 @@ Future<dynamic> myProjects(context) async {
     // mywidgets.displayToast(msg: "after making the get request");
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response) as Map;
+    print(jsonData);
 
     return jsonData;
   } on SocketException catch (e) {
@@ -727,7 +848,7 @@ Future<dynamic> likePost({required status_id}) async {
 
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response);
-
+    print(jsonData);
     return jsonData;
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -736,34 +857,34 @@ Future<dynamic> likePost({required status_id}) async {
   }
 }
 
-Future<dynamic> unlikePost({required status_id}) async {
-  try {
-    String token = getX.read(constants.GETX_TOKEN);
-    final Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token'
-    };
+// Future<dynamic> unlikePost({required status_id}) async {
+//   try {
+//     String token = getX.read(constants.GETX_TOKEN);
+//     final Map<String, String> headers = {
+//       'Content-Type': 'application/json',
+//       'Authorization': 'Bearer $token'
+//     };
 
-    final Map<String, dynamic> requestBody = {
-      "status_id": "$status_id",
-    }; // Replace with your request data
-    http.Client client = http.Client();
-    final response = await client.post(
-      Uri.https(url, "/api/v1/status/unlike"),
-      headers: headers,
-      body: jsonEncode(requestBody),
-    );
+//     final Map<String, dynamic> requestBody = {
+//       "status_id": "$status_id",
+//     }; // Replace with your request data
+//     http.Client client = http.Client();
+//     final response = await client.post(
+//       Uri.https(url, "/api/v1/status/unlike"),
+//       headers: headers,
+//       body: jsonEncode(requestBody),
+//     );
 
-    final utf8Response = utf8.decode(response.bodyBytes);
-    final jsonData = json.decode(utf8Response) as Map;
+//     final utf8Response = utf8.decode(response.bodyBytes);
+//     final jsonData = json.decode(utf8Response) as Map;
 
-    return jsonData;
-  } on SocketException catch (e) {
-    return {"status": "Network Error"};
-  } on Error catch (e) {
-    return "Some error occured $e";
-  }
-}
+//     return jsonData;
+//   } on SocketException catch (e) {
+//     return {"status": "Network Error"};
+//   } on Error catch (e) {
+//     return "Some error occured $e";
+//   }
+// }
 
 Future<dynamic> confirmProjectCompletion({required project_id}) async {
   String baseUrl =
@@ -891,7 +1012,8 @@ Future<dynamic> loginClient({required email, required password}) async {
 
     final Map<String, dynamic> requestBody = {
       "phone": email,
-      "password": password
+      "password": password,
+      "fcm_token": device_token
     }; // Replace with your request data
 
     http.Client client = http.Client();
@@ -904,6 +1026,33 @@ Future<dynamic> loginClient({required email, required password}) async {
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response) as Map;
 
+    return jsonData;
+  } on SocketException catch (e) {
+    return {"status": "Network Error"};
+  } on Error catch (e) {
+    return "Some error occured";
+  }
+}
+
+Future<dynamic> forgetPassword({required email}) async {
+  try {
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+
+    final Map<String, dynamic> requestBody = {
+      "phone": email
+    }; // Replace with your request data
+
+    http.Client client = http.Client();
+    final response = await client.post(
+      Uri.https(url, "/api/v1/password/reset"),
+      headers: headers,
+      body: jsonEncode(requestBody),
+    );
+
+    final utf8Response = utf8.decode(response.bodyBytes);
+    final jsonData = json.decode(utf8Response);
     return jsonData;
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -1020,14 +1169,47 @@ Future<dynamic> resetPassword(
   }
 }
 
+Future<dynamic> changePassword({
+  required newPassword,
+  required email,
+  required confirmedPassword,
+}) async {
+  try {
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+
+    final Map<String, dynamic> requestBody = {
+      "new": newPassword,
+      "phone": email
+    }; // Replace with your request data
+
+    http.Client client = http.Client();
+    final response = await client.post(
+      Uri.https(url, "/api/v1/password/reset/new"),
+      headers: headers,
+      body: jsonEncode(requestBody),
+    );
+
+    final utf8Response = utf8.decode(response.bodyBytes);
+    final jsonData = json.decode(utf8Response);
+
+    return jsonData;
+  } on SocketException catch (e) {
+    return {"status": "Network Error"};
+  } on Error catch (e) {
+    return "Some error occured";
+  }
+}
+
 /////////////////////////////////////// The post api request
 
 Future<dynamic> createPost({
   List<XFile?>? imageFiles,
-  required String token,
   required body,
 }) async {
   try {
+    String token = getX.read(constants.GETX_TOKEN);
     String uri = '${mainUrl}/status';
     final request = http.MultipartRequest('POST', Uri.parse(uri));
 
@@ -1075,11 +1257,13 @@ Future<dynamic> updatePersonalInfo(
   try {
     String uri = 'https://base.usedara.com/api/v1/profile/update';
     final request = http.MultipartRequest('Post', Uri.parse(uri));
+    String token = getX.read(constants.GETX_TOKEN);
     request.fields['first_name'] = first_name;
     request.fields['last_name'] = last_name;
     request.fields['phone'] = phone;
     request.fields['email'] = email;
     request.fields['bio'] = bio;
+    request.headers['Authorization'] = 'Bearer $token';
     if (imageFile != null) {
       final fileStream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
       final length = await imageFile.length();
@@ -1109,14 +1293,55 @@ Future<dynamic> updateAddressInfo(
     required phone,
     d}) async {
   try {
-    String uri = 'https://base.usedara.com/api/v1/service-information';
+    String token = getX.read(constants.GETX_TOKEN);
+    String uri = 'https://base.usedara.com/api/v1/customer/address';
     final request = http.MultipartRequest('Post', Uri.parse(uri));
     request.fields['country'] = country;
     request.fields['state'] = state;
     request.fields['lga'] = lga;
     request.fields['address'] = address;
-    request.fields['user_id'] = user_id;
-    request.fields['phone'] = phone;
+    request.fields['user_id'] = user_id.toString();
+    request.headers['Authorization'] = 'Bearer $token';
+    // request.fields['phone'] = "phone";
+    if (imageFile != null) {
+      final fileStream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
+      final length = await imageFile.length();
+      final multipartFile = http.MultipartFile(
+          'profile_image', fileStream, length,
+          filename: path.basename(imageFile.path));
+      request.files.add(multipartFile); // Add the file to the request
+    }
+    final response = await request.send();
+    final responseString = await response.stream.bytesToString();
+    final jsonData = json.decode(responseString);
+    print(jsonData);
+    return jsonData;
+  } on SocketException catch (e) {
+    print(e);
+    return {"status": "Network Error"};
+  } on Error catch (e) {
+    print(e);
+    return {"status": "Some error occurred"};
+  }
+}
+
+Future<dynamic> updateServiceInfo(
+    {File? imageFile,
+    required bio,
+    required skills,
+    required user_id,
+    required service,
+    required experience}) async {
+  try {
+    String token = getX.read(constants.GETX_TOKEN);
+    String uri = 'https://base.usedara.com/api/v1/service-information';
+    final request = http.MultipartRequest('Post', Uri.parse(uri));
+    request.fields['bio'] = bio;
+    request.fields['skills'] = skills;
+    request.fields['user_id'] = user_id.toString();
+    request.fields["service"] = service;
+    request.fields['experience'] = experience;
+    request.headers['Authorization'] = 'Bearer $token';
     if (imageFile != null) {
       final fileStream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
       final length = await imageFile.length();
@@ -1128,6 +1353,86 @@ Future<dynamic> updateAddressInfo(
     final response = await request.send();
     final responseString = await response.stream.bytesToString();
     final jsonData = json.decode(responseString);
+    print(jsonData);
+    return jsonData;
+  } on SocketException catch (e) {
+    return {"status": "Network Error"};
+  } on Error catch (e) {
+    return {"status": "Some error occurred"};
+  }
+}
+
+Future<dynamic> updateKyc(
+    {File? cac,
+    required id_number,
+    File? id_image_back,
+    File? id_image_front,
+    required id_type}) async {
+  try {
+    String token = getX.read(constants.GETX_TOKEN);
+    String uri = 'https://base.usedara.com/api/v1/kyc';
+    final request = http.MultipartRequest('Post', Uri.parse(uri));
+    request.fields['id_number'] = id_number;
+    request.fields['id_type'] = id_type;
+    request.headers['Authorization'] = 'Bearer $token';
+    if (id_image_back != null || id_image_front != null || cac != null) {
+      final fileStream =
+          http.ByteStream(Stream.castFrom(id_image_front!.openRead()));
+      final length = await id_image_front!.length();
+
+      final fileStream2 =
+          http.ByteStream(Stream.castFrom(id_image_back!.openRead()));
+      final length2 = await id_image_back!.length();
+
+      final fileStream3 = http.ByteStream(Stream.castFrom(cac!.openRead()));
+      final length3 = await cac.length();
+
+      final multipartFile = http.MultipartFile(
+          'id_image_front', fileStream, length,
+          filename: path.basename(id_image_front.path));
+
+      final multipartFile2 = http.MultipartFile(
+          'id_image_back', fileStream2, length2,
+          filename: path.basename(id_image_back.path));
+
+      final multipartFile3 = http.MultipartFile('cac', fileStream3, length3,
+          filename: path.basename(cac.path));
+
+      request.files.add(multipartFile); // Add the file to the request
+      request.files.add(multipartFile2); // Add the file to the request
+      request.files.add(multipartFile3); // Add the file to the request
+    }
+    final response = await request.send();
+    final responseString = await response.stream.bytesToString();
+    final jsonData = json.decode(responseString);
+    print(jsonData);
+    return jsonData;
+  } on SocketException catch (e) {
+    return {"status": "Network Error"};
+  } on Error catch (e) {
+    return {"status": "Some error occurred"};
+  }
+}
+
+Future<dynamic> updateBanner({
+  File? imageFile,
+}) async {
+  try {
+    String token = getX.read(constants.GETX_TOKEN);
+    String uri = 'https://base.usedara.com/api/v1/banner/update';
+    final request = http.MultipartRequest('Post', Uri.parse(uri));
+    request.headers['Authorization'] = 'Bearer $token';
+    if (imageFile != null) {
+      final fileStream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
+      final length = await imageFile.length();
+      final multipartFile = http.MultipartFile('media', fileStream, length,
+          filename: path.basename(imageFile.path));
+      request.files.add(multipartFile); // Add the file to the request
+    }
+    final response = await request.send();
+    final responseString = await response.stream.bytesToString();
+    final jsonData = json.decode(responseString);
+    print(jsonData);
     return jsonData;
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -1255,6 +1560,36 @@ Future<dynamic> setProjectAmount({
   }
 }
 
+Future<dynamic> setAbout({required about}) async {
+  try {
+    String token = getX.read(constants.GETX_TOKEN);
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
+    };
+
+    final Map<String, dynamic> requestBody = {
+      "about": about,
+    }; // Replace with your request data
+
+    http.Client client = http.Client();
+    final response = await client.post(
+      Uri.https(url, "/api/v1/profile/aboutme"),
+      headers: headers,
+      body: jsonEncode(requestBody),
+    );
+
+    final utf8Response = utf8.decode(response.bodyBytes);
+    final jsonData = json.decode(utf8Response);
+
+    return jsonData;
+  } on SocketException catch (e) {
+    return {"status": "Network Error"};
+  } on Error catch (e) {
+    return "Some error occured";
+  }
+}
+
 Future<dynamic> sendLocation({
   required latitude,
   required longitude,
@@ -1289,48 +1624,96 @@ Future<dynamic> sendLocation({
   }
 }
 
-Future<dynamic> getAgoraChannelToken(
-    {required channelName, required role}) async {
-  Future<dynamic> getClientOffers() async {
-    try {
-      String token = getX.read(constants.GETX_TOKEN);
-      final Map<String, String> headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token'
-      };
-
-      http.Client client = http.Client();
-      final response = await client
-          .get(Uri.https(url, "/api/v1/customer/offers"), headers: headers);
-      final utf8Response = utf8.decode(response.bodyBytes);
-      final jsonData = json.decode(utf8Response) as Map;
-
-      return jsonData;
-    } on SocketException catch (e) {
-      return {"status": "Network Error"};
-    } on Error catch (e) {
-      return "Some error occured $e";
-    }
-  }
-
-  Future<dynamic> getAgoraChannelToken(
-      {required channelName, required role}) async {
-    print(
-        ">>>>>>>>>>>>>>>>In the getAgoraChannelToken Place...... Before making the http request to get token");
+Future<dynamic> getClientOffers() async {
+  try {
+    String token = getX.read(constants.GETX_TOKEN);
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
+    };
 
     http.Client client = http.Client();
-    http.Response response = await client.post(
-      Uri.https("gradeeasebackend.onrender.com", "/agora/generateAccessToken"),
-      body: json.encode({
-        "channel": channelName,
-        "role": role, //subscriber, publisher
-      }),
-      headers: {"Content-Type": "application/json"},
+    final response = await client.get(Uri.https(url, "/api/v1/customer/offers"),
+        headers: headers);
+    final utf8Response = utf8.decode(response.bodyBytes);
+    final jsonData = json.decode(utf8Response) as Map;
+
+    return jsonData;
+  } on SocketException catch (e) {
+    return {"status": "Network Error"};
+  } on Error catch (e) {
+    return "Some error occured $e";
+  }
+}
+
+Future<dynamic> getAgoraChannelToken(
+    {required channelName, required role}) async {
+  print(
+      ">>>>>>>>>>>>>>>>In the getAgoraChannelToken Place...... Before making the http request to get token");
+
+  http.Client client = http.Client();
+  http.Response response = await client.post(
+    Uri.https("gradeeasebackend.onrender.com", "/agora/generateAccessToken"),
+    body: json.encode({
+      "channel": channelName,
+      "role": role, //subscriber, publisher
+    }),
+    headers: {"Content-Type": "application/json"},
+  );
+
+  dynamic decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+
+  return decodedResponse;
+}
+
+Future<dynamic> sendNotification({title, body, token}) async {
+  try {
+    const serverToken =
+        "AAAA4Gcykpk:APA91bE4UgV8YtqxXUKJ_qRp5HBRguGEKFNElhF0hOo0Ex3uJqAZTdM6PcZKP0XfKjwVxCn18FeW0sSxug8rvMZkosBLUkSSZaX6sgDVnZq8OlPu7PAbPsQa9AWtsM-XmDYtIS7QlgMP";
+    // String token = getX.read(constants.GETX_TOKEN);
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': "key=${serverToken}",
+    };
+
+    final Map<String, dynamic> requestBody = {
+      "notification": {
+        "title": title,
+        "body": body,
+        "sound": "alert.mp3",
+      },
+      "priority": 'high',
+      "sound": "alert.mp3",
+      "data": {
+        "click_action": 'FLUTTER_NOTIFICATION_CLICK',
+        "id": '1',
+        "sound": "alert.mp3",
+      },
+      "apns": {
+        "payload": {
+          "aps": {
+            "sound": "alert.mp3",
+          }
+        }
+      },
+      "to": token,
+    }; // Replace with your request data
+
+    http.Client client = http.Client();
+    final response = await client.post(
+      Uri.https("fcm.googleapis.com", "/fcm/send"),
+      headers: headers,
+      body: jsonEncode(requestBody),
     );
 
-    dynamic decodedResponse =
-        jsonDecode(utf8.decode(response.bodyBytes)) as Map;
-
-    return decodedResponse;
+    final utf8Response = utf8.decode(response.bodyBytes);
+    final jsonData = json.decode(utf8Response);
+    print(jsonData);
+    print(jsonData);
+    return jsonData;
+  } on SocketException catch (e) {
+    return {"status": "Network Error"};
+  } on Error catch (e) {
+    return "Some error occured $e";
   }
 }

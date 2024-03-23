@@ -1,11 +1,11 @@
-import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dara_app/main.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:dara_app/screens/authentication/login.dart';
 import 'package:dara_app/screens/authentication/registration.dart';
 import 'package:dara_app/screens/authentication/registrationClient.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 
 ////////////////// So, I need the bottom nav bar to check the user tier,
@@ -135,6 +135,7 @@ class _SelectTierState extends State<SelectTier>{
                         width: 64,
                         height: 64,
                         padding: EdgeInsets.symmetric(horizontal: 20),
+                        margin: EdgeInsets.only(left: 10),
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: AssetImage("assets/serviceProviderLogo.png"),
@@ -214,6 +215,7 @@ class _SelectTierState extends State<SelectTier>{
                         // color: Colors.red,
                         width: 64,
                         height: 64,
+                        margin: EdgeInsets.only(left: 10),
                         padding: EdgeInsets.symmetric(horizontal: 20),
                         decoration: BoxDecoration(
                           image: DecorationImage(

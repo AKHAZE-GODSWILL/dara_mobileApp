@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:dara_app/utils/apiRequest.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dara_app/screens/chat/Chat.dart';
+import 'package:dara_app/widget/call_dialog.dart';
 import 'package:dara_app/Firebase/Model/User.dart';
 import 'package:dara_app/widget/custom_circle.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
@@ -12,6 +13,7 @@ import 'package:dara_app/Firebase/Firebase_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/callsScreen.dart';
+
 
 class ViewOffers extends StatefulWidget {
   const ViewOffers(
@@ -260,8 +262,11 @@ class _ViewOffersState extends State<ViewOffers> {
                           List<User> users = [
                             User(
                               lastMessage: '',
-                              urlAvatar:  widget.offerDetail["sender_profile_image"],
-                              userMobile: "",
+                              urlAvatar:
+                                  widget.offerDetail["sender_profile_image"],
+                              userMobile: widget.offerDetail.toString(),
+                              fcmToken:
+                                  widget.offerDetail["fcm_token"].toString(),
                               lastMessageTime: DateTime.now(),
                               idUser: widget.offerDetail["sender_user_id"],
                               name: '${widget.offerDetail["sender"]}',
@@ -274,20 +279,26 @@ class _ViewOffersState extends State<ViewOffers> {
 
                           //----------------------//
                           FirebaseApi.addUserChat(
-                            // shipment: e.value,
-                            token2: 'data.fcmToken',
-                            token: 'snapshot.data[index].fcmToken',
+                            token2: device_token,
+                            token: users[0].fcmToken,
                             urlAvatar2: provider.client_profile_image,
                             name2: provider.client_first_name,
                             recieveruserId2:
-                                provider.sp_user_id.toString() == null
+                                provider.userType.toString() == "client"
                                     ? provider.client_user_id.toString()
                                     : provider.sp_user_id.toString(),
                             recieveruserId: users[0].idUser,
-                            idArtisan: provider.sp_user_id.toString() == null
+                            idArtisan: provider.userType.toString() == "client"
                                 ? provider.client_user_id.toString()
                                 : provider.sp_user_id.toString(),
-                            artisanMobile: provider.client_phone,
+                            artisanMobile:
+                                provider.userType.toString() == "client"
+                                    ? provider.value["user_object"]
+                                            ["personal_information"]["phone"]
+                                        .toString()
+                                    : provider.value["user_object"]
+                                            ["personal_information"]["phone"]
+                                        .toString(),
                             userMobile: users[0].userMobile,
                             idUser: users[0].idUser.toString(),
                             urlAvatar: users[0].urlAvatar,
@@ -330,29 +341,38 @@ class _ViewOffersState extends State<ViewOffers> {
                       InkWell(
                         onTap: () {
                           /////////
-                          Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) {
-                                  return CallsScreen(
-                                    target_id:
-                                        widget.offerDetail["sender_user_id"],
-                                    target_name: widget.offerDetail["sender"],
-                                    target_img: widget
-                                        .offerDetail["sender_profile_image"],
-                                  );
-                                  // MainOnboard();
-                                  // HomePageWidget();
-                                },
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  return FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  );
-                                },
-                              ));
+                          ///
+                          callDialog(
+                            context: context,
+                            phone: widget.offerDetail["phone"],
+                            target_id: widget.offerDetail["sender_user_id"],
+                            target_name: widget.offerDetail["sender"],
+                            target_img:
+                                widget.offerDetail["sender_profile_image"],
+                          );
+                          // Navigator.push(
+                          //     context,
+                          //     PageRouteBuilder(
+                          //       pageBuilder:
+                          //           (context, animation, secondaryAnimation) {
+                          //         return CallsScreen(
+                          //           target_id:
+                          //               widget.offerDetail["sender_user_id"],
+                          //           target_name: widget.offerDetail["sender"],
+                          //           target_img: widget
+                          //               .offerDetail["sender_profile_image"],
+                          //         );
+                          //         // MainOnboard();
+                          //         // HomePageWidget();
+                          //       },
+                          //       transitionsBuilder: (context, animation,
+                          //           secondaryAnimation, child) {
+                          //         return FadeTransition(
+                          //           opacity: animation,
+                          //           child: child,
+                          //         );
+                          //       },
+                          //     ));
                         },
                         child: Container(
                           height: 40,

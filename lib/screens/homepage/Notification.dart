@@ -21,7 +21,18 @@ class _NotificationState extends State<Notifications> {
     super.initState();
     getNotifications().then((value) {
       setState(() {
-        notification = value;
+          if (value.toString() == "false") {
+       setState(() {
+          notification = [];
+       });
+      } else {
+        setState(() {
+          notification = value;
+          notification = notification!
+              .where((element) => element["status"] == "0")
+              .toList();
+        });
+      }
       });
     });
   }

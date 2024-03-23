@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'Posts.dart';
 import 'Reviews.dart';
 import 'Overview.dart';
@@ -5,21 +6,87 @@ import 'package:dara_app/main.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:dara_app/utils/apiRequest.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:dara_app/Provider/DataProvider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dara_app/screens/homepage/drawerRoutes/settings/businnesInfo.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/personalInfo.dart';
-
 
 enum TypeSelected { OVERVIEW, POST, REVIEW }
 
 class AccountMain extends StatefulWidget {
-  const AccountMain({Key? key, required this. backToHome}) : super(key: key);
+  const AccountMain({Key? key, required this.backToHome}) : super(key: key);
   final Function backToHome;
   @override
   State<AccountMain> createState() => _AccountMainState();
 }
 
 class _AccountMainState extends State<AccountMain> {
+  String updatedImage = "";
+  String imgPath = "";
+
+  String imgPath_Url = "";
+  String imgExt = "";
+  File? readyUploadImage;
+  bool hasImg = false;
+
+  getImageGallery(DataProvider provider) {
+    ImagePicker().pickImage(source: ImageSource.gallery).then((selectedImage) {
+      if (selectedImage == null) return;
+      readyUploadImage = File(selectedImage.path);
+      setState(() {
+        imgPath = readyUploadImage!.path;
+        imgExt = imgPath.split(".").last;
+        hasImg = true;
+        imgPath_Url = "";
+      });
+
+      updateBanner(
+        imageFile: readyUploadImage,
+      ).then((value) {
+        Fluttertoast.showToast(msg: "Updated Successfully");
+        reloadUserObject().then((value) {
+          if ((provider.userType == "serviceProvider")) {
+            provider.set_sp_login_info(
+                value: value,
+                firstName: value["user_object"]["personal_information"]
+                    ["first_name"],
+                lastName: value["user_object"]["personal_information"]
+                    ["last_name"],
+                email: value["user_object"]["personal_information"]["email"],
+                id: value["user_object"]["personal_information"]["id"]
+                    .toString(),
+                access_token: value["access_token"],
+                profile_image:
+                    (value["user_object"]["address_information"] != null)
+                        ? value["user_object"]["address_information"]
+                            ["profile_image"]
+                        : "");
+          } else {
+            provider.set_client_login_info(
+                value: value,
+                firstName: value["user_object"]["personal_information"]
+                    ["first_name"],
+                lastName: value["user_object"]["personal_information"]
+                    ["last_name"],
+                email: value["user_object"]["personal_information"]["email"],
+                id: value["user_object"]["personal_information"]["id"]
+                    .toString(),
+                access_token: value["access_token"],
+                profile_image:
+                    (value["user_object"]["address_information"] != null)
+                        ? value["user_object"]["address_information"]
+                            ["profile_image"]
+                        : "");
+          }
+        });
+      });
+    });
+  }
+
   TypeSelected selected = TypeSelected.OVERVIEW;
 
   @override
@@ -41,10 +108,22 @@ class _AccountMainState extends State<AccountMain> {
                       Container(
                           width: MediaQuery.of(context).size.width,
                           height: 210,
-                          child: Image.asset(
-                            "assets/accBg.png",
-                            fit: BoxFit.cover,
-                          )),
+                          child:  provider.value["user_object"]
+                                      ["personal_information"]["banner"]==null?
+                                      Image.asset(
+                                  "assets/accBg.png",
+                                  fit: BoxFit.cover,
+                                )
+                                      :(imgPath.isEmpty
+                              ? Image.network(
+                                  provider.value["user_object"]
+                                      ["personal_information"]["banner"]??"",
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.file(
+                                  File(imgPath),
+                                  fit: BoxFit.cover,
+                                ))),
                       Column(
                         children: [
                           SizedBox(height: 19),
@@ -56,15 +135,16 @@ class _AccountMainState extends State<AccountMain> {
                                     height: 42,
                                     width: 42,
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(100),
+                                        borderRadius:
+                                            BorderRadius.circular(100),
                                         border:
                                             Border.all(color: Colors.white38)),
                                     child: Container(
                                         child: Transform.scale(
                                             scale: 0.5,
                                             child: IconButton(
-                                              onPressed: (){
-                                                widget.backToHome(index:0);
+                                              onPressed: () {
+                                                widget.backToHome(index: 0);
                                               },
                                               icon: Icon(
                                                 Icons.arrow_back,
@@ -77,7 +157,8 @@ class _AccountMainState extends State<AccountMain> {
                                     height: 42,
                                     width: 42,
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(100),
+                                        borderRadius:
+                                            BorderRadius.circular(100),
                                         border:
                                             Border.all(color: Colors.white38)),
                                     child: Container(
@@ -88,15 +169,24 @@ class _AccountMainState extends State<AccountMain> {
                               ],
                             ),
                           ),
-                          Padding(
-                            padding: EdgeInsets.only(
-                                right: 10,
-                                top: MediaQuery.of(context).size.height * 0.10),
-                            child: Align(
-                              alignment: Alignment.topRight,
-                              child: SvgPicture.asset("assets/svg/camera2.svg"),
+                          InkWell(
+                            onTap: () {
+                              getImageGallery(provider);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  right: 20,
+                                  left: 10,
+                                  bottom: 10,
+                                  top: MediaQuery.of(context).size.height *
+                                      0.10),
+                              child: Align(
+                                alignment: Alignment.topRight,
+                                child:
+                                    SvgPicture.asset("assets/svg/camera2.svg"),
+                              ),
                             ),
-                          ),
+                          )
                         ],
                       )
                     ],
@@ -115,49 +205,84 @@ class _AccountMainState extends State<AccountMain> {
                             Stack(
                               children: [
                                 CachedNetworkImage(
-                                          imageUrl: (provider.userType== "serviceProvider")? provider.sp_profile_image!:provider.client_profile_image!,
-                                          imageBuilder: (context, imageProvider) => Container(
-                                            width: 80,
-                                            height: 80,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              image: DecorationImage(
-                                                image: imageProvider, fit: BoxFit.cover),
-                                            ),
-                                          ),
-                                          placeholder: (context, url) => CircularProgressIndicator(),
-                                          errorWidget: (context, url, error) => Icon(Icons.person,
-                                         size: 50, color:Colors.grey),
-                                          ),
+                                  imageUrl: provider.value["user_object"]
+                                      ["address_information"]["profile_image"],
+                                  imageBuilder: (context, imageProvider) =>
+                                      Container(
+                                    width: 80,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover),
+                                    ),
+                                  ),
+                                  placeholder: (context, url) =>
+                                      CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) => Icon(
+                                      Icons.person,
+                                      size: 50,
+                                      color: Colors.grey),
+                                ),
                                 Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: SvgPicture.asset("assets/svg/camera.svg"))
-    
-    
+                                    bottom: 0,
+                                    right: 0,
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation,
+                                                  secondaryAnimation) {
+                                                return PersonalInfo();
+                                              },
+                                              transitionsBuilder: (context,
+                                                  animation,
+                                                  secondaryAnimation,
+                                                  child) {
+                                                return FadeTransition(
+                                                  opacity: animation,
+                                                  child: child,
+                                                );
+                                              },
+                                            )).then((value) {
+                                          setState(() {});
+                                        });
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: SvgPicture.asset(
+                                            "assets/svg/camera.svg"),
+                                      ),
+                                    ))
                               ],
                             ),
                             InkWell(
-                              onTap: (){
-                                Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, animation, secondaryAnimation) {
-                                        return PersonalInfo();
-                                      },
-                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                        return FadeTransition(
-                                          opacity: animation,
-                                          child: child,
-                                        );
-                                      },
-                                    )
-                                  );
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SvgPicture.asset("assets/svg/edit.svg"),
-                              ))
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation,
+                                            secondaryAnimation) {
+                                          return PersonalInfo();
+                                        },
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          return FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          );
+                                        },
+                                      )).then((value) {
+                                    setState(() {});
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child:
+                                      SvgPicture.asset("assets/svg/edit.svg"),
+                                ))
                           ],
                         ),
                       ),
@@ -186,8 +311,8 @@ class _AccountMainState extends State<AccountMain> {
                     TextSpan(
                       text:
                           "# ${provider.value["user_object"]["service_information"][0]["skills"]} ",
-                      style:
-                          TextStyle(fontSize: 13, color: constants.appMainColor),
+                      style: TextStyle(
+                          fontSize: 13, color: constants.appMainColor),
                     )
                   ])),
                 ],
@@ -280,20 +405,22 @@ class _AccountMainState extends State<AccountMain> {
                                   },
                                   child: Center(
                                     child: Container(
-                                      width:
-                                          MediaQuery.of(context).size.width * 0.3,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.3,
                                       height: 50,
                                       child: Center(
                                         child: Text("OverView"),
                                       ),
                                       decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(30),
+                                          borderRadius:
+                                              BorderRadius.circular(30),
                                           color: Color(0xFFf3f4f6)),
                                     ),
                                   ),
                                 )
                               : Container(
-                                  width: MediaQuery.of(context).size.width * 0.3,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.3,
                                 ),
                           selected != TypeSelected.POST
                               ? InkWell(
@@ -307,17 +434,19 @@ class _AccountMainState extends State<AccountMain> {
                                       child: Center(
                                         child: Text("Posts"),
                                       ),
-                                      width:
-                                          MediaQuery.of(context).size.width * 0.3,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.3,
                                       height: 50,
                                       decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(30),
+                                          borderRadius:
+                                              BorderRadius.circular(30),
                                           color: Color(0xFFf3f4f6)),
                                     ),
                                   ),
                                 )
                               : Container(
-                                  width: MediaQuery.of(context).size.width * 0.3,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.3,
                                 ),
                           selected != TypeSelected.REVIEW
                               ? InkWell(
@@ -331,17 +460,19 @@ class _AccountMainState extends State<AccountMain> {
                                       child: Center(
                                         child: Text("Reviews"),
                                       ),
-                                      width:
-                                          MediaQuery.of(context).size.width * 0.3,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.3,
                                       height: 50,
                                       decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(30),
+                                          borderRadius:
+                                              BorderRadius.circular(30),
                                           color: Color(0xFFf3f4f6)),
                                     ),
                                   ),
                                 )
                               : Container(
-                                  width: MediaQuery.of(context).size.width * 0.3,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.3,
                                 )
                         ],
                       ),
@@ -381,16 +512,13 @@ class _AccountMainState extends State<AccountMain> {
                 ],
               ),
             ),
-    
             Divider(),
-    
-    
             selected == TypeSelected.OVERVIEW
                 ? Overview()
                 : selected == TypeSelected.POST
                     ? Posts()
-                    : Reviews(provider.value["user_object"]["personal_information"]
-            ["service_provider"])
+                    : Reviews(provider.value["user_object"]
+                        ["personal_information"]["service_provider"])
           ],
         ),
       ),

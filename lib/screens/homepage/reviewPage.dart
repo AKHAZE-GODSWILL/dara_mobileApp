@@ -292,7 +292,7 @@ class _ReviewServiceState extends State<ReviewService> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Text(
-                          "Would you recommend Daniel services to other clients?",
+                          "Would you recommend ${(provider.userType == "serviceProvider") ? widget.projectDetail["customer_first_name"] : widget.projectDetail["service_provider_first_name"]} services to other clients?",
                           style: TextStyle(
                               fontSize: 12, fontWeight: FontWeight.bold),
                         ),
@@ -352,7 +352,6 @@ class _ReviewServiceState extends State<ReviewService> {
                           Navigator.of(context, rootNavigator: true).pop();
                           Navigator.of(context, rootNavigator: true).pop();
                         } else if (value["status"] == "Network Error") {
-                        
                           Navigator.pop(context);
                           mywidgets.displayToast(
                               msg:
