@@ -50,7 +50,6 @@ class _BusinessInfoState extends State<BusinessInfo> {
   @override
   void initState() {
     DataProvider provider = Provider.of<DataProvider>(context, listen: false);
-    print(provider.value["user_object"]);
     dropdownvalueLGA =
         provider.value["user_object"]["address_information"]["lga"];
     dropdownvalueSkills =
@@ -837,8 +836,6 @@ class _BusinessInfoState extends State<BusinessInfo> {
 
                       InkWell(
                         onTap: () {
-                          print(readyUploadImage_Cover);
-                          print(readyUploadImage);
                           if (readyUploadImage == null) {
                             Fluttertoast.showToast(msg: "Select a picture");
                           } else {

@@ -14,8 +14,6 @@ String url = 'base.usedara.com'; // Replace with your API endpoint
 
 Future<dynamic> registerServiceProvider(
     {required countryCallCode, required phoneNumber}) async {
-  print("${countryCallCode}${phoneNumber}");
-  print("${countryCallCode}${phoneNumber}");
   try {
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -104,8 +102,6 @@ Future<dynamic> saveBankAccount(
 
 Future<dynamic> loginServiceProvider(
     {required phoneNumber, required password}) async {
-  print("${phoneNumber}");
-  print("${phoneNumber}");
   try {
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -262,7 +258,6 @@ Future<dynamic> sendUpdatedViews() async {
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response);
     getX.remove("views");
-    print(jsonData);
 
     return jsonData;
   } on SocketException catch (e) {
@@ -288,8 +283,6 @@ Future<dynamic> getNotifications() async {
 
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response);
-    print(jsonData);
-    print(jsonData);
 
     return jsonData["data"] == "0" ||
             jsonData["data"] == 0 ||
@@ -317,9 +310,6 @@ Future<dynamic> getServiceProvider(String id) async {
     );
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response);
-    print(jsonData);
-    print(jsonData);
-    print(jsonData);
     return jsonData["data"][0];
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -331,7 +321,6 @@ Future<dynamic> getServiceProvider(String id) async {
 Future<dynamic> ServiceProviderMap() async {
   try {
     String token = getX.read(constants.GETX_TOKEN);
-    print(token);
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
@@ -414,7 +403,6 @@ Future<dynamic> fetchHistory() async {
     );
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response);
-    print(jsonData);
     return jsonData["data"] ?? [];
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -437,7 +425,6 @@ Future<dynamic> fetchReview(id) async {
     );
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response);
-    print(jsonData);
     return jsonData["data"] ?? [];
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -570,8 +557,6 @@ Future<dynamic> getSkills() async {
 
 Future<dynamic> getSpecificSkills(id) async {
   String token = getX.read(constants.GETX_TOKEN);
-  print(token);
-  print("/api/v1/categories/${id}/skills");
   try {
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -659,9 +644,7 @@ Future<dynamic> serviceProviderPersonalInfo(
 
 Future<dynamic> getOffers(context) async {
   DataProvider dataProvider = Provider.of(context, listen: false);
-  print(dataProvider.userType == "client"
-      ? "/api/v1/customer/offers"
-      : "/api/v1/offers");
+
 
   try {
     String token = getX.read(constants.GETX_TOKEN);
@@ -683,7 +666,6 @@ Future<dynamic> getOffers(context) async {
     // mywidgets.displayToast(msg: "after making the get request");
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response) as Map;
-      print(jsonData);
     return jsonData;
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -761,7 +743,6 @@ Future<dynamic> myProjects(context) async {
     // mywidgets.displayToast(msg: "after making the get request");
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response) as Map;
-    print(jsonData);
 
     return jsonData;
   } on SocketException catch (e) {
@@ -848,7 +829,6 @@ Future<dynamic> likePost({required status_id}) async {
 
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response);
-    print(jsonData);
     return jsonData;
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -912,11 +892,7 @@ Future<dynamic> confirmProjectCompletion({required project_id}) async {
 Future<dynamic> completeProject({required projectId}) async {
   try {
     String token = getX.read(constants.GETX_TOKEN);
-    print({
-      "token": "Bearer $token",
-      "project_id": projectId,
-      "end_note": "completed",
-    });
+   
 
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -1314,13 +1290,10 @@ Future<dynamic> updateAddressInfo(
     final response = await request.send();
     final responseString = await response.stream.bytesToString();
     final jsonData = json.decode(responseString);
-    print(jsonData);
     return jsonData;
   } on SocketException catch (e) {
-    print(e);
     return {"status": "Network Error"};
   } on Error catch (e) {
-    print(e);
     return {"status": "Some error occurred"};
   }
 }
@@ -1353,7 +1326,6 @@ Future<dynamic> updateServiceInfo(
     final response = await request.send();
     final responseString = await response.stream.bytesToString();
     final jsonData = json.decode(responseString);
-    print(jsonData);
     return jsonData;
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -1405,7 +1377,6 @@ Future<dynamic> updateKyc(
     final response = await request.send();
     final responseString = await response.stream.bytesToString();
     final jsonData = json.decode(responseString);
-    print(jsonData);
     return jsonData;
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -1432,7 +1403,6 @@ Future<dynamic> updateBanner({
     final response = await request.send();
     final responseString = await response.stream.bytesToString();
     final jsonData = json.decode(responseString);
-    print(jsonData);
     return jsonData;
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -1465,7 +1435,6 @@ Future<dynamic> reloadUserObject() async {
 }
 
 Future<dynamic> searchServiceProviders({required query}) async {
-  print(query);
   try {
     String token = getX.read(constants.GETX_TOKEN);
     final Map<String, String> headers = {
@@ -1529,8 +1498,6 @@ Future<dynamic> setProjectAmount({
   required project_id,
 }) async {
   try {
-    print(project_id);
-    print(amount);
     String token = getX.read(constants.GETX_TOKEN);
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -1648,8 +1615,7 @@ Future<dynamic> getClientOffers() async {
 
 Future<dynamic> getAgoraChannelToken(
     {required channelName, required role}) async {
-  print(
-      ">>>>>>>>>>>>>>>>In the getAgoraChannelToken Place...... Before making the http request to get token");
+
 
   http.Client client = http.Client();
   http.Response response = await client.post(
@@ -1708,8 +1674,6 @@ Future<dynamic> sendNotification({title, body, token}) async {
 
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response);
-    print(jsonData);
-    print(jsonData);
     return jsonData;
   } on SocketException catch (e) {
     return {"status": "Network Error"};

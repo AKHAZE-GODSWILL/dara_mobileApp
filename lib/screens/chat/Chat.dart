@@ -154,7 +154,6 @@ class _ChatPageState extends State<ChatPage> {
 
     myProjects(context).then((value) {
       if (value["status"] == true && value["message"] == "success") {
-        print(value["data"]);
         setState(() {
           allProjects = value["data"];
           allProjects!.forEach((element) {
@@ -893,7 +892,7 @@ class _ChatPageState extends State<ChatPage> {
                                   child: IconButton(
                                       onPressed: () async {
                                         if (datas.isWriting) {
-                                          // print(device_token);
+                                        
                                           sendMessage();
                                           sendNotification(
                                               title: "Dara message",
@@ -1090,7 +1089,6 @@ class _ChatPageState extends State<ChatPage> {
                               value: dropdownvalueProject,
                               onChanged: (ongoingProjects) {
                                 setState(() {
-                                  print(ongoingProjects);
                                   dropdownvalueProject = ongoingProjects;
                                   dropdownvalueProjectID =
                                       ongoingProjects["project_id"];
@@ -1237,7 +1235,6 @@ class _ChatPageState extends State<ChatPage> {
                                       amount: price,
                                       project_id: dropdownvalueProjectID)
                                   .then((value) {
-                                print(value);
                                 if (value["status"] == true &&
                                     value["message"] ==
                                         "You have set the final amount for the selected project.") {

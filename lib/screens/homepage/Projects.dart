@@ -990,8 +990,7 @@ class _ProjectsState extends State<Projects> {
                                                                     ),
                                                                   ])),
                                                                   onTap: () {
-                                                                    print(completedProjects[
-                                                                        index]);
+                                                                
                                                                   },
                                                                 ),
                                                               ),

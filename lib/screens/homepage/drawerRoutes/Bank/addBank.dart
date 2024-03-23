@@ -170,13 +170,11 @@ class _AddBankState extends State<AddBank> {
                               value: dropdownvalueBankValue.toString(),
                               onChanged: (value) {
                                 setState(() {
-                                  print(value);
                                   dropdownvalueBank = widget.banks!.singleWhere(
                                           (element) => element["name"] == value)
                                       as Map;
                                   dropdownvalueBankValue = value;
-                                  print(dropdownvalueBank.toString());
-                                  // print(dropdownvalueBankValue.toString());
+                                 
                                 });
                               },
                               buttonHeight: 40,

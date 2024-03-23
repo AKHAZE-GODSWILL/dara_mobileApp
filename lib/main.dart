@@ -22,12 +22,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 String device_token = "";
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print(message);
-  print(message);
+
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  print("Handling a background message: ${message.messageId}");
-  // print(message);
+
   const AndroidNotificationDetails androidNotificationDetails =
       AndroidNotificationDetails('1', '1',
           channelDescription: '1',
@@ -98,8 +96,7 @@ class _MyAppState extends State<MyApp> {
     _firebaseMessaging = FirebaseMessaging.instance;
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      print(message);
-      print(message);
+   
       const AndroidNotificationDetails androidNotificationDetails =
           AndroidNotificationDetails('your channel id', 'your channel name',
               channelDescription: 'your channel description',
@@ -120,7 +117,7 @@ class _MyAppState extends State<MyApp> {
           NotificationResponse notificationResponse) async {
         final String? payload = notificationResponse.payload;
         if (notificationResponse.payload != null) {
-          debugPrint('notification payload: $payload');
+       
         }
         // await Navigator.push(
         //   context,
@@ -129,8 +126,7 @@ class _MyAppState extends State<MyApp> {
       }
 
       device_token = token.toString();
-      print(device_token);
-      print(device_token);
+      
 
 
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =

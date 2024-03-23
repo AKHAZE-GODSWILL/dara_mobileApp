@@ -653,11 +653,7 @@ class _GetVerifiedState extends State<GetVerified> {
                       ),
                       InkWell(
                         onTap: () {
-                          // print(filesInfo[0]["path"].toString().isEmpty);
-                          // print(filesInfo[1]["path"].toString().isEmpty);
-
-                          print(filesInfo[2]["path"].toString().isEmpty);
-                          print("ppp");
+                     
 
                           if (filesInfo[0]["path"].toString().isNotEmpty ||
                               filesInfo[1]["path"].toString().isNotEmpty ||
@@ -683,7 +679,6 @@ class _GetVerifiedState extends State<GetVerified> {
                               id_number: idNumberController.text,
                               id_type: dropdownvalueIDType,
                             ).then((value) {
-                              print("eee");
                               Navigator.pop(context);
                               Navigator.pop(context);
                               Fluttertoast.showToast(

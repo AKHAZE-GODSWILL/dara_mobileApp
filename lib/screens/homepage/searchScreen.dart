@@ -13,6 +13,7 @@ import 'package:dara_app/screens/homepage/drawerRoutes/settings/personalInfo.dar
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/loginSettings.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/withDrawalAccount.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/notificationSettings.dart';
+import 'package:dara_app/screens/homepage/serviceProviderProfile/serviceProviderAccount.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -202,7 +203,13 @@ class _SearchPageState extends State<SearchPage> {
                                   const EdgeInsets.only(top: 8.0, bottom: 8),
                               child: InkWell(
                                   onTap: () {
-                                    print(serviceProviders![index].toString());
+                                   
+                                      Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ServiceProviderAccount(
+                                            user: serviceProviders![index]["service_provider_id"]
+                                             )));
                                   },
                                   child: Container(
                                     height: 80,

@@ -435,7 +435,6 @@ class _ViewProjectState extends State<ViewProject> {
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: InkWell(
                           onTap: () {
-                            print(widget.projectDetail);
                             mywidgets.showHireSheet(
                                 context: context,
                                 sp_id: widget.projectDetail["service_provider"],

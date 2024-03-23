@@ -593,7 +593,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
                         email: emailAddressController!.text,
                         bio: bioController!.text)
                       ..then((value) {
-                        print(value);
 
                         if (value["status"] == true) {
                           mywidgets.displayToast(msg: "Profile Updated");

@@ -138,7 +138,6 @@ class _HomePageState extends State<HomePage> {
     scrollController = ScrollController();
     scrollController2 = ScrollController();
     getNotifications().then((value) {
-      print(value);
       if (value.toString() == "false") {
         setState(() {
           notification = [];
@@ -481,10 +480,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-     
-     
-     
-     
       body: notification == null || user_object == null
           ? Center(
               child: CircularProgressIndicator(),
@@ -1109,16 +1104,28 @@ class _HomePageState extends State<HomePage> {
                                                               5),
                                                       child: Row(
                                                         children: [
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    right: 8.0),
-                                                            child: CircleAvatar(
-                                                              radius: 25,
-                                                              backgroundImage:
-                                                                  NetworkImage(
-                                                                "${provider.value["user_object"]["top_rated_service_providers"][index]["profile_image"]}",
+                                                          InkWell(
+                                                            onTap: () {
+                                                              Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder: (context) =>
+                                                                          ServiceProviderAccount(
+                                                                              user: provider.value["user_object"]["top_rated_service_providers"][index]["service_provider_id"])));
+                                                            },
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      right:
+                                                                          8.0),
+                                                              child:
+                                                                  CircleAvatar(
+                                                                radius: 25,
+                                                                backgroundImage:
+                                                                    NetworkImage(
+                                                                  "${provider.value["user_object"]["top_rated_service_providers"][index]["profile_image"]}",
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
@@ -1260,14 +1267,14 @@ class _HomePageState extends State<HomePage> {
                                                                     left: 10.0),
                                                             child: InkWell(
                                                               onTap: () {
-                                                              
                                                                 mywidgets.showHireSheet(
                                                                     context:
                                                                         context,
                                                                     sp_id:
                                                                         "${provider.value["user_object"]["top_rated_service_providers"][index]["service_provider_id"]}",
                                                                     service:
-                                                                        provider.value["user_object"]["top_rated_service_providers"][index]["service"]??"");
+                                                                        provider.value["user_object"]["top_rated_service_providers"][index]["service"] ??
+                                                                            "");
                                                               },
                                                               child: Container(
                                                                 width: 69,
@@ -1642,7 +1649,6 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(onTap: () {
-                      print(posts[postIndex]["status_id"]);
                       DataProvider provider =
                           Provider.of<DataProvider>(context, listen: false);
                       GetStorage box = GetStorage();

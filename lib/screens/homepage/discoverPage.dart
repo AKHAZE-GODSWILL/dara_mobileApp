@@ -53,7 +53,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
     getLocation();
     determinePosition();
     ServiceProviderMap().then((value) {
-      print(value);
       setState(() {
         result = value;
       });
@@ -299,7 +298,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                       top: 8.0, bottom: 8),
                                   child: InkWell(
                                       onTap: () {
-                                        print(serviceProviders[index]);
                                       },
                                       child: Container(
                                         height: 80,
@@ -592,8 +590,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                                                   InkWell(
                                                                       onTap:
                                                                           () {
-                                                                        print(result![index]
-                                                                            .toString());
+                                                                     
                                                                       },
                                                                       child:
                                                                           Row(

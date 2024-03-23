@@ -312,7 +312,6 @@ class Mywidget {
   }
 
   showHireSheet({context, required sp_id, required service}) {
-    print(service);
     String? dropdownvalueProject = service;
     String message = "";
     String skillRequired = "";
@@ -518,8 +517,7 @@ class Mywidget {
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: InkWell(
                         onTap: () {
-                          print(message.isNotEmpty &&
-                              dropdownvalueProject == null);
+                         
 
                           if (message.isNotEmpty &&
                               dropdownvalueProject != null) {

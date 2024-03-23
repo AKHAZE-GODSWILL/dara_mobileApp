@@ -10,6 +10,7 @@ import 'package:dara_app/screens/homepage/drawerRoutes/settings/personalInfo.dar
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/loginSettings.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/withDrawalAccount.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/notificationSettings.dart';
+import 'package:dara_app/screens/homepage/serviceProviderProfile/serviceProviderAccount.dart';
 
 class CategoryDetails extends StatefulWidget {
   const CategoryDetails({Key? key, required this.title}) : super(key: key);
@@ -137,7 +138,13 @@ class _CategoryDetailsState extends State<CategoryDetails> {
                           padding: const EdgeInsets.only(top: 8.0, bottom: 8),
                           child: InkWell(
                               onTap: () {
-                                print(result![index].toString());
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ServiceProviderAccount(
+                                            user: result![index][
+                                                    "service_provider_id"]
+                                             )));
                               },
                               child: Container(
                                 height: 78,
@@ -271,7 +278,6 @@ class _CategoryDetailsState extends State<CategoryDetails> {
                                             const EdgeInsets.only(left: 10.0),
                                         child: InkWell(
                                           onTap: () {
-                                            print(result![index]);
                                             mywidgets.showHireSheet(
                                                 context: context,
                                                 sp_id: result![index]

@@ -26,7 +26,6 @@ class _BanksState extends State<Banks> {
     fetchOfficialBanks().then((value) {
       setState(() {
         bank_list = value;
-        print(bank_list);
       });
     });
   }

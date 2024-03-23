@@ -429,7 +429,6 @@ class _WalletPageState extends State<WalletPage> {
                               horizontal: 20, vertical: 15),
                           child: InkWell(
                             onTap: () {
-                              print(banks);
                               if (banks == {}) {
                                 Fluttertoast.showToast(
                                     msg:

@@ -228,7 +228,6 @@ class _ChatHistoryState extends State<ChatHistory> {
                           chatData.add(v);
                           searchData.add(v);
                           index++;
-                          print(index);
                         }
                         if (index == (user!.length)) {
                           done = true;
@@ -315,7 +314,7 @@ class _ChatHistoryState extends State<ChatHistory> {
     // mywidgets.displayToast(msg: "${user.lastMessage}");
     return InkWell(
       onTap: () {
-        print(user.urlAvatar.toString());
+      
         var utils = Provider.of<DataProvider>(context, listen: false);
         FirebaseApi.updateUsertoRead(
             idUser: user.idUser,

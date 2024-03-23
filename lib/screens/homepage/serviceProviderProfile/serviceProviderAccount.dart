@@ -30,7 +30,6 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
   @override
   void initState() {
     getServiceProvider(widget.user.toString()).then((value) {
-      print(value);
 
       setState(() {
         data = value;
@@ -254,7 +253,7 @@ class _ServiceProviderAccountState extends State<ServiceProviderAccount> {
                               padding: const EdgeInsets.only(left: 10.0),
                               child: InkWell(
                                 onTap: () {
-                                  // print("${data!}");
+                                
                                   mywidgets.showHireSheet(
                                       context: context,
                                       sp_id: "${data!["service_provider_id"]}",
