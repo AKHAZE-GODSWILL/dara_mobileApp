@@ -2,6 +2,7 @@ import '../../main.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:get_time_ago/get_time_ago.dart';
 import 'package:dara_app/utils/apiRequest.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dara_app/screens/chat/Chat.dart';
@@ -13,7 +14,6 @@ import 'package:dara_app/Firebase/Firebase_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/callsScreen.dart';
-
 
 class ViewOffers extends StatefulWidget {
   const ViewOffers(
@@ -120,7 +120,7 @@ class _ViewOffersState extends State<ViewOffers> {
                       SizedBox(
                         height: 10,
                       ),
-                      Text(widget.offerDetail["skill_needed"]),
+                      Text(widget.offerDetail["skill_needed"] ?? ""),
                     ],
                   ),
                 ),
@@ -142,7 +142,7 @@ class _ViewOffersState extends State<ViewOffers> {
                       SizedBox(
                         height: 10,
                       ),
-                      Text(widget.offerDetail["message"]),
+                      Text(widget.offerDetail["message"] ?? ""),
                     ],
                   ),
                 ),
@@ -164,7 +164,8 @@ class _ViewOffersState extends State<ViewOffers> {
                       SizedBox(
                         height: 10,
                       ),
-                      Text("Started: N/A"),
+                      Text(
+                          "Started: ${"${GetTimeAgo.parse(DateTime.parse(widget.offerDetail!["created_at"]))}"}"),
                       SizedBox(
                         height: 10,
                       ),
@@ -190,7 +191,7 @@ class _ViewOffersState extends State<ViewOffers> {
                       SizedBox(
                         height: 10,
                       ),
-                      Text("N${widget.offerDetail["price"]}"),
+                      Text("NGN${widget.offerDetail["price"] ?? ""}"),
                     ],
                   ),
                 ),
@@ -212,7 +213,11 @@ class _ViewOffersState extends State<ViewOffers> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: CachedNetworkImage(
-                          imageUrl: widget.offerDetail["sender_profile_image"],
+                          imageUrl: (provider.userType == "serviceProvider")
+                              ? widget.offerDetail["sender_profile_image"] ?? ""
+                              : widget.offerDetail[
+                                      "service_provider_profile_image"] ??
+                                  "",
                           imageBuilder: (context, imageProvider) => Container(
                             width: 50,
                             height: 50,
@@ -235,7 +240,10 @@ class _ViewOffersState extends State<ViewOffers> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.offerDetail["sender"],
+                            (provider.userType == "serviceProvider")
+                                ? widget.offerDetail["sender"] ?? ""
+                                : widget.offerDetail["service_provider_name"] ??
+                                    "",
                             style: TextStyle(
                                 fontSize: 17, fontWeight: FontWeight.bold),
                           ),
@@ -262,18 +270,35 @@ class _ViewOffersState extends State<ViewOffers> {
                           List<User> users = [
                             User(
                               lastMessage: '',
-                              urlAvatar:
-                                  widget.offerDetail["sender_profile_image"],
+                              urlAvatar: (provider.userType ==
+                                      "serviceProvider")
+                                  ? widget.offerDetail[
+                                          "sender_profile_image"] ??
+                                      ""
+                                  : widget.offerDetail[
+                                          "service_provider_profile_image"] ??
+                                      "",
                               userMobile: widget.offerDetail.toString(),
                               fcmToken:
                                   widget.offerDetail["fcm_token"].toString(),
                               lastMessageTime: DateTime.now(),
-                              idUser: widget.offerDetail["sender_user_id"],
-                              name: '${widget.offerDetail["sender"]}',
+                              idUser: (provider.userType == "serviceProvider")
+                                  ? widget.offerDetail["sender_user_id"] ?? ""
+                                  : widget.offerDetail["service_provider_id"] ??
+                                      "",
+                              name: (provider.userType == "serviceProvider")
+                                  ? '${widget.offerDetail["sender"] ?? ""}'
+                                  : '${widget.offerDetail["service_provider_name"] ?? ""}',
                               read: true,
-                              id: widget.offerDetail["sender_user_id"],
+                              id: (provider.userType == "serviceProvider")
+                                  ? widget.offerDetail["sender_user_id"] ?? ""
+                                  : widget.offerDetail["service_provider_id"] ??
+                                      "",
                               status: true,
-                              docid: widget.offerDetail["sender_user_id"],
+                              docid: (provider.userType == "serviceProvider")
+                                  ? widget.offerDetail["sender_user_id"] ?? ""
+                                  : widget.offerDetail["service_provider_id"] ??
+                                      "",
                             )
                           ];
 
@@ -344,11 +369,21 @@ class _ViewOffersState extends State<ViewOffers> {
                           ///
                           callDialog(
                             context: context,
-                            phone: widget.offerDetail["phone"],
-                            target_id: widget.offerDetail["sender_user_id"],
-                            target_name: widget.offerDetail["sender"],
-                            target_img:
-                                widget.offerDetail["sender_profile_image"],
+                            phone: widget.offerDetail["phone"] ?? "",
+                            target_id: (provider.userType == "serviceProvider")
+                                ? widget.offerDetail["sender_user_id"] ?? ""
+                                : widget.offerDetail["service_provider_id"] ??
+                                    "",
+                            target_name: (provider.userType ==
+                                    "serviceProvider")
+                                ? '${widget.offerDetail["sender"] ?? ""}'
+                                : '${widget.offerDetail["service_provider_name"] ?? ""}',
+                            target_img: (provider.userType == "serviceProvider")
+                                ? widget.offerDetail["sender_profile_image"] ??
+                                    ""
+                                : widget.offerDetail[
+                                        "service_provider_profile_image"] ??
+                                    "",
                           );
                           // Navigator.push(
                           //     context,
@@ -404,7 +439,8 @@ class _ViewOffersState extends State<ViewOffers> {
                             circularCustom(context);
 
                             rejectOffers(
-                                    offer_id: widget.offerDetail["offer_id"])
+                                    offer_id:
+                                        widget.offerDetail["offer_id"] ?? "")
                                 .then((value) {
                               // mywidgets.displayToast(msg: "making the request");
 
@@ -422,7 +458,8 @@ class _ViewOffersState extends State<ViewOffers> {
                                         "Network Error. Check your Network Connection and try again");
                               } else {
                                 Navigator.pop(context);
-                                mywidgets.displayToast(msg: value["message"]);
+                                mywidgets.displayToast(
+                                    msg: value["message"] ?? "");
                               }
 
                               setState(() {
@@ -461,7 +498,8 @@ class _ViewOffersState extends State<ViewOffers> {
                             // mywidgets.displayToast(msg: "${widget.offerDetail["offer_id"]}");
                             circularCustom(context);
                             acceptOffers(
-                                    offer_id: widget.offerDetail["offer_id"])
+                                    offer_id:
+                                        widget.offerDetail["offer_id"] ?? "")
                                 .then((value) {
                               // mywidgets.displayToast(msg: "making the request");
 
@@ -509,32 +547,35 @@ class _ViewOffersState extends State<ViewOffers> {
                         ),
                       ],
                     )
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: InkWell(
-                        onTap: () {
-                          (provider.userType == "serviceProvider")
-                              ? CustomAcknowledgedDialog(widget.offerDetail)
-                              : Navigator.pop(context);
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 48,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                  color: Color(0XFFEF4444), width: 2),
-                              borderRadius: BorderRadius.circular(200)),
-                          child: Center(
-                            child: Text(
-                              "Cancel Request",
-                              style: TextStyle(
-                                  color: Color(0XFFEF4444), fontSize: 14),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                  : Container(),
+
+              //  Padding(
+              //     padding: const EdgeInsets.symmetric(horizontal: 10),
+              //     child: InkWell(
+              //       onTap: () {
+              //         (provider.userType == "serviceProvider")
+              //             ? CustomAcknowledgedDialog(widget.offerDetail)
+              //             : Navigator.pop(context);
+              //       },
+              //       child: Container(
+              //         width: MediaQuery.of(context).size.width,
+              //         height: 48,
+              //         decoration: BoxDecoration(
+              //             color: Colors.white,
+              //             border: Border.all(
+              //                 color: Color(0XFFEF4444), width: 2),
+              //             borderRadius: BorderRadius.circular(200)),
+              //         child: Center(
+              //           child: Text(
+              //             "Cancel Request",
+              //             style: TextStyle(
+              //                 color: Color(0XFFEF4444), fontSize: 14),
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+
               SizedBox(height: 40)
             ],
           ),

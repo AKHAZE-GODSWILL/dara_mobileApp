@@ -346,7 +346,9 @@ class _ReviewServiceState extends State<ReviewService> {
                       uploadReview(
                               service_provider:
                                   widget.projectDetail["service_provider"],
-                              review: review)
+                              review: review,
+                              rating: rating
+                              )
                           .then((value) {
                         if (value["status"].toString() == "true") {
                           Navigator.of(context, rootNavigator: true).pop();

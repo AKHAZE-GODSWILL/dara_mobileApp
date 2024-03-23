@@ -2,6 +2,7 @@ import '../../main.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:get_time_ago/get_time_ago.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dara_app/utils/apiRequest.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,6 +16,7 @@ import 'package:dara_app/screens/homepage/drawerRoutes/shareApp.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/chatHistory.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/daraSupport.dart';
 import 'package:dara_app/screens/homepage/drawerRoutes/settings/settingsPage.dart';
+
 
 // import 'package:flutter_ph/**/osphor_icons/flutter_phosphor_icons.dart';
 
@@ -389,7 +391,10 @@ class _OffersState extends State<Offers> {
                       ),
                     ],
                   )
-                : Column(
+                :
+                
+                
+                 Column(
                     children: [
                       SizedBox(height: 19),
                       Padding(
@@ -469,6 +474,9 @@ class _OffersState extends State<Offers> {
                           })
                     ],
                   ),
+     
+     
+     
       ),
     );
   }
@@ -489,7 +497,7 @@ class _OffersState extends State<Offers> {
                       child: Stack(
                         children: [
                           CachedNetworkImage(
-                            imageUrl: offers![index]["sender_profile_image"],
+                            imageUrl: offers![index]["sender_profile_image"]??'',
                             imageBuilder: (context, imageProvider) => Container(
                               width: 50,
                               height: 50,
@@ -534,7 +542,7 @@ class _OffersState extends State<Offers> {
                           child: RichText(
                               text: TextSpan(children: [
                             TextSpan(
-                              text: offers![index]["sender"],
+                              text: offers![index]["sender"]??"",
                               style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -551,7 +559,7 @@ class _OffersState extends State<Offers> {
                         Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: Text(
-                            "6h",
+                             "${GetTimeAgo.parse(DateTime.parse(offers![index]["created_at"]))}",
                             style: TextStyle(fontSize: 12, color: Colors.black),
                           ),
                         ),
@@ -606,7 +614,7 @@ class _OffersState extends State<Offers> {
                     child: InkWell(
                       onTap: () {
                         circularCustom(context);
-                        acceptOffers(offer_id: offers![index]["offer_id"])
+                        acceptOffers(offer_id: offers![index]["offer_id"]??"")
                             .then((value) {
                           // mywidgets.displayToast(msg: "making the request");
 
@@ -625,7 +633,7 @@ class _OffersState extends State<Offers> {
                                     "Network Error. Check your Network Connection and try again");
                           } else {
                             Navigator.pop(context);
-                            mywidgets.displayToast(msg: value["message"]);
+                            mywidgets.displayToast(msg: value["message"]??"");
                           }
 
                           setState(() {
@@ -656,7 +664,7 @@ class _OffersState extends State<Offers> {
                     child: InkWell(
                       onTap: () {
                         circularCustom(context);
-                        rejectOffers(offer_id: offers![index]["offer_id"])
+                        rejectOffers(offer_id: offers![index]["offer_id"]??"")
                             .then((value) {
                           // mywidgets.displayToast(msg: "making the request");
 
@@ -674,7 +682,7 @@ class _OffersState extends State<Offers> {
                                     "Network Error. Check your Network Connection and try again");
                           } else {
                             Navigator.pop(context);
-                            mywidgets.displayToast(msg: value["message"]);
+                            mywidgets.displayToast(msg: value["message"]??"");
                           }
 
                           setState(() {
@@ -725,7 +733,7 @@ class _OffersState extends State<Offers> {
                       child: Stack(
                         children: [
                           CachedNetworkImage(
-                            imageUrl: offers![index]["sender_profile_image"],
+                            imageUrl: offers![index]["service_provider_profile_image"]??"",
                             imageBuilder: (context, imageProvider) => Container(
                               width: 50,
                               height: 50,
@@ -776,7 +784,7 @@ class _OffersState extends State<Offers> {
                                         fontSize: 12, color: Colors.black),
                                   ),
                                   TextSpan(
-                                    text: "Grace Williams ",
+                                    text: "${offers![index]["service_provider_name"]??""} ",
                                     style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
@@ -791,7 +799,7 @@ class _OffersState extends State<Offers> {
                               : RichText(
                                   text: TextSpan(children: [
                                   TextSpan(
-                                    text: "Daniel Smith ",
+                                    text: "${offers![index]["service_provider_name"]??""} ",
                                     style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
@@ -808,7 +816,7 @@ class _OffersState extends State<Offers> {
                         Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: Text(
-                            "6h",
+                            "${GetTimeAgo.parse(DateTime.parse(offers![index]["created_at"]))}",
                             style: TextStyle(fontSize: 12, color: Colors.black),
                           ),
                         ),
@@ -858,49 +866,35 @@ class _OffersState extends State<Offers> {
                       ),
                     ),
                   ),
-                  (index % 2 == 0)
-                      ? Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
-                          child: InkWell(
-                            onTap: () {},
-                            child: Container(
-                              width: 139,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: constants.appMainColor, width: 2),
-                                  borderRadius: BorderRadius.circular(200)),
-                              child: Center(
-                                child: Text(
-                                  "Confirm",
-                                  style: TextStyle(
-                                      color: constants.appMainColor,
-                                      fontSize: 14),
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
-                          child: InkWell(
-                            onTap: () {},
-                            child: Container(
-                              width: 139,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(200)),
-                              child: Center(
-                                child: Text(
-                                  "Cancel",
-                                  style: TextStyle(
-                                      color: Colors.red, fontSize: 14),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                  // (index % 2 == 0)
+                  //     ? Padding(
+                  //         padding: const EdgeInsets.only(left: 10.0),
+                  //         child: InkWell(
+                  //           onTap: () {
+
+                  //           },
+                  //           child: Container(
+                  //             width: 139,
+                  //             height: 32,
+                  //             decoration: BoxDecoration(
+                  //                 color: Colors.white,
+                  //                 border: Border.all(
+                  //                     color: constants.appMainColor, width: 2),
+                  //                 borderRadius: BorderRadius.circular(200)),
+                  //             child: Center(
+                  //               child: Text(
+                  //                 "Confirm",
+                  //                 style: TextStyle(
+                  //                     color: constants.appMainColor,
+                  //                     fontSize: 14),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       )
+                  //     : Container()
+              
+              
                 ],
               )
             ],

@@ -666,6 +666,7 @@ Future<dynamic> getOffers(context) async {
     // mywidgets.displayToast(msg: "after making the get request");
     final utf8Response = utf8.decode(response.bodyBytes);
     final jsonData = json.decode(utf8Response) as Map;
+    print(jsonData);
     return jsonData;
   } on SocketException catch (e) {
     return {"status": "Network Error"};
@@ -778,7 +779,7 @@ Future<dynamic> allClientsProjects() async {
   }
 }
 
-Future<dynamic> uploadReview({required service_provider, review}) async {
+Future<dynamic> uploadReview({required service_provider, required review,required rating}) async {
   try {
     String token = getX.read(constants.GETX_TOKEN);
     final Map<String, String> headers = {
@@ -787,8 +788,9 @@ Future<dynamic> uploadReview({required service_provider, review}) async {
     };
 
     final Map<String, dynamic> requestBody = {
-      "service_provider": "$service_provider",
-      "review": "$review"
+      "service_provider_id": "$service_provider",
+      "comment": "$review",
+      "rating": rating 
     }; // Replace with your request data
 
     http.Client client = http.Client();

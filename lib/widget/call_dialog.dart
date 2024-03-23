@@ -25,7 +25,7 @@ callDialog({context, target_id, target_name, target_img, phone}) {
                         topRight: Radius.circular(40)),
                     child: Container(
                       color: Colors.transparent,
-                      height: 30,
+                      height: 260,
                       child: Stack(
                         children: [
                           Align(
@@ -83,7 +83,7 @@ callDialog({context, target_id, target_name, target_img, phone}) {
                                       width: MediaQuery.of(context).size.width *
                                           0.8,
                                       child: Text(
-                                        'Carrier rates may apply. call via in app or direct call',
+                                        'Carrier rates may apply. call via direct call',
                                         style: TextStyle(
                                             fontSize: 16,
                                             color: Colors.black54),
